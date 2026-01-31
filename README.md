@@ -143,6 +143,71 @@ For inquiries about submissions or collaborations, contact the editorial team.
 
 ---
 
+## Backend Monitoring System
+
+This repository includes a comprehensive backend monitoring system with an AI agent for intelligent incident analysis.
+
+### Components
+
+#### 1. Health Check Endpoints (`src/routes/health.js`)
+- `/health` - Liveness check (is the service running?)
+- `/ready` - Readiness check (are all dependencies available?)
+- `/metrics` - Basic performance metrics
+
+#### 2. Monitoring Agent (`src/monitoring/agent.js`)
+A background process that continuously monitors your backend:
+- Configurable check intervals (default: 30s for health, 60s for ready)
+- Consecutive failure detection (alerts after 3 failures)
+- Latency monitoring with thresholds
+- Slack integration for notifications
+
+#### 3. AI Agent (`src/monitoring/ai-agent.js`)
+Intelligent incident analysis using LLMs:
+- Supports OpenAI (GPT-4) and Anthropic (Claude) APIs
+- Rule-based fallback when no API key configured
+- Pattern recognition for recurring issues
+- Actionable recommendations
+
+#### 4. GitHub Actions Workflow (`.github/workflows/monitoring.yml`)
+Automated monitoring running every 5 minutes:
+- Checks all health endpoints
+- Generates status reports
+- Sends Slack alerts on failures
+- Triggers AI analysis for incidents
+
+### Quick Start
+
+```bash
+# Start your backend with health endpoints
+npm start
+
+# In another terminal, start the monitoring agent
+node src/monitoring/agent.js
+
+# Optionally, start the AI agent for incident analysis
+OPENAI_API_KEY=sk-xxx node src/monitoring/ai-agent.js
+```
+
+### Configuration
+
+Set these environment variables:
+
+| Variable | Description | Default |
+|----------|-------------|--------|
+| `HEALTH_URL` | Health endpoint URL | `http://localhost:3000/health` |
+| `READY_URL` | Ready endpoint URL | `http://localhost:3000/ready` |
+| `SLACK_WEBHOOK_URL` | Slack webhook for alerts | - |
+| `AI_WEBHOOK_URL` | AI agent webhook | - |
+| `OPENAI_API_KEY` | OpenAI API key | - |
+| `ANTHROPIC_API_KEY` | Anthropic API key | - |
+
+### GitHub Actions Secrets
+
+Add these secrets in your repository settings:
+- `BACKEND_URL` - Your production backend URL
+- `SLACK_WEBHOOK_URL` - Slack incoming webhook URL
+- `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` - For AI analysis
+
 *"Where poetry passes through like light through glass"*
 
 © 2026 The Gallery

@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Gallery - Winter 2026</title>
+    <style>
+        :root {
+            --color-cream: #f5f1e8;
+            --color-dark: #2a2a2a;
+            --color-accent: #8b7355;
+            --color-light-accent: #c9b8a3;
+            --font-serif: 'Georgia', 'Times New Roman', serif;
+            --font-sans: 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-serif);
+            background-color: var(--color-cream);
+            color: var(--color-dark);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        .hero {
+            min-height: 70vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 4rem 2rem;
+            background: linear-gradient(to bottom, #e8e4da 0%, var(--color-cream) 100%);
+            position: relative;
+        }
+
+        .issue-label {
+            font-family: var(--font-sans);
+            font-size: 0.75rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--color-accent);
+            margin-bottom: 2rem;
+            font-weight: 400;
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 8vw, 5.5rem);
+            font-weight: 400;
+            letter-spacing: -0.02em;
+            margin-bottom: 1.5rem;
+            color: var(--color-dark);
+        }
+
+        .hero h1 em {
+            font-style: italic;
+        }
+
+        .tagline {
+            font-size: 1rem;
+            font-style: italic;
+            color: var(--color-accent);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .section-header {
+            font-family: var(--font-sans);
+            font-size: 0.7rem;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--color-accent);
+            margin: 5rem 0 3rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--color-light-accent);
+        }
+
+        .poem-grid {
+            display: grid;
+            gap: 2rem;
+            margin-bottom: 5rem;
+        }
+
+        .poem-card {
+            padding: 2.5rem 0;
+            border-bottom: 1px solid rgba(139, 115, 85, 0.15);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .poem-card:hover {
+            padding-left: 1rem;
+        }
+
+        .poem-title {
+            font-size: 1.5rem;
+            font-weight: 400;
+            margin-bottom: 0.5rem;
+            color: var(--color-dark);
+        }
+
+        .poem-author {
+            font-family: var(--font-sans);
+            font-size: 0.85rem;
+            color: var(--color-accent);
+            margin-bottom: 0.75rem;
+        }
+
+        .poem-preview {
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: #5a5a5a;
+            font-style: italic;
+        }
+
+        .read-more {
+            font-family: var(--font-sans);
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--color-accent);
+            margin-top: 1rem;
+            display: inline-block;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            overflow-y: auto;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 4rem 2rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background-color: var(--color-cream);
+            padding: 4rem;
+            max-width: 700px;
+            width: 100%;
+            position: relative;
+            animation: slideUp 0.4s ease;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            font-size: 2rem;
+            font-weight: 300;
+            color: var(--color-accent);
+            cursor: pointer;
+            background: none;
+            border: none;
+            line-height: 1;
+            transition: color 0.2s ease;
+        }
+
+        .close-btn:hover {
+            color: var(--color-dark);
+        }
+
+        .modal-poem-title {
+            font-size: 2rem;
+            font-weight: 400;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-poem-author {
+            font-family: var(--font-sans);
+            font-size: 0.9rem;
+            color: var(--color-accent);
+            margin-bottom: 3rem;
+        }
+
+        .modal-poem-text {
+            font-size: 1.05rem;
+            line-height: 2;
+            white-space: pre-line;
+        }
+
+        footer {
+            text-align: center;
+            padding: 4rem 2rem;
+            font-family: var(--font-sans);
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--color-accent);
+        }
+
+        /* Top Navigation Bar */
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 1rem 3rem;
+            background-color: rgba(245, 241, 232, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(139, 115, 85, 0.1);
+        }
+
+        .login-buttons {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .login-btn {
+            font-family: var(--font-sans);
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--color-accent);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .login-btn:hover {
+            color: var(--color-dark);
+        }
+
+        .login-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 1px;
+            background-color: var(--color-dark);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .login-btn:hover::after {
+            width: 80%;
+        }
+
+        .login-divider {
+            color: var(--color-light-accent);
+            font-weight: 300;
+        }
+
+        /* Login Modal */
+        .login-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 3000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-modal-overlay.active {
+            display: flex;
+        }
+
+        .login-modal {
+            background: var(--color-cream);
+            padding: 3rem;
+            max-width: 450px;
+            width: 90%;
+            position: relative;
+            animation: slideUp 0.4s ease;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 2rem;
+            font-weight: 300;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--color-accent);
+            transition: color 0.3s ease;
+            line-height: 1;
+        }
+
+        .login-modal-close:hover {
+            color: var(--color-dark);
+        }
+
+        .login-modal h2 {
+            font-size: 2rem;
+            font-weight: 400;
+            margin-bottom: 0.5rem;
+            text-align: center;
+            color: var(--color-dark);
+        }
+
+        .login-modal p {
+            color: var(--color-accent);
+            text-align: center;
+            font-style: italic;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-family: var(--font-sans);
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--color-accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            font-family: var(--font-serif);
+            font-size: 1rem;
+            border: 1px solid var(--color-light-accent);
+            background: #fff;
+            transition: border-color 0.3s ease;
+            color: var(--color-dark);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--color-accent);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            font-family: var(--font-sans);
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            background: var(--color-dark);
+            color: var(--color-cream);
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background: #3a3a3a;
+        }
+
+        @media (max-width: 768px) {
+            .top-nav {
+                padding: 1rem 1.5rem;
+            }
+
+            .login-btn {
+                font-size: 0.65rem;
+                padding: 0.5rem 0.5rem;
+            }
+
+            .hero {
+                min-height: 60vh;
+                padding: 6rem 1.5rem 3rem;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .modal-content {
+                padding: 2.5rem 1.5rem;
+            }
+
+            .modal-poem-title {
+                font-size: 1.5rem;
+            }
+
+            .section-header {
+                margin: 3rem 0 2rem;
+            }
+
+            .login-modal {
+                padding: 2rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+        <div class="login-buttons">
+            <button class="login-btn" onclick="openLoginModal('editor')">Editor Log In</button>
+            <span class="login-divider">|</span>
+            <button class="login-btn" onclick="openLoginModal('writer')">Writer Log In</button>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <div class="issue-label">Winter 2026</div>
+        <h1>The <em>Gallery</em></h1>
+        <p class="tagline">Where poetry passes through like light through glass</p>
+    </div>
+
+    <div class="container">
+        <div class="section-header">Featured</div>
+        
+        <div class="poem-grid" id="poemGrid">
+            <div class="poem-card" data-poem-id="1">
+                <div class="poem-title">Liminal Spaces</div>
+                <div class="poem-author">by Sarah Chen</div>
+                <div class="poem-preview">Between the wanting and the wound,<br>I found a door that opened inward...</div>
+                <div class="read-more">Read Full Poem →</div>
+            </div>
+
+            <div class="poem-card" data-poem-id="2">
+                <div class="poem-title">The Light Collector</div>
+                <div class="poem-author">by Marcus Webb</div>
+                <div class="poem-preview">She kept jars of morning light,<br>arranged them on the windowsill...</div>
+                <div class="read-more">Read Full Poem →</div>
+            </div>
+
+            <div class="poem-card" data-poem-id="3">
+                <div class="poem-title">Inheritance</div>
+                <div class="poem-author">by Priya Sharma</div>
+                <div class="poem-preview">My grandmother's hands speak<br>a language I'm still learning...</div>
+                <div class="read-more">Read Full Poem →</div>
+            </div>
+
+            <div class="poem-card" data-poem-id="4">
+                <div class="poem-title">Urban Pastoral</div>
+                <div class="poem-author">by James Liu</div>
+                <div class="poem-preview">The subway busker's violin<br>carves a chapel from concrete...</div>
+                <div class="read-more">Read Full Poem →</div>
+            </div>
+
+            <div class="poem-card" data-poem-id="5">
+                <div class="poem-title">What the Ocean Said</div>
+                <div class="poem-author">by Elena Vasquez</div>
+                <div class="poem-preview">Come back when you're ready<br>to remember what you've forgotten...</div>
+                <div class="read-more">Read Full Poem →</div>
+            </div>
+
+            <div class="poem-card" data-poem-id="6">
+                <div class="poem-title">Anatomy of Silence</div>
+                <div class="poem-author">by David Okonkwo</div>
+                <div class="poem-preview">There are silences that sing<br>and silences that suffocate...</div>
+                <div class="read-more">Read Full Poem →</div>
+            </div>
+
+            <div class="poem-card" data-poem-id="7">
+                <div class="poem-title">The Cartographer's Daughter</div>
+                <div class="poem-author">by Lily Morrison</div>
+                <div class="poem-preview">She drew maps of places<br>that existed only in translation...</div>
+                <div class="read-more">Read Full Poem →</div>
+            </div>
+
+            <div class="poem-card" data-poem-id="8">
+                <div class="poem-title">Midnight Economy</div>
+                <div class="poem-author">by Rafael Torres</div>
+                <div class="poem-preview">The diner at 3am trades in confessions,<br>currency of the sleepless...</div>
+                <div class="read-more">Read Full Poem →</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="poemModal">
+        <div class="modal-content">
+            <button class="close-btn" id="closeModal">&times;</button>
+            <div class="modal-poem-title" id="modalTitle"></div>
+            <div class="modal-poem-author" id="modalAuthor"></div>
+            <div class="modal-poem-text" id="modalText"></div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="login-modal-overlay" id="loginModal">
+        <div class="login-modal">
+            <button class="login-modal-close" onclick="closeLoginModal()">&times;</button>
+            <h2 id="loginTitle">Log In</h2>
+            <p id="loginSubtitle">Access your account</p>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="submit-btn">Enter</button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        The Gallery &copy; 2026 &nbsp;&middot;&nbsp; A Space for Poetry
+    </footer>
+
+    <script>
+        const poems = {
+            1: {
+                title: "Liminal Spaces",
+                author: "Sarah Chen",
+                text: `Between the wanting and the wound,
+I found a door that opened inward—
+not to darkness, but to a room
+where time pools like water
+at the bottom of a well.
+
+Here, the air tastes of almonds
+and forgotten names. Here,
+every surface reflects something
+other than what stands before it.
+
+I am learning to live
+in the threshold, to make a home
+of the in-between, where nothing
+is certain except the quality
+of light on the edge of decision.
+
+My mother called this indecision.
+My lover called it fear.
+But I know it as the place
+where all things are still possible,
+where the future hasn't chosen me yet.`
+            },
+            2: {
+                title: "The Light Collector",
+                author: "Marcus Webb",
+                text: `She kept jars of morning light,
+arranged them on the windowsill
+like a lexicon of brightness—
+March light thick as honey,
+August light sharp as gin.
+
+The neighbors thought her strange,
+this woman who woke before dawn
+to trap gold in glass,
+who labeled each vessel
+with dates and weather patterns.
+
+But she knew what they didn't:
+that winter would come,
+that darkness is a hunger,
+that memory needs something
+to illuminate its corridors.
+
+On the year's shortest day,
+she unscrewed every lid,
+let six months of mornings
+fill her small apartment
+until even the shadows glowed.`
+            },
+            3: {
+                title: "Inheritance",
+                author: "Priya Sharma",
+                text: `My grandmother's hands speak
+a language I'm still learning—
+the grammar of ghee and turmeric,
+syntax of gold thread through silk.
+
+She teaches me to make rotis
+perfect as full moons, tells me
+the secret is in the pressure,
+knowing when to push and when to yield.
+
+But there are other lessons
+in the way she folds her grief
+into the dough, works it smooth
+until it stops resisting.
+
+I inherit her recipes,
+her gold bangles, the way
+she says my name with all
+its English angles softened.
+
+What I can't inherit: her fluency
+in leaving, her doctorate in survival,
+the way she carried an entire country
+in the folds of her sari.
+
+Still, I'm learning. Still,
+my hands remember what
+my tongue has forgotten,
+kneading history into sustenance.`
+            },
+            4: {
+                title: "Urban Pastoral",
+                author: "James Liu",
+                text: `The subway busker's violin
+carves a chapel from concrete,
+makes the morning commute
+a pilgrimage of sound.
+
+We are all converts here,
+clutching our coffee like prayer beads,
+seeking grace in the gap
+between stations, between breaths.
+
+Above us, the city grows
+its peculiar garden—
+fire escapes bloom with laundry,
+pigeons negotiate for bread.
+
+Someone's Bach, someone's baby
+crying, someone's argument
+in a language I almost understand—
+all of it sacred, all of it psalm.
+
+This is my church: the 6 train
+at rush hour, the democratic
+crush of bodies, each of us
+alone together, going home.`
+            },
+            5: {
+                title: "What the Ocean Said",
+                author: "Elena Vasquez",
+                text: `Come back when you're ready
+to remember what you've forgotten—
+that you are mostly water,
+that salt is your first language.
+
+Come back when the city
+has made you too solid,
+when you need reminding
+that boundaries are illusion.
+
+I will take your sharp edges,
+tumble them smooth,
+give you back to yourself
+grain by grain, wave by wave.
+
+You think you are separate,
+but I know you—
+every tear you've cried
+has found its way back to me.
+
+Come back. The tide
+is always turning.
+Every ending
+is just water, returning.`
+            },
+            6: {
+                title: "Anatomy of Silence",
+                author: "David Okonkwo",
+                text: `There are silences that sing
+and silences that suffocate—
+I learned to tell the difference
+in my father's house.
+
+The silence before speech:
+a held breath, a loading gun,
+potential humming like power lines
+before the storm.
+
+The silence after: a aftermath,
+debris settling, trying to determine
+if it's safe yet to uncover
+your head, to stand upright.
+
+And then there are the silences
+that love speaks—
+my mother's hand on my father's shoulder,
+a whole conversation in the pressure.
+
+Now I practice a silence
+that is neither weapon nor wound,
+but a clearing in the forest,
+a space for something new to grow.
+
+I am learning that silence
+can be a gift you give yourself,
+a room where you finally
+hear your own name.`
+            },
+            7: {
+                title: "The Cartographer's Daughter",
+                author: "Lily Morrison",
+                text: `She drew maps of places
+that existed only in translation—
+the country between two languages,
+the border zone of almost-understanding.
+
+Her father mapped the measurable world:
+coastlines, mountains, rivers.
+She mapped the territories
+no compass could find.
+
+Here is the island of First Kiss.
+Here is the desert of Father's Silence.
+Here is the ocean of Mother's Humming,
+vast and uncharted.
+
+She knew that all maps lie,
+that the territory always exceeds
+its representation, that grief
+is a country with no fixed borders.
+
+Still, she drew. Still, she tried
+to make sense of the senseless,
+to chart a course through the unmappable
+country of being alive.
+
+Her inheritance: understanding
+that to be lost is sometimes
+the only way to find
+where you actually are.`
+            },
+            8: {
+                title: "Midnight Economy",
+                author: "Rafael Torres",
+                text: `The diner at 3am trades in confessions,
+currency of the sleepless,
+where the coffee's always fresh
+and the waitress knows everyone's story.
+
+Here, the nurse from the night shift
+sits across from the insomniac poet,
+neither one asking the other
+why they're still awake.
+
+The divorced man studies his pie
+like it holds answers.
+The student, wired on deadline panic,
+types prayers to the gods of GPA.
+
+We are the after-hours people,
+the ones who don't fit
+into daylight's neat categories,
+who do our living in the margins.
+
+The fluorescent lights hum
+their tuneless song. The waitress
+refills our cups without asking,
+knows we're here for the warmth
+
+as much as the coffee,
+this church of the sleepless,
+where the only sacrament
+is staying human, staying.`
+            }
+        };
+
+        const poemCards = document.querySelectorAll('.poem-card');
+        const modal = document.getElementById('poemModal');
+        const closeBtn = document.getElementById('closeModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalAuthor = document.getElementById('modalAuthor');
+        const modalText = document.getElementById('modalText');
+
+        poemCards.forEach(card => {
+            card.addEventListener('click', () => {
+                const poemId = card.getAttribute('data-poem-id');
+                const poem = poems[poemId];
+                
+                modalTitle.textContent = poem.title;
+                modalAuthor.textContent = `by ${poem.author}`;
+                modalText.textContent = poem.text;
+                
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+        });
+
+        closeBtn.addEventListener('click', () => {
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (modal.classList.contains('active')) {
+                    modal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+                closeLoginModal();
+            }
+        });
+
+        // Open login modal
+        function openLoginModal(type) {
+            const loginModal = document.getElementById('loginModal');
+            const title = document.getElementById('loginTitle');
+            const subtitle = document.getElementById('loginSubtitle');
+
+            if (type === 'editor') {
+                title.textContent = 'Editor Log In';
+                subtitle.textContent = 'Access the editorial dashboard';
+            } else {
+                title.textContent = 'Writer Log In';
+                subtitle.textContent = 'Submit and manage your work';
+            }
+
+            loginModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close login modal
+        function closeLoginModal() {
+            const loginModal = document.getElementById('loginModal');
+            loginModal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Handle login form submission
+        function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            // Placeholder - in production, this would authenticate with a backend
+            console.log('Login attempt:', { email });
+            alert('Login functionality would connect to your backend here.\n\nIn production, this would:\n• Authenticate credentials\n• Create a session\n• Redirect to dashboard');
+            closeLoginModal();
+            
+            // Reset form
+            event.target.reset();
+        }
+
+        // Close login modal when clicking outside
+        document.getElementById('loginModal').addEventListener('click', (e) => {
+            if (e.target.id === 'loginModal') {
+                closeLoginModal();
+            }
+        });
+    </script>
+</body>
+</html>

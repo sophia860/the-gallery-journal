@@ -1,0 +1,178 @@
+name: Backend Health Monitoring
+
+on:
+  # Run every 5 minutes
+  schedule:
+    - cron: '*/5 * * * *'
+  
+  # Also run on push to main for testing
+  push:
+    branches: [main]
+  
+  # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      endpoint_url:
+        description: 'Custom endpoint URL to check'
+        required: false
+        default: ''
+
+env:
+  # Set your production URL here
+  BACKEND_URL: ${{ secrets.BACKEND_URL || 'https://the-gallery-journal.example.com' }}
+  SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+    name: Check Backend Health
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Check /health endpoint
+        id: health
+        run: |
+          URL="${{ github.event.inputs.endpoint_url || env.BACKEND_URL }}/health"
+          echo "Checking health endpoint: $URL"
+          
+          RESPONSE=$(curl -s -w "\n%{http_code}" --max-time 30 "$URL" || echo "FAILED\n000")
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+          
+          echo "HTTP Status: $HTTP_CODE"
+          echo "Response: $BODY"
+          
+          echo "status_code=$HTTP_CODE" >> $GITHUB_OUTPUT
+          echo "response=$BODY" >> $GITHUB_OUTPUT
+          
+          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
+            echo "health_status=healthy" >> $GITHUB_OUTPUT
+          else
+            echo "health_status=unhealthy" >> $GITHUB_OUTPUT
+          fi
+        continue-on-error: true
+      
+      - name: Check /ready endpoint
+        id: ready
+        run: |
+          URL="${{ github.event.inputs.endpoint_url || env.BACKEND_URL }}/ready"
+          echo "Checking readiness endpoint: $URL"
+          
+          RESPONSE=$(curl -s -w "\n%{http_code}" --max-time 30 "$URL" || echo "FAILED\n000")
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+          
+          echo "HTTP Status: $HTTP_CODE"
+          echo "Response: $BODY"
+          
+          echo "status_code=$HTTP_CODE" >> $GITHUB_OUTPUT
+          
+          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
+            echo "ready_status=ready" >> $GITHUB_OUTPUT
+          else
+            echo "ready_status=not_ready" >> $GITHUB_OUTPUT
+          fi
+        continue-on-error: true
+      
+      - name: Check /metrics endpoint
+        id: metrics
+        run: |
+          URL="${{ github.event.inputs.endpoint_url || env.BACKEND_URL }}/metrics"
+          echo "Checking metrics endpoint: $URL"
+          
+          RESPONSE=$(curl -s -w "\n%{http_code}" --max-time 30 "$URL" || echo "FAILED\n000")
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+          
+          echo "HTTP Status: $HTTP_CODE"
+          echo "Metrics: $BODY"
+          
+          echo "status_code=$HTTP_CODE" >> $GITHUB_OUTPUT
+        continue-on-error: true
+      
+      - name: Generate Status Report
+        id: report
+        run: |
+          echo "## Backend Health Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Timestamp:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "**Backend URL:** ${{ env.BACKEND_URL }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Endpoint | Status | HTTP Code |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|--------|-----------|" >> $GITHUB_STEP_SUMMARY
+          echo "| /health | ${{ steps.health.outputs.health_status }} | ${{ steps.health.outputs.status_code }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| /ready | ${{ steps.ready.outputs.ready_status }} | ${{ steps.ready.outputs.status_code }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| /metrics | - | ${{ steps.metrics.outputs.status_code }} |" >> $GITHUB_STEP_SUMMARY
+          
+          # Determine overall status
+          if [ "${{ steps.health.outputs.health_status }}" = "unhealthy" ] || [ "${{ steps.ready.outputs.ready_status }}" = "not_ready" ]; then
+            echo "overall_status=critical" >> $GITHUB_OUTPUT
+          else
+            echo "overall_status=healthy" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Send Slack Alert (on failure)
+        if: steps.report.outputs.overall_status == 'critical' && env.SLACK_WEBHOOK != ''
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+            --data '{
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {"type": "plain_text", "text": ":rotating_light: Backend Health Alert"}
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Backend is experiencing issues*\n\n- Health: ${{ steps.health.outputs.health_status }} (${{ steps.health.outputs.status_code }})\n- Ready: ${{ steps.ready.outputs.ready_status }} (${{ steps.ready.outputs.status_code }})"
+                  }
+                },
+                {
+                  "type": "context",
+                  "elements": [
+                    {"type": "mrkdwn", "text": "Triggered by: GitHub Actions | <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run>"}
+                  ]
+                }
+              ]
+            }' "${{ env.SLACK_WEBHOOK }}"
+      
+      - name: Fail if unhealthy
+        if: steps.report.outputs.overall_status == 'critical'
+        run: |
+          echo "::error::Backend health check failed!"
+          exit 1
+
+  # Optional: Run the AI agent analysis on failures
+  ai-analysis:
+    needs: health-check
+    runs-on: ubuntu-latest
+    if: failure()
+    name: AI Incident Analysis
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Run AI Analysis
+        if: env.OPENAI_API_KEY != '' || env.ANTHROPIC_API_KEY != ''
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          echo "Running AI analysis on incident..."
+          # In production, this would call the AI agent
+          # node src/monitoring/ai-agent.js --analyze
+          echo "AI analysis would be triggered here with available API keys"

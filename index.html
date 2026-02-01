@@ -22,22 +22,31 @@
 
         body {
             font-family: var(--font-serif);
-            background-color: var(--color-cream);
+            background: radial-gradient(circle at 20% 20%, #f9f5ee, #f2e9dc 35%, #ede3d2 70%);
             color: var(--color-dark);
             line-height: 1.7;
             overflow-x: hidden;
+            scroll-behavior: smooth;
         }
 
         .hero {
             min-height: 70vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             align-items: center;
-            text-align: center;
-            padding: 4rem 2rem;
-            background: linear-gradient(to bottom, #e8e4da 0%, var(--color-cream) 100%);
+            gap: 2.5rem;
+            text-align: left;
+            padding: 7rem 2rem 4rem;
+            background: linear-gradient(135deg, #f6f1e9 0%, #f0e4d3 100%);
             position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 2rem 1.5rem 1.5rem 1.5rem;
+            border: 1px solid rgba(139, 115, 85, 0.15);
+            pointer-events: none;
         }
 
         .issue-label {
@@ -46,7 +55,7 @@
             letter-spacing: 0.3em;
             text-transform: uppercase;
             color: var(--color-accent);
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
             font-weight: 400;
         }
 
@@ -54,7 +63,7 @@
             font-size: clamp(3rem, 8vw, 5.5rem);
             font-weight: 400;
             letter-spacing: -0.02em;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
             color: var(--color-dark);
         }
 
@@ -67,16 +76,106 @@
             font-style: italic;
             color: var(--color-accent);
             max-width: 600px;
-            margin: 0 auto;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-copy {
+            position: relative;
+            padding-left: 0.5rem;
+        }
+
+        .cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+            padding: 0.85rem 1.3rem;
+            font-family: var(--font-sans);
+            font-size: 0.8rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            background: var(--color-dark);
+            color: var(--color-cream);
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .magazine-cta {
+            position: relative;
+            background: linear-gradient(160deg, #fdfaf6 0%, #efe1cf 100%);
+            padding: 2rem;
+            border: 1px solid rgba(139, 115, 85, 0.18);
+            box-shadow: 0 18px 40px rgba(0,0,0,0.12);
+            max-width: 360px;
+            justify-self: center;
+        }
+
+        .magazine-cta::before {
+            content: '';
+            position: absolute;
+            inset: 1rem;
+            border: 1px solid rgba(139, 115, 85, 0.08);
+            pointer-events: none;
+        }
+
+        .magazine-spine {
+            font-family: var(--font-sans);
+            font-size: 0.65rem;
+            letter-spacing: 0.28em;
+            text-transform: uppercase;
+            color: var(--color-accent);
+            margin-bottom: 1rem;
+        }
+
+        .magazine-cover {
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        .magazine-cover .cover-title {
+            font-size: 2rem;
+            letter-spacing: -0.01em;
+        }
+
+        .magazine-cover .cover-subtitle {
+            font-family: var(--font-sans);
+            font-size: 0.85rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--color-accent);
+        }
+
+        .magazine-cover .cover-meta {
+            font-size: 0.95rem;
+            color: #5a5a5a;
+            font-style: italic;
+        }
+
+        .magazine-foot {
+            margin-top: 1.2rem;
+            font-family: var(--font-sans);
+            font-size: 0.75rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--color-accent);
         }
 
         .container {
-            max-width: 900px;
+            max-width: 1100px;
             margin: 0 auto;
             padding: 0 2rem;
         }
 
         .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
             font-family: var(--font-sans);
             font-size: 0.7rem;
             letter-spacing: 0.25em;
@@ -85,6 +184,13 @@
             margin: 5rem 0 3rem;
             padding-bottom: 1rem;
             border-bottom: 1px solid var(--color-light-accent);
+        }
+
+        .section-header::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(139, 115, 85, 0.25), transparent);
         }
 
         .poem-grid {
@@ -98,10 +204,25 @@
             border-bottom: 1px solid rgba(139, 115, 85, 0.15);
             cursor: pointer;
             transition: all 0.3s ease;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: start;
+            gap: 1rem;
         }
 
         .poem-card:hover {
             padding-left: 1rem;
+        }
+
+        .poem-meta {
+            justify-self: end;
+            text-align: right;
+            font-family: var(--font-sans);
+            font-size: 0.7rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--color-accent);
+            opacity: 0.8;
         }
 
         .poem-title {
@@ -163,7 +284,7 @@
         .modal-content {
             background-color: var(--color-cream);
             padding: 4rem;
-            max-width: 700px;
+            max-width: 760px;
             width: 100%;
             position: relative;
             animation: slideUp 0.4s ease;
@@ -203,7 +324,7 @@
             font-family: var(--font-sans);
             font-size: 0.9rem;
             color: var(--color-accent);
-            margin-bottom: 3rem;
+            margin-bottom: 1.5rem;
         }
 
         .modal-poem-text {
@@ -394,6 +515,21 @@
             background: #3a3a3a;
         }
 
+        @media (max-width: 900px) {
+            .hero {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-copy {
+                text-align: center;
+            }
+
+            .magazine-cta {
+                margin: 0 auto;
+            }
+        }
+
         @media (max-width: 768px) {
             .top-nav {
                 padding: 1rem 1.5rem;
@@ -442,9 +578,21 @@
     </nav>
 
     <div class="hero">
-        <div class="issue-label">Winter 2026</div>
-        <h1>The <em>Gallery</em></h1>
-        <p class="tagline">Where poetry passes through like light through glass</p>
+        <div class="hero-copy">
+            <div class="issue-label">Winter 2026</div>
+            <h1>The <em>Gallery</em></h1>
+            <p class="tagline">Where poetry passes through like light through glass</p>
+            <button class="cta-btn" onclick="openMagazine()">Read the live issue →</button>
+        </div>
+        <div class="magazine-cta">
+            <div class="magazine-spine">Live Gallery</div>
+            <div class="magazine-cover">
+                <div class="cover-title">The Gallery</div>
+                <div class="cover-subtitle">Winter 2026 — Issue 01</div>
+                <div class="cover-meta">An ongoing, living magazine inspired by the shoreline.</div>
+            </div>
+            <div class="magazine-foot">Swipe / arrow keys to turn pages</div>
+        </div>
     </div>
 
     <div class="container">
@@ -452,59 +600,83 @@
         
         <div class="poem-grid" id="poemGrid">
             <div class="poem-card" data-poem-id="1">
-                <div class="poem-title">Liminal Spaces</div>
-                <div class="poem-author">by Sarah Chen</div>
-                <div class="poem-preview">Between the wanting and the wound,<br>I found a door that opened inward...</div>
-                <div class="read-more">Read Full Poem →</div>
+                <div class="poem-main">
+                    <div class="poem-title">Liminal Spaces</div>
+                    <div class="poem-author">by Sarah Chen</div>
+                    <div class="poem-preview">Between the wanting and the wound,<br>I found a door that opened inward...</div>
+                    <div class="read-more">Read Full Poem →</div>
+                </div>
+                <div class="poem-meta">Page 01</div>
             </div>
 
             <div class="poem-card" data-poem-id="2">
-                <div class="poem-title">The Light Collector</div>
-                <div class="poem-author">by Marcus Webb</div>
-                <div class="poem-preview">She kept jars of morning light,<br>arranged them on the windowsill...</div>
-                <div class="read-more">Read Full Poem →</div>
+                <div class="poem-main">
+                    <div class="poem-title">The Light Collector</div>
+                    <div class="poem-author">by Marcus Webb</div>
+                    <div class="poem-preview">She kept jars of morning light,<br>arranged them on the windowsill...</div>
+                    <div class="read-more">Read Full Poem →</div>
+                </div>
+                <div class="poem-meta">Page 02</div>
             </div>
 
             <div class="poem-card" data-poem-id="3">
-                <div class="poem-title">Inheritance</div>
-                <div class="poem-author">by Priya Sharma</div>
-                <div class="poem-preview">My grandmother's hands speak<br>a language I'm still learning...</div>
-                <div class="read-more">Read Full Poem →</div>
+                <div class="poem-main">
+                    <div class="poem-title">Inheritance</div>
+                    <div class="poem-author">by Priya Sharma</div>
+                    <div class="poem-preview">My grandmother's hands speak<br>a language I'm still learning...</div>
+                    <div class="read-more">Read Full Poem →</div>
+                </div>
+                <div class="poem-meta">Page 03</div>
             </div>
 
             <div class="poem-card" data-poem-id="4">
-                <div class="poem-title">Urban Pastoral</div>
-                <div class="poem-author">by James Liu</div>
-                <div class="poem-preview">The subway busker's violin<br>carves a chapel from concrete...</div>
-                <div class="read-more">Read Full Poem →</div>
+                <div class="poem-main">
+                    <div class="poem-title">Urban Pastoral</div>
+                    <div class="poem-author">by James Liu</div>
+                    <div class="poem-preview">The subway busker's violin<br>carves a chapel from concrete...</div>
+                    <div class="read-more">Read Full Poem →</div>
+                </div>
+                <div class="poem-meta">Page 04</div>
             </div>
 
             <div class="poem-card" data-poem-id="5">
-                <div class="poem-title">What the Ocean Said</div>
-                <div class="poem-author">by Elena Vasquez</div>
-                <div class="poem-preview">Come back when you're ready<br>to remember what you've forgotten...</div>
-                <div class="read-more">Read Full Poem →</div>
+                <div class="poem-main">
+                    <div class="poem-title">What the Ocean Said</div>
+                    <div class="poem-author">by Elena Vasquez</div>
+                    <div class="poem-preview">Come back when you're ready<br>to remember what you've forgotten...</div>
+                    <div class="read-more">Read Full Poem →</div>
+                </div>
+                <div class="poem-meta">Page 05</div>
             </div>
 
             <div class="poem-card" data-poem-id="6">
-                <div class="poem-title">Anatomy of Silence</div>
-                <div class="poem-author">by David Okonkwo</div>
-                <div class="poem-preview">There are silences that sing<br>and silences that suffocate...</div>
-                <div class="read-more">Read Full Poem →</div>
+                <div class="poem-main">
+                    <div class="poem-title">Anatomy of Silence</div>
+                    <div class="poem-author">by David Okonkwo</div>
+                    <div class="poem-preview">There are silences that sing<br>and silences that suffocate...</div>
+                    <div class="read-more">Read Full Poem →</div>
+                </div>
+                <div class="poem-meta">Page 06</div>
             </div>
 
             <div class="poem-card" data-poem-id="7">
-                <div class="poem-title">The Cartographer's Daughter</div>
-                <div class="poem-author">by Lily Morrison</div>
-                <div class="poem-preview">She drew maps of places<br>that existed only in translation...</div>
-                <div class="read-more">Read Full Poem →</div>
+                <div class="poem-main">
+                    <div class="poem-title">The Cartographer's Daughter</div>
+                    <div class="poem-author">by Lily Morrison</div>
+                    <div class="poem-preview">She drew maps of places<br>that existed only in translation...</div>
+                    <div class="read-more">Read Full Poem →</div>
+                </div>
+                <div class="poem-meta">Page 07</div>
             </div>
 
             <div class="poem-card" data-poem-id="8">
-                <div class="poem-title">Midnight Economy</div>
-                <div class="poem-author">by Rafael Torres</div>
-                <div class="poem-preview">The diner at 3am trades in confessions,<br>currency of the sleepless...</div>
-                <div class="read-more">Read Full Poem →</div>
+                <div class="poem-main">
+                    <div class="poem-title">Midnight Economy</div>
+                    <div class="poem-author">by Rafael Torres</div>
+                    <div class="poem-preview">The diner at 3am trades in confessions,<br>currency of the sleepless...</div>
+                    <div class="read-more">Read Full Poem →</div>
+                </div>
+                <div class="poem-meta">Page 08</div>
             </div>
         </div>
     </div>
@@ -820,11 +992,14 @@ is staying human, staying.`
         const modalTitle = document.getElementById('modalTitle');
         const modalAuthor = document.getElementById('modalAuthor');
         const modalText = document.getElementById('modalText');
+        const poemGrid = document.getElementById('poemGrid');
 
-        poemCards.forEach(card => {
+        poemCards.forEach((card, idx) => {
             card.addEventListener('click', () => {
                 const poemId = card.getAttribute('data-poem-id');
                 const poem = poems[poemId];
+                activeIndex = idx;
+                highlightCard(activeIndex);
                 
                 modalTitle.textContent = poem.title;
                 modalAuthor.textContent = `by ${poem.author}`;
@@ -834,6 +1009,20 @@ is staying human, staying.`
                 document.body.style.overflow = 'hidden';
             });
         });
+
+        // Allow keyboard navigation like a magazine (arrow keys to move selection)
+        let activeIndex = 0;
+        function highlightCard(index) {
+            poemCards.forEach((card, i) => {
+                card.style.opacity = i === index ? '1' : '0.6';
+                card.style.transform = i === index ? 'translateX(6px)' : 'translateX(0)';
+            });
+            poemCards[index].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function openActiveCard() {
+            poemCards[activeIndex].click();
+        }
 
         closeBtn.addEventListener('click', () => {
             modal.classList.remove('active');
@@ -854,6 +1043,14 @@ is staying human, staying.`
                     document.body.style.overflow = 'auto';
                 }
                 closeLoginModal();
+            } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+                activeIndex = (activeIndex + 1) % poemCards.length;
+                highlightCard(activeIndex);
+            } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                activeIndex = (activeIndex - 1 + poemCards.length) % poemCards.length;
+                highlightCard(activeIndex);
+            } else if (e.key === 'Enter') {
+                openActiveCard();
             }
         });
 
@@ -947,6 +1144,17 @@ is staying human, staying.`
                 closeLoginModal();
             }
         });
+
+        // Quick access CTA
+        function openMagazine() {
+            if (poemGrid) {
+                poemGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                highlightCard(activeIndex);
+            }
+        }
+
+        // Initialize highlight on load
+        highlightCard(activeIndex);
     </script>
 </body>
 </html>

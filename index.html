@@ -1877,6 +1877,22 @@ is staying human, staying.`
             }
         }
 
+        // Publish submission into gallery as a new poem card (simple append)
+        function publishToGallery(id) {
+            const list = loadSubmissions();
+            const sub = list.find(s => s.id === id);
+            if (!sub) return;
+            const newId = `pub-${id}`;
+            poems[newId] = {
+                title: sub.title,
+                author: sub.displayName || sub.author,
+                collection: 'memory',
+                text: sub.body
+            };
+            renderCollection('memory');
+            logActivity(`Published "${sub.title}" to gallery`);
+        }
+
         function backToGallery() {
             document.querySelector('.hero').style.display = '';
             document.querySelector('.container').style.display = '';
@@ -2411,8 +2427,15 @@ is staying human, staying.`
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.ed-nav button').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                if (btn.getAttribute('data-edview') === 'labels') {
+                const view = btn.getAttribute('data-edview');
+                if (view === 'labels') {
                     openLabelManager();
+                } else if (view === 'dashboard') {
+                    renderEditorStudio(getCurrentUser(), 'all');
+                } else if (view === 'submissions') {
+                    renderEditorStudio(getCurrentUser(), 'all');
+                } else if (view === 'settings') {
+                    openTemplatesManager();
                 }
             });
         });
@@ -2529,7 +2552,11 @@ is staying human, staying.`
             };
             document.getElementById('detailPublish').onclick = () => {
                 publishToGallery(sub.id);
+                (sub.timeline = sub.timeline || []).push({ action: 'published', ts: new Date().toISOString() });
+                saveSubmissions(subs);
                 logActivity(`Published "${sub.title}"`);
+                renderEditorStudio(getCurrentUser());
+                openDetail(id);
             };
             document.getElementById('detailSaveNotes').onclick = () => {
                 sub.internalNotes = detailNotes.value;
@@ -2544,3 +2571,59 @@ is staying human, staying.`
     </script>
 </body>
 </html>
+        /* Templates manager */
+        function openTemplatesManager() {
+            const panel = document.createElement('div');
+            panel.className = 'ed-modal active';
+            panel.innerHTML = `
+                <div class="content">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <h4>Response Templates</h4>
+                        <button class="ed-btn secondary" data-close>Close</button>
+                    </div>
+                    <div id="tmplList"></div>
+                    <div style="display:grid;gap:0.35rem;">
+                        <input id="tmplTitle" placeholder="Template title" style="padding:0.5rem;border:1px solid rgba(0,0,0,0.12);">
+                        <textarea id="tmplBody" rows="4" placeholder="Template body" style="padding:0.6rem;border:1px solid rgba(0,0,0,0.12);"></textarea>
+                        <button class="ed-btn" id="tmplSave">Save Template</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(panel);
+            const tmplList = panel.querySelector('#tmplList');
+
+            function renderTemplates() {
+                const tpls = loadTemplates();
+                tmplList.innerHTML = tpls.map((t,i)=>`
+                    <div style="border:1px solid rgba(0,0,0,0.1);padding:0.5rem;margin-bottom:0.4rem;">
+                        <div><strong>${t.title}</strong></div>
+                        <div style="font-size:0.9rem;color:#555;white-space:pre-line;">${t.body}</div>
+                        <div style="display:flex;gap:0.4rem;margin-top:0.35rem;">
+                            <button class="ed-btn secondary" data-del="${i}">Delete</button>
+                        </div>
+                    </div>
+                `).join('') || '<div>No templates yet.</div>';
+                tmplList.querySelectorAll('button[data-del]').forEach(btn => {
+                    btn.onclick = () => {
+                        const t = loadTemplates();
+                        t.splice(Number(btn.getAttribute('data-del')),1);
+                        saveTemplates(t);
+                        renderTemplates();
+                    };
+                });
+            }
+
+            renderTemplates();
+            panel.querySelector('[data-close]').onclick = () => panel.remove();
+            panel.querySelector('#tmplSave').onclick = () => {
+                const title = panel.querySelector('#tmplTitle').value.trim();
+                const body = panel.querySelector('#tmplBody').value.trim();
+                if (!title || !body) return;
+                const t = loadTemplates();
+                t.push({ title, body });
+                saveTemplates(t);
+                panel.querySelector('#tmplTitle').value = '';
+                panel.querySelector('#tmplBody').value = '';
+                renderTemplates();
+            };
+        }

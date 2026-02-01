@@ -606,6 +606,112 @@
             background: #fff;
         }
 
+        /* Editor dashboard */
+        #editorDashboard {
+            display: none;
+            min-height: 100vh;
+            background: #f7f3ea;
+            padding: 2rem clamp(1.25rem, 3vw, 3rem);
+            font-family: var(--font-sans);
+        }
+
+        .ed-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .ed-title {
+            font-size: 2rem;
+            letter-spacing: -0.01em;
+        }
+
+        .ed-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .ed-btn {
+            padding: 0.6rem 0.9rem;
+            border: 1px solid var(--color-dark);
+            background: var(--color-dark);
+            color: var(--color-cream);
+            letter-spacing: 0.05em;
+            cursor: pointer;
+        }
+
+        .ed-btn.secondary {
+            background: transparent;
+            color: var(--color-dark);
+        }
+
+        .ed-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .ed-stat {
+            background: #fffdf8;
+            border: 1px solid rgba(0,0,0,0.08);
+            padding: 0.9rem;
+            box-shadow: 0 10px 24px rgba(0,0,0,0.06);
+        }
+
+        .ed-filters {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .ed-filter {
+            padding: 0.45rem 0.8rem;
+            border: 1px solid rgba(0,0,0,0.15);
+            background: #fff;
+            cursor: pointer;
+        }
+
+        .ed-filter.active {
+            background: var(--color-dark);
+            color: var(--color-cream);
+            border-color: var(--color-dark);
+        }
+
+        .ed-list {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .ed-card {
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.08);
+            padding: 1rem;
+            box-shadow: 0 12px 26px rgba(0,0,0,0.08);
+        }
+
+        .ed-meta {
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .ed-preview {
+            margin: 0.5rem 0;
+            background: #fdfaf6;
+            padding: 0.75rem;
+            border: 1px solid rgba(0,0,0,0.05);
+            max-height: 140px;
+            overflow: hidden;
+        }
+
+        .ed-preview.expanded {
+            max-height: none;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -943,6 +1049,27 @@
             </div>
             <div class="magazine-foot">Swipe / arrow keys to turn pages</div>
         </div>
+    </div>
+
+    <div id="editorDashboard">
+        <div class="ed-header">
+            <div>
+                <div class="ed-title">Editor's Studio</div>
+                <div id="edUser" class="ed-meta"></div>
+            </div>
+            <div class="ed-actions">
+                <button class="ed-btn secondary" onclick="backToGallery()">Back to Gallery</button>
+                <button class="ed-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+        <div class="ed-stats" id="edStats"></div>
+        <div class="ed-filters">
+            <button class="ed-filter active" data-filter="all">All</button>
+            <button class="ed-filter" data-filter="pending">Pending</button>
+            <button class="ed-filter" data-filter="approved">Approved</button>
+            <button class="ed-filter" data-filter="rejected">Rejected</button>
+        </div>
+        <div class="ed-list" id="edList"></div>
     </div>
 
     <div class="container">
@@ -1543,6 +1670,19 @@ is staying human, staying.`
             }
         }
 
+        function backToGallery() {
+            document.querySelector('.hero').style.display = '';
+            document.querySelector('.container').style.display = '';
+            document.getElementById('editorDashboard').style.display = 'none';
+            const user = getCurrentUser();
+            if (user && user.role === 'editor') {
+                // return to studio panel area
+                const panel = document.getElementById('studioPanel');
+                panel.style.display = 'block';
+                panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
         // Collections navigation
         collectionTabs.forEach(tab => {
             tab.addEventListener('click', () => {
@@ -1581,14 +1721,12 @@ is staying human, staying.`
             const user = requireRole('writer');
             if (!user) return;
             renderWriterStudio(user);
-            document.getElementById('studioPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         function openEditorStudio(fromLogin = false) {
             const user = requireRole('editor');
             if (!user) return;
             renderEditorStudio(user);
-            document.getElementById('studioPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         function renderWriterStudio(user) {
@@ -1598,7 +1736,7 @@ is staying human, staying.`
             const profile = getProfile(user.email);
             panel.innerHTML = `
                 <h4>Writer's Studio — ${user.email}</h4>
-                <div class="profile-card">
+                <div class="profile-card" id="writerProfileCard">
                     <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap;">
                         ${profile.photo ? `<img src="${profile.photo}" alt="Profile" style="width:60px;height:60px;object-fit:cover;border-radius:50%;border:1px solid rgba(0,0,0,0.1);">` : ''}
                         <div>
@@ -1633,34 +1771,60 @@ is staying human, staying.`
             });
         }
 
-        function renderEditorStudio(user) {
-            const panel = document.getElementById('studioPanel');
-            panel.style.display = 'block';
+        function renderEditorStudio(user, filter = 'all') {
+            // Hide main gallery
+            document.querySelector('.hero').style.display = 'none';
+            document.querySelector('.container').style.display = 'none';
+            document.getElementById('editorDashboard').style.display = 'block';
+            document.getElementById('edUser').textContent = user.email;
+
             const submissions = loadSubmissions();
-            panel.innerHTML = `
-                <h4>Editor's Studio — ${user.email}</h4>
-                <div class="studio-list" id="editorSubmissions">
-                    ${submissions.length === 0 ? '<p>No submissions yet.</p>' : ''}
-                </div>
+            const stats = {
+                total: submissions.length,
+                pending: submissions.filter(s => s.status === 'pending').length,
+                approved: submissions.filter(s => s.status === 'approved').length,
+                rejected: submissions.filter(s => s.status === 'rejected').length
+            };
+            const edStats = document.getElementById('edStats');
+            edStats.innerHTML = `
+                <div class="ed-stat"><div>Total</div><strong>${stats.total}</strong></div>
+                <div class="ed-stat"><div>Pending</div><strong>${stats.pending}</strong></div>
+                <div class="ed-stat"><div>Approved</div><strong>${stats.approved}</strong></div>
+                <div class="ed-stat"><div>Rejected</div><strong>${stats.rejected}</strong></div>
             `;
-            const listEl = panel.querySelector('#editorSubmissions');
-            submissions.forEach(sub => {
+
+            document.querySelectorAll('.ed-filter').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-filter') === filter);
+                btn.onclick = () => renderEditorStudio(user, btn.getAttribute('data-filter'));
+            });
+
+            const listEl = document.getElementById('edList');
+            listEl.innerHTML = '';
+            const filtered = submissions.filter(sub => filter === 'all' ? true : sub.status === filter);
+            if (filtered.length === 0) {
+                listEl.innerHTML = '<div style="color:#555;">No submissions in this view.</div>';
+                return;
+            }
+
+            filtered.forEach(sub => {
                 const card = document.createElement('div');
-                card.className = 'submission-card';
+                card.className = 'ed-card';
+                const bodyPreview = sub.body.replace(/\n/g, '<br>');
                 card.innerHTML = `
                     <div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;">
                         <strong>${sub.title}</strong>
                         <span class="badge ${sub.status}">${sub.status}</span>
                     </div>
-                    <div style="font-size:0.9rem;color:#555;">${sub.body.slice(0,160)}${sub.body.length>160?'...':''}</div>
-                    <div style="font-size:0.85rem;color:#777;">By ${sub.author}</div>
-                    ${sub.tags ? `<div style="font-size:0.8rem;color:#777;">Tags: ${sub.tags.join(', ')}</div>` : ''}
-                    ${sub.notes ? `<div style="font-size:0.8rem;color:#777;">Notes: ${sub.notes}</div>` : ''}
-                    ${sub.displayName ? `<div style="font-size:0.8rem;color:#777;">Display name: ${sub.displayName}</div>` : ''}
-                    ${sub.bio ? `<div style="font-size:0.8rem;color:#777;">Bio: ${sub.bio}</div>` : ''}
-                    <div class="submission-actions">
-                        <button data-action="approve" data-id="${sub.id}">Approve</button>
-                        <button data-action="reject" data-id="${sub.id}" class="secondary">Reject</button>
+                    <div class="ed-meta">By ${sub.author}${sub.displayName ? ` • ${sub.displayName}` : ''}</div>
+                    ${sub.bio ? `<div class="ed-meta">${sub.bio}</div>` : ''}
+                    ${sub.tags ? `<div class="ed-meta">Tags: ${sub.tags.join(', ')}</div>` : ''}
+                    <div class="ed-meta">Submitted: ${new Date(sub.submittedAt || Date.now()).toLocaleString()}</div>
+                    <div class="ed-preview" data-id="${sub.id}">${bodyPreview}</div>
+                    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem;">
+                        <button class="ed-btn" data-action="approve" data-id="${sub.id}">Approve</button>
+                        <button class="ed-btn secondary" data-action="reject" data-id="${sub.id}">Reject</button>
+                        ${sub.status === 'approved' ? `<button class="ed-btn secondary" data-publish="${sub.id}">Publish to Gallery</button>` : ''}
+                        <button class="ed-btn secondary" data-toggle="${sub.id}">Toggle Preview</button>
                     </div>
                 `;
                 listEl.appendChild(card);
@@ -1675,8 +1839,23 @@ is staying human, staying.`
                     if (idx >= 0) {
                         list[idx].status = action === 'approve' ? 'approved' : 'rejected';
                         saveSubmissions(list);
-                        renderEditorStudio(user);
+                        renderEditorStudio(user, filter);
                     }
+                });
+            });
+
+            listEl.querySelectorAll('button[data-toggle]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-toggle');
+                    const prev = listEl.querySelector(`.ed-preview[data-id="${id}"]`);
+                    if (prev) prev.classList.toggle('expanded');
+                });
+            });
+
+            listEl.querySelectorAll('button[data-publish]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-publish');
+                    publishToGallery(id);
                 });
             });
         }

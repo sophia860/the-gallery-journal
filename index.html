@@ -193,36 +193,85 @@
             background: linear-gradient(90deg, rgba(139, 115, 85, 0.25), transparent);
         }
 
+        .gallery-wall {
+            position: relative;
+            background: linear-gradient(180deg, #f5f1e8 0%, #f3eddf 40%, #efe5d3 100%);
+            border: 1px solid rgba(139, 115, 85, 0.18);
+            padding: 3rem 2rem;
+            margin-bottom: 5rem;
+            box-shadow: inset 0 30px 60px rgba(0,0,0,0.04);
+        }
+
+        .gallery-wall::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(139,115,85,0.1), rgba(139,115,85,0));
+            transform: translateX(-50%);
+            pointer-events: none;
+        }
+
         .poem-grid {
             display: grid;
-            gap: 2rem;
-            margin-bottom: 5rem;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2.5rem;
         }
 
         .poem-card {
-            padding: 2.5rem 0;
-            border-bottom: 1px solid rgba(139, 115, 85, 0.15);
             cursor: pointer;
-            transition: all 0.3s ease;
-            display: grid;
-            grid-template-columns: 1fr auto;
-            align-items: start;
-            gap: 1rem;
+            transition: all 0.35s ease;
+            position: relative;
         }
 
         .poem-card:hover {
-            padding-left: 1rem;
+            transform: translateY(-6px);
+            filter: drop-shadow(0 18px 28px rgba(0,0,0,0.12));
+        }
+
+        .poem-frame {
+            background: #fdfaf6;
+            border: 14px solid #e7dcc8;
+            box-shadow:
+                0 10px 25px rgba(0,0,0,0.12),
+                inset 0 0 0 2px rgba(139,115,85,0.18);
+            padding: 1.8rem 1.6rem;
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 1rem;
+            min-height: 220px;
+        }
+
+        .poem-frame::after {
+            content: '';
+            position: absolute;
+            top: -16px;
+            left: 40px;
+            width: 48px;
+            height: 6px;
+            background: radial-gradient(circle at 30% 50%, rgba(0,0,0,0.12), transparent 55%);
+            filter: blur(2px);
+            transform: rotate(-2deg);
+        }
+
+        .poem-main {
+            display: grid;
+            gap: 0.45rem;
         }
 
         .poem-meta {
             justify-self: end;
+            align-self: start;
             text-align: right;
             font-family: var(--font-sans);
             font-size: 0.7rem;
             letter-spacing: 0.18em;
             text-transform: uppercase;
             color: var(--color-accent);
-            opacity: 0.8;
+            opacity: 0.75;
         }
 
         .poem-title {
@@ -240,9 +289,9 @@
         }
 
         .poem-preview {
-            font-size: 0.95rem;
-            line-height: 1.8;
-            color: #5a5a5a;
+            font-size: 1rem;
+            line-height: 1.9;
+            color: #4a4a4a;
             font-style: italic;
         }
 
@@ -254,6 +303,7 @@
             color: var(--color-accent);
             margin-top: 1rem;
             display: inline-block;
+            opacity: 0.8;
         }
 
         .modal {
@@ -598,86 +648,104 @@
     <div class="container">
         <div class="section-header">Featured</div>
         
-        <div class="poem-grid" id="poemGrid">
+            <div class="gallery-wall">
+            <div class="poem-grid" id="poemGrid">
             <div class="poem-card" data-poem-id="1">
-                <div class="poem-main">
-                    <div class="poem-title">Liminal Spaces</div>
-                    <div class="poem-author">by Sarah Chen</div>
-                    <div class="poem-preview">Between the wanting and the wound,<br>I found a door that opened inward...</div>
-                    <div class="read-more">Read Full Poem →</div>
+                <div class="poem-frame">
+                    <div class="poem-main">
+                        <div class="poem-title">Liminal Spaces</div>
+                        <div class="poem-author">by Sarah Chen</div>
+                        <div class="poem-preview">Between the wanting and the wound,<br>I found a door that opened inward...</div>
+                        <div class="read-more">Read Full Poem →</div>
+                    </div>
+                    <div class="poem-meta">Wall 01</div>
                 </div>
-                <div class="poem-meta">Page 01</div>
             </div>
 
             <div class="poem-card" data-poem-id="2">
-                <div class="poem-main">
-                    <div class="poem-title">The Light Collector</div>
-                    <div class="poem-author">by Marcus Webb</div>
-                    <div class="poem-preview">She kept jars of morning light,<br>arranged them on the windowsill...</div>
-                    <div class="read-more">Read Full Poem →</div>
+                <div class="poem-frame">
+                    <div class="poem-main">
+                        <div class="poem-title">The Light Collector</div>
+                        <div class="poem-author">by Marcus Webb</div>
+                        <div class="poem-preview">She kept jars of morning light,<br>arranged them on the windowsill...</div>
+                        <div class="read-more">Read Full Poem →</div>
+                    </div>
+                    <div class="poem-meta">Wall 02</div>
                 </div>
-                <div class="poem-meta">Page 02</div>
             </div>
 
             <div class="poem-card" data-poem-id="3">
-                <div class="poem-main">
-                    <div class="poem-title">Inheritance</div>
-                    <div class="poem-author">by Priya Sharma</div>
-                    <div class="poem-preview">My grandmother's hands speak<br>a language I'm still learning...</div>
-                    <div class="read-more">Read Full Poem →</div>
+                <div class="poem-frame">
+                    <div class="poem-main">
+                        <div class="poem-title">Inheritance</div>
+                        <div class="poem-author">by Priya Sharma</div>
+                        <div class="poem-preview">My grandmother's hands speak<br>a language I'm still learning...</div>
+                        <div class="read-more">Read Full Poem →</div>
+                    </div>
+                    <div class="poem-meta">Wall 03</div>
                 </div>
-                <div class="poem-meta">Page 03</div>
             </div>
 
             <div class="poem-card" data-poem-id="4">
-                <div class="poem-main">
-                    <div class="poem-title">Urban Pastoral</div>
-                    <div class="poem-author">by James Liu</div>
-                    <div class="poem-preview">The subway busker's violin<br>carves a chapel from concrete...</div>
-                    <div class="read-more">Read Full Poem →</div>
+                <div class="poem-frame">
+                    <div class="poem-main">
+                        <div class="poem-title">Urban Pastoral</div>
+                        <div class="poem-author">by James Liu</div>
+                        <div class="poem-preview">The subway busker's violin<br>carves a chapel from concrete...</div>
+                        <div class="read-more">Read Full Poem →</div>
+                    </div>
+                    <div class="poem-meta">Wall 04</div>
                 </div>
-                <div class="poem-meta">Page 04</div>
             </div>
 
             <div class="poem-card" data-poem-id="5">
-                <div class="poem-main">
-                    <div class="poem-title">What the Ocean Said</div>
-                    <div class="poem-author">by Elena Vasquez</div>
-                    <div class="poem-preview">Come back when you're ready<br>to remember what you've forgotten...</div>
-                    <div class="read-more">Read Full Poem →</div>
+                <div class="poem-frame">
+                    <div class="poem-main">
+                        <div class="poem-title">What the Ocean Said</div>
+                        <div class="poem-author">by Elena Vasquez</div>
+                        <div class="poem-preview">Come back when you're ready<br>to remember what you've forgotten...</div>
+                        <div class="read-more">Read Full Poem →</div>
+                    </div>
+                    <div class="poem-meta">Wall 05</div>
                 </div>
-                <div class="poem-meta">Page 05</div>
             </div>
 
             <div class="poem-card" data-poem-id="6">
-                <div class="poem-main">
-                    <div class="poem-title">Anatomy of Silence</div>
-                    <div class="poem-author">by David Okonkwo</div>
-                    <div class="poem-preview">There are silences that sing<br>and silences that suffocate...</div>
-                    <div class="read-more">Read Full Poem →</div>
+                <div class="poem-frame">
+                    <div class="poem-main">
+                        <div class="poem-title">Anatomy of Silence</div>
+                        <div class="poem-author">by David Okonkwo</div>
+                        <div class="poem-preview">There are silences that sing<br>and silences that suffocate...</div>
+                        <div class="read-more">Read Full Poem →</div>
+                    </div>
+                    <div class="poem-meta">Wall 06</div>
                 </div>
-                <div class="poem-meta">Page 06</div>
             </div>
 
             <div class="poem-card" data-poem-id="7">
-                <div class="poem-main">
-                    <div class="poem-title">The Cartographer's Daughter</div>
-                    <div class="poem-author">by Lily Morrison</div>
-                    <div class="poem-preview">She drew maps of places<br>that existed only in translation...</div>
-                    <div class="read-more">Read Full Poem →</div>
+                <div class="poem-frame">
+                    <div class="poem-main">
+                        <div class="poem-title">The Cartographer's Daughter</div>
+                        <div class="poem-author">by Lily Morrison</div>
+                        <div class="poem-preview">She drew maps of places<br>that existed only in translation...</div>
+                        <div class="read-more">Read Full Poem →</div>
+                    </div>
+                    <div class="poem-meta">Wall 07</div>
                 </div>
-                <div class="poem-meta">Page 07</div>
             </div>
 
             <div class="poem-card" data-poem-id="8">
-                <div class="poem-main">
-                    <div class="poem-title">Midnight Economy</div>
-                    <div class="poem-author">by Rafael Torres</div>
-                    <div class="poem-preview">The diner at 3am trades in confessions,<br>currency of the sleepless...</div>
-                    <div class="read-more">Read Full Poem →</div>
+                <div class="poem-frame">
+                    <div class="poem-main">
+                        <div class="poem-title">Midnight Economy</div>
+                        <div class="poem-author">by Rafael Torres</div>
+                        <div class="poem-preview">The diner at 3am trades in confessions,<br>currency of the sleepless...</div>
+                        <div class="read-more">Read Full Poem →</div>
+                    </div>
+                    <div class="poem-meta">Wall 08</div>
                 </div>
-                <div class="poem-meta">Page 08</div>
             </div>
+        </div>
         </div>
     </div>
 

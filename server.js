@@ -1,12 +1,11 @@
 const express = require('express');
 const path = require('path');
-const bodyParser = require('body-parser');
 const healthRoutes = require('./src/routes/health');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(bodyParser.json());
+app.use(express.json());
 
 // Health endpoints
 app.use(healthRoutes);
@@ -23,15 +22,12 @@ app.post('/api/auth/login', (req, res) => {
     token: 'mock-token',
     user: {
       email,
-      role: email.includes('editor') ? 'editor' : 'writer'
+      role: 'writer'
     }
   });
 });
 
-// Serve static frontend
-app.use(express.static(path.join(__dirname)));
-
-// Fallback to index.html
+// Serve frontend entry
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });

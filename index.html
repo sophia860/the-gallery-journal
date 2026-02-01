@@ -1170,34 +1170,54 @@
                 </div>
             </aside>
             <main class="ed-main">
-                <div class="ed-stats" id="edStats"></div>
-                <div class="ed-toolbar">
-                    <input id="edSearch" placeholder="Search title/author/content" style="padding:0.5rem;border:1px solid rgba(0,0,0,0.12);flex:1 1 220px;">
-                    <input id="edDateFrom" type="date" style="padding:0.45rem;border:1px solid rgba(0,0,0,0.12);">
-                    <input id="edDateTo" type="date" style="padding:0.45rem;border:1px solid rgba(0,0,0,0.12);">
-                    <select id="edLabelFilter" style="padding:0.45rem;border:1px solid rgba(0,0,0,0.12);">
-                        <option value="">Label filter</option>
-                    </select>
-                    <select id="edSort" style="padding:0.45rem;border:1px solid rgba(0,0,0,0.12);">
-                        <option value="date">Sort by date</option>
-                        <option value="title">Sort by title</option>
-                        <option value="rating">Sort by rating</option>
-                    </select>
+                <div id="edSubmissionsView">
+                    <div class="ed-stats" id="edStats"></div>
+                    <div class="ed-toolbar">
+                        <input id="edSearch" placeholder="Search title/author/content" style="padding:0.5rem;border:1px solid rgba(0,0,0,0.12);flex:1 1 220px;">
+                        <input id="edDateFrom" type="date" style="padding:0.45rem;border:1px solid rgba(0,0,0,0.12);">
+                        <input id="edDateTo" type="date" style="padding:0.45rem;border:1px solid rgba(0,0,0,0.12);">
+                        <select id="edLabelFilter" style="padding:0.45rem;border:1px solid rgba(0,0,0,0.12);">
+                            <option value="">Label filter</option>
+                        </select>
+                        <select id="edSort" style="padding:0.45rem;border:1px solid rgba(0,0,0,0.12);">
+                            <option value="date">Sort by date</option>
+                            <option value="title">Sort by title</option>
+                            <option value="rating">Sort by rating</option>
+                        </select>
+                    </div>
+                    <div class="ed-filters">
+                        <button class="ed-filter active" data-filter="all">All</button>
+                        <button class="ed-filter" data-filter="pending">Pending</button>
+                        <button class="ed-filter" data-filter="approved">Approved</button>
+                        <button class="ed-filter" data-filter="rejected">Rejected</button>
+                    </div>
+                    <div class="ed-toolbar">
+                        <button class="ed-btn" id="bulkApprove">Approve All</button>
+                        <button class="ed-btn secondary" id="bulkReject">Reject All</button>
+                        <button class="ed-btn secondary" id="bulkAddLabel">Add Label</button>
+                        <button class="ed-btn secondary" id="bulkRemoveLabel">Remove Label</button>
+                        <button class="ed-btn secondary" id="bulkExport">Export Selected</button>
+                    </div>
+                    <div class="ed-list" id="edList"></div>
                 </div>
-                <div class="ed-filters">
-                    <button class="ed-filter active" data-filter="all">All</button>
-                    <button class="ed-filter" data-filter="pending">Pending</button>
-                    <button class="ed-filter" data-filter="approved">Approved</button>
-                    <button class="ed-filter" data-filter="rejected">Rejected</button>
+                <div id="edLabelsView" style="display:none;">
+                    <h4>Labels / Categories</h4>
+                    <div id="labelListInline"></div>
+                    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem;">
+                        <input id="newLabelNameInline" placeholder="Label name" style="flex:1;min-width:140px;padding:0.5rem;border:1px solid rgba(0,0,0,0.12);">
+                        <input id="newLabelColorInline" type="color" value="#8b7355" style="width:60px;height:42px;border:1px solid rgba(0,0,0,0.12);">
+                        <button class="ed-btn" id="addLabelBtnInline">Add Label</button>
+                    </div>
                 </div>
-                <div class="ed-toolbar">
-                    <button class="ed-btn" id="bulkApprove">Approve All</button>
-                    <button class="ed-btn secondary" id="bulkReject">Reject All</button>
-                    <button class="ed-btn secondary" id="bulkAddLabel">Add Label</button>
-                    <button class="ed-btn secondary" id="bulkRemoveLabel">Remove Label</button>
-                    <button class="ed-btn secondary" id="bulkExport">Export Selected</button>
+                <div id="edSettingsView" style="display:none;">
+                    <h4>Response Templates</h4>
+                    <div id="tmplListInline"></div>
+                    <div style="display:grid;gap:0.35rem;margin-top:0.5rem;">
+                        <input id="tmplTitleInline" placeholder="Template title" style="padding:0.5rem;border:1px solid rgba(0,0,0,0.12);">
+                        <textarea id="tmplBodyInline" rows="4" placeholder="Template body" style="padding:0.6rem;border:1px solid rgba(0,0,0,0.12);"></textarea>
+                        <button class="ed-btn" id="tmplSaveInline">Save Template</button>
+                    </div>
                 </div>
-                <div class="ed-list" id="edList"></div>
             </main>
         </div>
     </div>
@@ -1911,7 +1931,6 @@ is staying human, staying.`
                 });
                 localStorage.setItem('publishedPoems', JSON.stringify(stored));
             }
-            // Sync into poems map for immediate render
             poems[newId] = {
                 title: sub.title,
                 author: sub.displayName || sub.author,
@@ -2401,74 +2420,58 @@ is staying human, staying.`
 
         ensureDefaultLabels();
 
-        function openLabelManager() {
-            const panel = document.createElement('div');
-            panel.className = 'ed-modal active';
-            panel.innerHTML = `
-                <div class="content">
-                    <div style="display:flex;justify-content:space-between;align-items:center;">
-                        <h4>Labels / Categories</h4>
-                        <button class="ed-btn secondary" data-close>Close</button>
-                    </div>
-                    <div id="labelList"></div>
-                    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
-                        <input id="newLabelName" placeholder="Label name" style="flex:1;min-width:140px;padding:0.5rem;border:1px solid rgba(0,0,0,0.12);">
-                        <input id="newLabelColor" type="color" value="#8b7355" style="width:60px;height:42px;border:1px solid rgba(0,0,0,0.12);">
-                        <button class="ed-btn" id="addLabelBtn">Add Label</button>
-                    </div>
+        function renderLabelsInline() {
+            const listContainer = document.getElementById('labelListInline');
+            const labels = loadLabels();
+            listContainer.innerHTML = labels.map(l => `
+                <div style="display:flex;align-items:center;gap:0.5rem;margin:0.3rem 0;">
+                    ${renderLabelPill(l.name, labels)}
+                    <button class="ed-btn secondary" data-del="${l.name}">Delete</button>
                 </div>
-            `;
-            document.body.appendChild(panel);
-
-            function renderLabels() {
-                const labels = loadLabels();
-                const list = panel.querySelector('#labelList');
-                list.innerHTML = labels.map(l => `
-                    <div style="display:flex;align-items:center;gap:0.5rem;margin:0.3rem 0;">
-                        ${renderLabelPill(l.name, labels)}
-                        <button class="ed-btn secondary" data-del="${l.name}">Delete</button>
-                    </div>
-                `).join('') || '<div>No labels yet.</div>';
-                list.querySelectorAll('button[data-del]').forEach(btn => {
-                    btn.onclick = () => {
-                        const updated = loadLabels().filter(x => x.name !== btn.getAttribute('data-del'));
-                        saveLabels(updated);
-                        renderLabels();
-                    };
-                });
-            }
-
-            panel.querySelector('[data-close]').onclick = () => panel.remove();
-            panel.querySelector('#addLabelBtn').onclick = () => {
-                const name = panel.querySelector('#newLabelName').value.trim();
-                const color = panel.querySelector('#newLabelColor').value;
+            `).join('') || '<div>No labels yet.</div>';
+            listContainer.querySelectorAll('button[data-del]').forEach(btn => {
+                btn.onclick = () => {
+                    const updated = loadLabels().filter(x => x.name !== btn.getAttribute('data-del'));
+                    saveLabels(updated);
+                    renderLabelsInline();
+                };
+            });
+            document.getElementById('addLabelBtnInline').onclick = () => {
+                const name = document.getElementById('newLabelNameInline').value.trim();
+                const color = document.getElementById('newLabelColorInline').value;
                 if (!name) return;
-                const labels = loadLabels();
-                if (labels.some(l => l.name.toLowerCase() === name.toLowerCase())) return;
-                labels.push({ name, color });
-                saveLabels(labels);
-                panel.querySelector('#newLabelName').value = '';
-                renderLabels();
+                const lbls = loadLabels();
+                if (lbls.some(l => l.name.toLowerCase() === name.toLowerCase())) return;
+                lbls.push({ name, color });
+                saveLabels(lbls);
+                document.getElementById('newLabelNameInline').value = '';
+                renderLabelsInline();
             };
-            renderLabels();
         }
 
-        document.querySelectorAll('.ed-nav button').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.ed-nav button').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                const view = btn.getAttribute('data-edview');
-                if (view === 'labels') {
-                    openLabelManager();
-                } else if (view === 'dashboard') {
-                    renderEditorStudio(getCurrentUser(), 'all');
-                } else if (view === 'submissions') {
-                    renderEditorStudio(getCurrentUser(), 'all');
-                } else if (view === 'settings') {
-                    openTemplatesManager();
-                }
+            const subView = document.getElementById('edSubmissionsView');
+            const labelsView = document.getElementById('edLabelsView');
+            const settingsView = document.getElementById('edSettingsView');
+            function showView(key) {
+                subView.style.display = key === 'submissions' || key === 'dashboard' ? 'block' : 'none';
+                labelsView.style.display = key === 'labels' ? 'block' : 'none';
+                settingsView.style.display = key === 'settings' ? 'block' : 'none';
+            }
+            document.querySelectorAll('.ed-nav button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.ed-nav button').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const view = btn.getAttribute('data-edview');
+                    showView(view);
+                    if (view === 'labels') {
+                        renderLabelsInline();
+                    } else if (view === 'settings') {
+                        renderTemplatesInline();
+                    } else {
+                        renderEditorStudio(getCurrentUser(), 'all');
+                    }
+                });
             });
-        });
 
         /* Bulk actions */
         function getSelectedIds() {
@@ -2537,60 +2540,65 @@ is staying human, staying.`
             const sub = subs.find(s => s.id === id);
             if (!sub) return;
             detailModal.classList.add('active');
-            document.getElementById('detailTitle').textContent = sub.title;
-            document.getElementById('detailMeta').innerHTML = `
-                <div>Author: ${sub.author}${sub.displayName ? ` • ${sub.displayName}` : ''}</div>
-                ${sub.bio ? `<div>${sub.bio}</div>` : ''}
-                ${(sub.tags && sub.tags.length) ? `<div>Tags: ${sub.tags.join(', ')}</div>` : ''}
-                ${(sub.labels && sub.labels.length) ? `<div>Labels: ${sub.labels.join(', ')}</div>` : ''}
-                <div>Submitted: ${new Date(sub.submittedAt || Date.now()).toLocaleString()}</div>
-            `;
-            document.getElementById('detailBody').innerHTML = sub.body.replace(/\n/g, '<br>');
-            document.getElementById('detailProfile').innerHTML = `
-                <div><strong>${sub.displayName || sub.author}</strong></div>
-                ${sub.bio || ''}
-            `;
-            renderTimeline(sub.timeline);
-            detailNotes.value = sub.internalNotes || '';
-            const ratingEl = document.getElementById('detailRating');
-            ratingEl.innerHTML = '';
-            for (let i=1;i<=5;i++) {
-                const b = document.createElement('button');
-                b.className = 'ed-btn secondary';
-                b.textContent = i <= (sub.rating||0) ? '★' : '☆';
-                b.onclick = () => {
-                    sub.rating = i;
-                    saveSubmissions(subs);
-                    renderEditorStudio(getCurrentUser());
-                    openDetail(id);
-                };
-                ratingEl.appendChild(b);
-            }
+            const setView = () => {
+                document.getElementById('detailTitle').textContent = sub.title;
+                document.getElementById('detailMeta').innerHTML = `
+                    <div>Author: ${sub.author}${sub.displayName ? ` • ${sub.displayName}` : ''}</div>
+                    ${sub.bio ? `<div>${sub.bio}</div>` : ''}
+                    ${(sub.tags && sub.tags.length) ? `<div>Tags: ${sub.tags.join(', ')}</div>` : ''}
+                    ${(sub.labels && sub.labels.length) ? `<div>Labels: ${sub.labels.join(', ')}</div>` : ''}
+                    <div>Submitted: ${new Date(sub.submittedAt || Date.now()).toLocaleString()}</div>
+                `;
+                document.getElementById('detailBody').innerHTML = sub.body.replace(/\n/g, '<br>');
+                document.getElementById('detailProfile').innerHTML = `
+                    <div><strong>${sub.displayName || sub.author}</strong></div>
+                    ${sub.bio || ''}
+                `;
+                renderTimeline(sub.timeline);
+                detailNotes.value = sub.internalNotes || '';
+                const ratingEl = document.getElementById('detailRating');
+                ratingEl.innerHTML = '';
+                for (let i=1;i<=5;i++) {
+                    const b = document.createElement('button');
+                    b.className = 'ed-btn secondary';
+                    b.textContent = i <= (sub.rating||0) ? '★' : '☆';
+                    b.onclick = () => {
+                        sub.rating = i;
+                        saveSubmissions(subs);
+                        renderTimeline(sub.timeline);
+                        renderEditorStudio(getCurrentUser());
+                        setView();
+                    };
+                    ratingEl.appendChild(b);
+                }
+            };
+            setView();
             document.getElementById('detailApprove').onclick = () => {
                 sub.status = 'approved';
                 (sub.timeline = sub.timeline || []).push({ action: 'approved', ts: new Date().toISOString() });
                 saveSubmissions(subs);
                 logActivity(`Approved "${sub.title}"`);
-                renderTimeline(sub.timeline);
+                updateActivityFeed();
                 renderEditorStudio(getCurrentUser());
-                openDetail(id);
+                setView();
             };
             document.getElementById('detailReject').onclick = () => {
                 sub.status = 'rejected';
                 (sub.timeline = sub.timeline || []).push({ action: 'rejected', ts: new Date().toISOString() });
                 saveSubmissions(subs);
                 logActivity(`Rejected "${sub.title}"`);
-                renderTimeline(sub.timeline);
+                updateActivityFeed();
                 renderEditorStudio(getCurrentUser());
-                openDetail(id);
+                setView();
             };
             document.getElementById('detailPublish').onclick = () => {
                 publishToGallery(sub.id);
                 (sub.timeline = sub.timeline || []).push({ action: 'published', ts: new Date().toISOString() });
                 saveSubmissions(subs);
                 logActivity(`Published "${sub.title}"`);
+                updateActivityFeed();
                 renderEditorStudio(getCurrentUser());
-                openDetail(id);
+                setView();
             };
             document.getElementById('detailSaveNotes').onclick = () => {
                 sub.internalNotes = detailNotes.value;
@@ -2618,58 +2626,35 @@ is staying human, staying.`
 </body>
 </html>
         /* Templates manager */
-        function openTemplatesManager() {
-            const panel = document.createElement('div');
-            panel.className = 'ed-modal active';
-            panel.innerHTML = `
-                <div class="content">
-                    <div style="display:flex;justify-content:space-between;align-items:center;">
-                        <h4>Response Templates</h4>
-                        <button class="ed-btn secondary" data-close>Close</button>
-                    </div>
-                    <div id="tmplList"></div>
-                    <div style="display:grid;gap:0.35rem;">
-                        <input id="tmplTitle" placeholder="Template title" style="padding:0.5rem;border:1px solid rgba(0,0,0,0.12);">
-                        <textarea id="tmplBody" rows="4" placeholder="Template body" style="padding:0.6rem;border:1px solid rgba(0,0,0,0.12);"></textarea>
-                        <button class="ed-btn" id="tmplSave">Save Template</button>
+        function renderTemplatesInline() {
+            const list = document.getElementById('tmplListInline');
+            const tpls = loadTemplates();
+            list.innerHTML = tpls.map((t,i)=>`
+                <div style="border:1px solid rgba(0,0,0,0.1);padding:0.5rem;margin-bottom:0.4rem;">
+                    <div><strong>${t.title}</strong></div>
+                    <div style="font-size:0.9rem;color:#555;white-space:pre-line;">${t.body}</div>
+                    <div style="display:flex;gap:0.4rem;margin-top:0.35rem;">
+                        <button class="ed-btn secondary" data-del="${i}">Delete</button>
                     </div>
                 </div>
-            `;
-            document.body.appendChild(panel);
-            const tmplList = panel.querySelector('#tmplList');
-
-            function renderTemplates() {
-                const tpls = loadTemplates();
-                tmplList.innerHTML = tpls.map((t,i)=>`
-                    <div style="border:1px solid rgba(0,0,0,0.1);padding:0.5rem;margin-bottom:0.4rem;">
-                        <div><strong>${t.title}</strong></div>
-                        <div style="font-size:0.9rem;color:#555;white-space:pre-line;">${t.body}</div>
-                        <div style="display:flex;gap:0.4rem;margin-top:0.35rem;">
-                            <button class="ed-btn secondary" data-del="${i}">Delete</button>
-                        </div>
-                    </div>
-                `).join('') || '<div>No templates yet.</div>';
-                tmplList.querySelectorAll('button[data-del]').forEach(btn => {
-                    btn.onclick = () => {
-                        const t = loadTemplates();
-                        t.splice(Number(btn.getAttribute('data-del')),1);
-                        saveTemplates(t);
-                        renderTemplates();
-                    };
-                });
-            }
-
-            renderTemplates();
-            panel.querySelector('[data-close]').onclick = () => panel.remove();
-            panel.querySelector('#tmplSave').onclick = () => {
-                const title = panel.querySelector('#tmplTitle').value.trim();
-                const body = panel.querySelector('#tmplBody').value.trim();
+            `).join('') || '<div>No templates yet.</div>';
+            list.querySelectorAll('button[data-del]').forEach(btn => {
+                btn.onclick = () => {
+                    const t = loadTemplates();
+                    t.splice(Number(btn.getAttribute('data-del')),1);
+                    saveTemplates(t);
+                    renderTemplatesInline();
+                };
+            });
+            document.getElementById('tmplSaveInline').onclick = () => {
+                const title = document.getElementById('tmplTitleInline').value.trim();
+                const body = document.getElementById('tmplBodyInline').value.trim();
                 if (!title || !body) return;
                 const t = loadTemplates();
                 t.push({ title, body });
                 saveTemplates(t);
-                panel.querySelector('#tmplTitle').value = '';
-                panel.querySelector('#tmplBody').value = '';
-                renderTemplates();
+                document.getElementById('tmplTitleInline').value = '';
+                document.getElementById('tmplBodyInline').value = '';
+                renderTemplatesInline();
             };
         }

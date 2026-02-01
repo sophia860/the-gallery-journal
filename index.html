@@ -2494,7 +2494,9 @@ is staying human, staying.`
         function bulkLabel(add, filter) {
             const ids = getSelectedIds();
             if (ids.length === 0) return alert('Select submissions first.');
-            const label = prompt(add ? 'Label to add' : 'Label to remove');
+            const labels = loadLabels();
+            if (labels.length === 0) { alert('No labels defined. Add labels first.'); return; }
+            const label = prompt(`${add ? 'Add' : 'Remove'} which label?\n` + labels.map(l=>`- ${l.name}`).join('\n'));
             if (!label) return;
             const list = loadSubmissions();
             ids.forEach(id => {

@@ -268,6 +268,10 @@
             margin: 0.5rem 0 1rem;
         }
 
+        .control-row.single-column {
+            grid-template-columns: 1fr;
+        }
+
         .control-row label {
             display: block;
             font-family: var(--font-sans);
@@ -671,7 +675,7 @@
                     <div class="pill">Theme: Liminality</div>
                     <small>Invitation · Rolling | Typography preserved</small>
                 </div>
-                <div class="ambient-card" style="margin-top:0.75rem;">
+                <div class="ambient-card">
                     <strong>City Sonics</strong>
                     <div class="pill">Theme: Urban sound</div>
                     <small>Invitation · Gentle deadline</small>
@@ -726,7 +730,7 @@
                     <label><input type="radio" name="visibility" value="public"> Public</label>
                 </div>
                 <div class="pill" id="visibilityBadge"><span class="status-dot"></span>Private draft URL</div>
-                <div class="control-row" style="grid-template-columns:1fr;">
+                <div class="control-row single-column">
                     <div>
                         <label for="draftState">Draft State</label>
                         <select id="draftState">
@@ -1250,14 +1254,19 @@ is staying human, staying.`
                     studio: 'Studio-only sharing',
                     public: 'Public share link'
                 };
-                visibilityBadge.innerHTML = `<span class="status-dot" style="background:${value === 'public' ? '#4caf50' : value === 'studio' ? '#f0ad4e' : '#6fbf73'}"></span>${labels[value]}`;
+                const dot = document.createElement('span');
+                dot.className = 'status-dot';
+                dot.style.background = value === 'public' ? '#4caf50' : value === 'studio' ? '#f0ad4e' : '#6fbf73';
+                visibilityBadge.textContent = '';
+                visibilityBadge.appendChild(dot);
+                visibilityBadge.appendChild(document.createTextNode(labels[value]));
             });
         });
 
         document.getElementById('saveDraft').addEventListener('click', () => {
             const content = draftInput.value.trim();
             if (!content) {
-                alert('Add some text to save a version.');
+                submissionStatus.textContent = 'Add text before saving a version.';
                 return;
             }
             const timestamp = new Date().toLocaleString();
@@ -1274,7 +1283,10 @@ is staying human, staying.`
             const note = document.getElementById('conversationInput').value.trim();
             if (!note) return;
             const p = document.createElement('p');
-            p.innerHTML = `<strong>You:</strong> ${note}`;
+            const strong = document.createElement('strong');
+            strong.textContent = 'You:';
+            p.appendChild(strong);
+            p.appendChild(document.createTextNode(` ${note}`));
             document.getElementById('conversation').appendChild(p);
             document.getElementById('conversationInput').value = '';
         });

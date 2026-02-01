@@ -1388,18 +1388,14 @@ is staying human, staying.`
             const user = requireRole('writer');
             if (!user) return;
             renderWriterStudio(user);
-            if (!fromLogin) {
-                document.getElementById('studioPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
+            document.getElementById('studioPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         function openEditorStudio(fromLogin = false) {
             const user = requireRole('editor');
             if (!user) return;
             renderEditorStudio(user);
-            if (!fromLogin) {
-                document.getElementById('studioPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
+            document.getElementById('studioPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         function renderWriterStudio(user) {
@@ -1502,6 +1498,7 @@ is staying human, staying.`
             } else {
                 renderWriterStudio(existingUser);
             }
+            document.getElementById('studioPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     </script>
 </body>

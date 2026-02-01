@@ -712,6 +712,89 @@
             max-height: none;
         }
 
+        .ed-layout {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 1rem;
+        }
+
+        .ed-side {
+            background: #fffdf8;
+            border: 1px solid rgba(0,0,0,0.08);
+            padding: 1rem;
+            box-shadow: 0 10px 24px rgba(0,0,0,0.06);
+            display: grid;
+            gap: 1rem;
+        }
+
+        .ed-nav button {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 0.6rem 0.8rem;
+            border: 1px solid rgba(0,0,0,0.08);
+            background: #fff;
+            margin-bottom: 0.4rem;
+            cursor: pointer;
+        }
+
+        .ed-nav button.active {
+            background: var(--color-dark);
+            color: var(--color-cream);
+        }
+
+        .ed-main {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .ed-toolbar {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .label-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.2rem 0.55rem;
+            border-radius: 999px;
+            border: 1px solid rgba(0,0,0,0.12);
+            font-size: 0.8rem;
+            cursor: default;
+        }
+
+        .ed-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 7000;
+        }
+
+        .ed-modal.active { display: flex; }
+
+        .ed-modal .content {
+            background: #fff;
+            width: min(900px, 94vw);
+            max-height: 90vh;
+            overflow: auto;
+            padding: 1.25rem;
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .activity-feed {
+            display: grid;
+            gap: 0.4rem;
+            font-size: 0.9rem;
+            color: #444;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -1062,14 +1145,79 @@
                 <button class="ed-btn" onclick="logout()">Logout</button>
             </div>
         </div>
-        <div class="ed-stats" id="edStats"></div>
-        <div class="ed-filters">
-            <button class="ed-filter active" data-filter="all">All</button>
-            <button class="ed-filter" data-filter="pending">Pending</button>
-            <button class="ed-filter" data-filter="approved">Approved</button>
-            <button class="ed-filter" data-filter="rejected">Rejected</button>
+        <div class="ed-layout">
+            <aside class="ed-side">
+                <div class="ed-nav">
+                    <button class="active" data-edview="dashboard">Dashboard</button>
+                    <button data-edview="submissions">All Submissions</button>
+                    <button data-edview="labels">Labels / Categories</button>
+                    <button data-edview="settings">Settings</button>
+                </div>
+                <div>
+                    <strong>Activity</strong>
+                    <div class="activity-feed" id="activityFeed"></div>
+                </div>
+            </aside>
+            <main class="ed-main">
+                <div class="ed-stats" id="edStats"></div>
+                <div class="ed-toolbar">
+                    <input id="edSearch" placeholder="Search title/author/content" style="padding:0.5rem;border:1px solid rgba(0,0,0,0.12);flex:1 1 220px;">
+                    <input id="edDateFrom" type="date" style="padding:0.45rem;border:1px solid rgba(0,0,0,0.12);">
+                    <input id="edDateTo" type="date" style="padding:0.45rem;border:1px solid rgba(0,0,0,0.12);">
+                    <select id="edLabelFilter" style="padding:0.45rem;border:1px solid rgba(0,0,0,0.12);">
+                        <option value="">Label filter</option>
+                    </select>
+                    <select id="edSort" style="padding:0.45rem;border:1px solid rgba(0,0,0,0.12);">
+                        <option value="date">Sort by date</option>
+                        <option value="title">Sort by title</option>
+                        <option value="rating">Sort by rating</option>
+                    </select>
+                </div>
+                <div class="ed-filters">
+                    <button class="ed-filter active" data-filter="all">All</button>
+                    <button class="ed-filter" data-filter="pending">Pending</button>
+                    <button class="ed-filter" data-filter="approved">Approved</button>
+                    <button class="ed-filter" data-filter="rejected">Rejected</button>
+                </div>
+                <div class="ed-toolbar">
+                    <button class="ed-btn" id="bulkApprove">Approve All</button>
+                    <button class="ed-btn secondary" id="bulkReject">Reject All</button>
+                    <button class="ed-btn secondary" id="bulkAddLabel">Add Label</button>
+                    <button class="ed-btn secondary" id="bulkRemoveLabel">Remove Label</button>
+                    <button class="ed-btn secondary" id="bulkExport">Export Selected</button>
+                </div>
+                <div class="ed-list" id="edList"></div>
+            </main>
         </div>
-        <div class="ed-list" id="edList"></div>
+    </div>
+
+    <div id="edDetailModal" class="ed-modal">
+        <div class="content">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <h4 id="detailTitle"></h4>
+                <button class="ed-btn secondary" onclick="closeDetail()">Close</button>
+            </div>
+            <div id="detailMeta" class="ed-meta"></div>
+            <div id="detailBody" class="ed-preview expanded"></div>
+            <div id="detailProfile" class="ed-meta"></div>
+            <div>
+                <strong>Timeline</strong>
+                <div id="detailTimeline" class="activity-feed"></div>
+            </div>
+            <div>
+                <strong>Internal Notes</strong>
+                <textarea id="detailNotes" rows="3" style="width:100%;padding:0.6rem;border:1px solid rgba(0,0,0,0.12);"></textarea>
+            </div>
+            <div>
+                <strong>Rating</strong>
+                <div id="detailRating" style="display:flex;gap:0.35rem;"></div>
+            </div>
+            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+                <button class="ed-btn" id="detailApprove">Approve</button>
+                <button class="ed-btn secondary" id="detailReject">Reject</button>
+                <button class="ed-btn secondary" id="detailPublish">Publish to Gallery</button>
+            </div>
+        </div>
     </div>
 
     <div class="container">
@@ -1204,6 +1352,34 @@
 
         function saveProfiles(obj) {
             localStorage.setItem('profiles', JSON.stringify(obj));
+        }
+
+        // Labels
+        function loadLabels() {
+            try {
+                return JSON.parse(localStorage.getItem('labels') || '[]');
+            } catch {
+                return [];
+            }
+        }
+
+        function saveLabels(list) {
+            localStorage.setItem('labels', JSON.stringify(list));
+        }
+
+        // Activity feed
+        function logActivity(text) {
+            const feed = JSON.parse(localStorage.getItem('activityFeed') || '[]');
+            feed.unshift({ text, ts: new Date().toISOString() });
+            localStorage.setItem('activityFeed', JSON.stringify(feed.slice(0, 30)));
+        }
+
+        function loadActivity() {
+            try {
+                return JSON.parse(localStorage.getItem('activityFeed') || '[]');
+            } catch {
+                return [];
+            }
         }
 
         // Check backend health status

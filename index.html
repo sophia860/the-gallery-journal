@@ -284,6 +284,40 @@
             font-weight: 300;
         }
 
+        .user-chip {
+            display: none;
+            align-items: center;
+            gap: 0.75rem;
+            font-family: var(--font-sans);
+            color: var(--color-dark);
+        }
+
+        .user-pill {
+            background: rgba(139, 115, 85, 0.12);
+            color: var(--color-dark);
+            padding: 0.5rem 0.9rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+        }
+
+        .logout-btn {
+            border: 1px solid var(--color-light-accent);
+            background: #fff;
+            color: var(--color-dark);
+            padding: 0.45rem 0.85rem;
+            font-family: var(--font-sans);
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .logout-btn:hover {
+            background: var(--color-dark);
+            color: var(--color-cream);
+        }
+
         /* Login Modal */
         .login-modal-overlay {
             display: none;
@@ -346,6 +380,30 @@
             font-size: 0.95rem;
         }
 
+        .quick-login {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .quick-btn {
+            padding: 0.75rem;
+            border: 1px solid var(--color-light-accent);
+            background: #fff;
+            font-family: var(--font-sans);
+            font-size: 0.8rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .quick-btn:hover {
+            border-color: var(--color-accent);
+            color: var(--color-dark);
+        }
+
         .form-group {
             margin-bottom: 1.5rem;
         }
@@ -394,6 +452,98 @@
             background: #3a3a3a;
         }
 
+        .divider {
+            text-align: center;
+            color: var(--color-light-accent);
+            font-family: var(--font-sans);
+            font-size: 0.7rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin: 1.25rem 0 1rem;
+        }
+
+        .studio-section {
+            display: none;
+            background: #fff;
+            border-top: 1px solid rgba(139, 115, 85, 0.18);
+            margin-top: 3rem;
+            padding: 3rem 0 4rem;
+        }
+
+        .studio-section.active {
+            display: block;
+        }
+
+        .studio-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .studio-title {
+            font-size: 1.75rem;
+            font-weight: 400;
+        }
+
+        .studio-nav {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .studio-tab {
+            border: 1px solid var(--color-light-accent);
+            background: #fdfbf7;
+            padding: 0.6rem 1rem;
+            cursor: pointer;
+            font-family: var(--font-sans);
+            font-size: 0.8rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+        }
+
+        .studio-tab.active {
+            background: var(--color-dark);
+            color: var(--color-cream);
+            border-color: var(--color-dark);
+        }
+
+        .studio-panels {
+            border: 1px solid rgba(139, 115, 85, 0.2);
+            background: #fdfbf7;
+            padding: 1.5rem;
+        }
+
+        .studio-panel {
+            display: none;
+            gap: 1rem;
+        }
+
+        .studio-panel.active {
+            display: block;
+        }
+
+        .panel-card {
+            padding: 1.2rem 1rem;
+            border: 1px solid rgba(139, 115, 85, 0.2);
+            margin-bottom: 0.75rem;
+            background: #fff;
+        }
+
+        .panel-card h4 {
+            margin-bottom: 0.35rem;
+            font-weight: 500;
+        }
+
+        .panel-card p {
+            color: #5a5a5a;
+            line-height: 1.6;
+        }
+
         @media (max-width: 768px) {
             .top-nav {
                 padding: 1rem 1.5rem;
@@ -428,6 +578,11 @@
             .login-modal {
                 padding: 2rem 1.5rem;
             }
+
+            .studio-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
     </style>
 </head>
@@ -438,6 +593,10 @@
             <button class="login-btn" onclick="openLoginModal('editor')">Editor Log In</button>
             <span class="login-divider">|</span>
             <button class="login-btn" onclick="openLoginModal('writer')">Writer Log In</button>
+        </div>
+        <div class="user-chip" id="userChip">
+            <span class="user-pill" id="userName"></span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
         </div>
     </nav>
 
@@ -524,6 +683,13 @@
             <button class="login-modal-close" onclick="closeLoginModal()">&times;</button>
             <h2 id="loginTitle">Log In</h2>
             <p id="loginSubtitle">Access your account</p>
+            <div class="quick-login">
+                <button type="button" class="quick-btn" onclick="demoLogin('editor')">Demo Editor</button>
+                <button type="button" class="quick-btn" onclick="demoLogin('writer')">Demo Writer</button>
+                <button type="button" class="quick-btn" onclick="demoLogin('senior editor')">Senior Editor</button>
+                <button type="button" class="quick-btn" onclick="demoLogin('guest writer')">Guest Writer</button>
+            </div>
+            <div class="divider">or</div>
             <form onsubmit="handleLogin(event)">
                 <div class="form-group">
                     <label for="email">Email</label>
@@ -535,6 +701,54 @@
                 </div>
                 <button type="submit" class="submit-btn">Enter</button>
             </form>
+        </div>
+    </div>
+
+    <!-- Studio Section -->
+    <div class="studio-section" id="studioSection">
+        <div class="container">
+            <div class="studio-header">
+                <div>
+                    <div class="issue-label" style="margin: 0 0 0.5rem;">Writer's Studio</div>
+                    <div class="studio-title">Welcome back, <span id="studioUserName">Writer</span></div>
+                </div>
+                <div class="studio-nav" id="studioTabs">
+                    <button class="studio-tab active" data-panel="my-studio">My Studio</button>
+                    <button class="studio-tab" data-panel="editor">Editor</button>
+                    <button class="studio-tab" data-panel="typography">Typography Lab</button>
+                    <button class="studio-tab" data-panel="dashboard">Editorial Dashboard</button>
+                </div>
+            </div>
+            <div class="studio-panels">
+                <div class="studio-panel active" id="panel-my-studio">
+                    <div class="panel-card">
+                        <h4>Works in Progress</h4>
+                        <p>Continue drafting your latest pieces and keep track of revisions.</p>
+                    </div>
+                    <div class="panel-card">
+                        <h4>Submitted Poems</h4>
+                        <p>Monitor the status of your submissions to the gallery.</p>
+                    </div>
+                </div>
+                <div class="studio-panel" id="panel-editor">
+                    <div class="panel-card">
+                        <h4>Inline Editor</h4>
+                        <p>Refine your poem with editorial suggestions and version history.</p>
+                    </div>
+                </div>
+                <div class="studio-panel" id="panel-typography">
+                    <div class="panel-card">
+                        <h4>Typography Lab</h4>
+                        <p>Experiment with type pairings and layout previews for publication.</p>
+                    </div>
+                </div>
+                <div class="studio-panel" id="panel-dashboard">
+                    <div class="panel-card">
+                        <h4>Editorial Dashboard</h4>
+                        <p>View upcoming issues, assign editors, and track deadlines.</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -857,6 +1071,40 @@ is staying human, staying.`
             }
         });
 
+        // Simple auth state helpers
+        const USERS_KEY = 'gallery_users';
+        const SESSION_KEY = 'gallery_session';
+
+        function loadUsers() {
+            try {
+                return JSON.parse(localStorage.getItem(USERS_KEY)) || {};
+            } catch {
+                return {};
+            }
+        }
+
+        function saveUsers(users) {
+            localStorage.setItem(USERS_KEY, JSON.stringify(users));
+        }
+
+        function setSession(user) {
+            sessionStorage.setItem(SESSION_KEY, JSON.stringify(user));
+            updateAuthUI();
+        }
+
+        function getSession() {
+            try {
+                return JSON.parse(sessionStorage.getItem(SESSION_KEY));
+            } catch {
+                return null;
+            }
+        }
+
+        function clearSession() {
+            sessionStorage.removeItem(SESSION_KEY);
+            updateAuthUI();
+        }
+
         // Open login modal
         function openLoginModal(type) {
             const loginModal = document.getElementById('loginModal');
@@ -941,6 +1189,92 @@ is staying human, staying.`
             // Reset form
             event.target.reset();
         }
+
+        // Local login for demo/quick sign-in or name-only signup
+        function createOrLoginUser({ email, password, name, role }) {
+            const users = loadUsers();
+            const key = email || name?.toLowerCase() || `user-${Date.now()}`;
+            if (!users[key]) {
+                users[key] = {
+                    email: email || `${key}@gallery.local`,
+                    password: password || '',
+                    name: name || 'Writer',
+                    role: role || 'writer'
+                };
+                saveUsers(users);
+            }
+
+            const user = users[key];
+            setSession(user);
+            closeLoginModal();
+            alert(`Welcome, ${user.name}!`);
+        }
+
+        function demoLogin(role) {
+            createOrLoginUser({
+                email: `${role.replace(/\s+/g, '')}@demo.local`,
+                password: '',
+                name: role === 'editor' ? 'Demo Editor' :
+                      role === 'senior editor' ? 'Senior Editor' :
+                      role === 'guest writer' ? 'Guest Writer' : 'Demo Writer',
+                role
+            });
+        }
+
+        function logout() {
+            clearSession();
+        }
+
+        function updateAuthUI() {
+            const session = getSession();
+            const loginButtons = document.querySelector('.login-buttons');
+            const userChip = document.getElementById('userChip');
+            const userName = document.getElementById('userName');
+            const studioSection = document.getElementById('studioSection');
+            const studioUserName = document.getElementById('studioUserName');
+
+            if (session) {
+                loginButtons.style.display = 'none';
+                userChip.style.display = 'flex';
+                userName.textContent = `${session.name} · ${session.role}`;
+                studioUserName.textContent = session.name;
+                studioSection.classList.add('active');
+            } else {
+                loginButtons.style.display = 'flex';
+                userChip.style.display = 'none';
+                studioSection.classList.remove('active');
+            }
+        }
+
+        // Studio tabs
+        const tabs = document.querySelectorAll('.studio-tab');
+        const panels = document.querySelectorAll('.studio-panel');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                panels.forEach(p => p.classList.remove('active'));
+                tab.classList.add('active');
+                const id = tab.getAttribute('data-panel');
+                document.getElementById(`panel-${id}`).classList.add('active');
+            });
+        });
+
+        // Initialize on load
+        updateAuthUI();
+
+        // Name-only signup: submit form with empty password will create a lightweight writer session
+        document.querySelector('.login-modal form').addEventListener('submit', (e) => {
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            if (!passwordInput.value) {
+                e.preventDefault();
+                const name = emailInput.value.trim();
+                if (name) {
+                    createOrLoginUser({ name, role: 'writer' });
+                }
+            }
+        });
+
         // Close login modal when clicking outside
         document.getElementById('loginModal').addEventListener('click', (e) => {
             if (e.target.id === 'loginModal') {

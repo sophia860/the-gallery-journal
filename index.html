@@ -543,6 +543,33 @@
     </footer>
 
     <script>
+
+                // Backend API Configuration
+        const API_CONFIG = {
+            // Change this URL to your actual backend URL
+            baseUrl: 'https://your-backend-api.com',
+            // Or use environment-specific URLs
+            // baseUrl: window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://your-production-api.com',
+            endpoints: {
+                login: '/api/auth/login',
+                health: '/health',
+                ready: '/ready'
+            }
+        };
+
+        // Check backend health status
+        async function checkBackendHealth() {
+            try {
+                const response = await fetch(API_CONFIG.baseUrl + API_CONFIG.endpoints.health);
+                const data = await response.json();
+                console.log('Backend health:', data);
+                return data.status === 'ok';
+            } catch (error) {
+                console.warn('Backend health check failed:', error);
+                return false;
+            }
+        }
+
         const poems = {
             1: {
                 title: "Liminal Spaces",
@@ -855,21 +882,65 @@ is staying human, staying.`
             document.body.style.overflow = 'auto';
         }
 
-        // Handle login form submission
-        function handleLogin(event) {
+// Handle login form submission - connects to backend API
+        async function handleLogin(event) {
             event.preventDefault();
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            const submitBtn = event.target.querySelector('.submit-btn');
+            const originalText = submitBtn.textContent;
 
-            // Placeholder - in production, this would authenticate with a backend
-            console.log('Login attempt:', { email });
-            alert('Login functionality would connect to your backend here.\n\nIn production, this would:\n• Authenticate credentials\n• Create a session\n• Redirect to dashboard');
-            closeLoginModal();
-            
+            // Update button state
+            submitBtn.textContent = 'Signing in...';
+            submitBtn.disabled = true;
+
+            try {
+                // Make API call to backend
+                const response = await fetch(API_CONFIG.baseUrl + API_CONFIG.endpoints.login, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Login successful
+                    console.log('Login successful:', data);
+                    
+                    // Store token if provided
+                    if (data.token) {
+                        localStorage.setItem('authToken', data.token);
+                    }
+                    
+                    // Store user info
+                    if (data.user) {
+                        localStorage.setItem('user', JSON.stringify(data.user));
+                    }
+
+                    closeLoginModal();
+                    alert('Login successful! Welcome back.');
+                    
+                    // Optionally redirect to dashboard
+                    // window.location.href = data.user.role === 'editor' ? '/editor-dashboard' : '/writer-dashboard';
+                } else {
+                    // Login failed
+                    throw new Error(data.message || 'Login failed. Please check your credentials.');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                alert(error.message || 'Unable to connect to server. Please try again later.');
+            } finally {
+                // Reset button state
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
+
             // Reset form
             event.target.reset();
         }
-
         // Close login modal when clicking outside
         document.getElementById('loginModal').addEventListener('click', (e) => {
             if (e.target.id === 'loginModal') {

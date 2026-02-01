@@ -1979,6 +1979,8 @@ is staying human, staying.`
         function requireRole(role) {
             const user = getCurrentUser();
             if (!user || user.role !== role) {
+                // hide any stale studio panel content
+                document.getElementById('studioPanel').style.display = 'none';
                 alert(`Please log in as a ${role} to access this studio.`);
                 openLoginModal(role === 'editor' ? 'editor' : 'writer');
                 return null;
@@ -2181,6 +2183,9 @@ is staying human, staying.`
             });
         }
 
+        // Public homepage should start clean: clear any persisted login/session to avoid auto-showing studios
+        localStorage.removeItem('user');
+        localStorage.removeItem('authToken');
         // Do not auto-open studios; keep homepage focused on reading.
 
         /* Typewriter overlay logic */

@@ -795,6 +795,17 @@
             color: #444;
         }
 
+        .ed-tags-row {
+            display: flex;
+            gap: 0.35rem;
+            flex-wrap: wrap;
+        }
+
+        .ed-checkbox {
+            width: 16px;
+            height: 16px;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -1216,6 +1227,7 @@
                 <button class="ed-btn" id="detailApprove">Approve</button>
                 <button class="ed-btn secondary" id="detailReject">Reject</button>
                 <button class="ed-btn secondary" id="detailPublish">Publish to Gallery</button>
+                <button class="ed-btn secondary" id="detailSaveNotes">Save Notes</button>
             </div>
         </div>
     </div>
@@ -1380,6 +1392,25 @@
             } catch {
                 return [];
             }
+        }
+
+        // Response templates
+        function loadTemplates() {
+            try {
+                return JSON.parse(localStorage.getItem('templates') || '[]');
+            } catch {
+                return [];
+            }
+        }
+
+        function saveTemplates(list) {
+            localStorage.setItem('templates', JSON.stringify(list));
+        }
+
+        function renderLabelPill(name, labels) {
+            const meta = labels.find(l => l.name === name);
+            const color = meta?.color || '#8b7355';
+            return `<span class="label-pill" style="border-color:${color};color:${color};">${name}</span>`;
         }
 
         // Check backend health status
@@ -1955,6 +1986,7 @@ is staying human, staying.`
             document.getElementById('edUser').textContent = user.email;
 
             const submissions = loadSubmissions();
+            const labels = loadLabels();
             const stats = {
                 total: submissions.length,
                 pending: submissions.filter(s => s.status === 'pending').length,
@@ -1976,7 +2008,27 @@ is staying human, staying.`
 
             const listEl = document.getElementById('edList');
             listEl.innerHTML = '';
-            const filtered = submissions.filter(sub => filter === 'all' ? true : sub.status === filter);
+            const search = document.getElementById('edSearch').value.toLowerCase();
+            const lf = document.getElementById('edLabelFilter').value;
+            const sortVal = document.getElementById('edSort').value;
+            const df = document.getElementById('edDateFrom').value ? new Date(document.getElementById('edDateFrom').value) : null;
+            const dt = document.getElementById('edDateTo').value ? new Date(document.getElementById('edDateTo').value) : null;
+
+            let filtered = submissions.filter(sub => filter === 'all' ? true : sub.status === filter);
+            filtered = filtered.filter(sub => {
+                const hay = `${sub.title} ${sub.body} ${sub.author} ${(sub.displayName||'')}`.toLowerCase();
+                if (search && !hay.includes(search)) return false;
+                if (lf && !(sub.labels || []).includes(lf)) return false;
+                const d = sub.submittedAt ? new Date(sub.submittedAt) : null;
+                if (df && d && d < df) return false;
+                if (dt && d && d > dt) return false;
+                return true;
+            });
+
+            if (sortVal === 'title') filtered.sort((a,b)=>a.title.localeCompare(b.title));
+            if (sortVal === 'rating') filtered.sort((a,b)=>(b.rating||0)-(a.rating||0));
+            if (sortVal === 'date') filtered.sort((a,b)=>new Date(b.submittedAt||0)-new Date(a.submittedAt||0));
+
             if (filtered.length === 0) {
                 listEl.innerHTML = '<div style="color:#555;">No submissions in this view.</div>';
                 return;
@@ -1988,12 +2040,16 @@ is staying human, staying.`
                 const bodyPreview = sub.body.replace(/\n/g, '<br>');
                 card.innerHTML = `
                     <div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;">
-                        <strong>${sub.title}</strong>
+                        <div style="display:flex;align-items:center;gap:0.5rem;">
+                            <input type="checkbox" class="ed-check" data-id="${sub.id}">
+                            <strong>${sub.title}</strong>
+                        </div>
                         <span class="badge ${sub.status}">${sub.status}</span>
                     </div>
                     <div class="ed-meta">By ${sub.author}${sub.displayName ? ` • ${sub.displayName}` : ''}</div>
                     ${sub.bio ? `<div class="ed-meta">${sub.bio}</div>` : ''}
-                    ${sub.tags ? `<div class="ed-meta">Tags: ${sub.tags.join(', ')}</div>` : ''}
+                    ${(sub.tags && sub.tags.length) ? `<div class="ed-meta">Tags: ${sub.tags.join(', ')}</div>` : ''}
+                    ${(sub.labels && sub.labels.length) ? `<div class="ed-meta">Labels: ${sub.labels.map(l=>renderLabelPill(l, labels)).join(' ')}</div>` : ''}
                     <div class="ed-meta">Submitted: ${new Date(sub.submittedAt || Date.now()).toLocaleString()}</div>
                     <div class="ed-preview" data-id="${sub.id}">${bodyPreview}</div>
                     <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem;">
@@ -2001,6 +2057,7 @@ is staying human, staying.`
                         <button class="ed-btn secondary" data-action="reject" data-id="${sub.id}">Reject</button>
                         ${sub.status === 'approved' ? `<button class="ed-btn secondary" data-publish="${sub.id}">Publish to Gallery</button>` : ''}
                         <button class="ed-btn secondary" data-toggle="${sub.id}">Toggle Preview</button>
+                        <button class="ed-btn secondary" data-detail="${sub.id}">Open Details</button>
                     </div>
                 `;
                 listEl.appendChild(card);
@@ -2014,7 +2071,9 @@ is staying human, staying.`
                     const idx = list.findIndex(s => s.id === id);
                     if (idx >= 0) {
                         list[idx].status = action === 'approve' ? 'approved' : 'rejected';
+                        (list[idx].timeline = list[idx].timeline || []).push({ action: action === 'approve' ? 'approved' : 'rejected', ts: new Date().toISOString() });
                         saveSubmissions(list);
+                        logActivity(`${action === 'approve' ? 'Approved' : 'Rejected'} "${list[idx].title}"`);
                         renderEditorStudio(user, filter);
                     }
                 });
@@ -2032,7 +2091,25 @@ is staying human, staying.`
                 btn.addEventListener('click', () => {
                     const id = btn.getAttribute('data-publish');
                     publishToGallery(id);
+                    logActivity(`Published submission ${id}`);
                 });
+            });
+
+            listEl.querySelectorAll('button[data-detail]').forEach(btn => {
+                btn.addEventListener('click', () => openDetail(btn.getAttribute('data-detail')));
+            });
+
+            document.getElementById('edLabelFilter').innerHTML = '<option value="">Label filter</option>' + labels.map(l=>`<option value="${l.name}">${l.name}</option>`).join('');
+            document.getElementById('activityFeed').innerHTML = loadActivity().map(a => `<div>• ${a.text} — ${new Date(a.ts).toLocaleTimeString()}</div>`).join('') || '<div>No recent activity.</div>';
+            document.getElementById('bulkApprove').onclick = () => bulkAction('approve', filter);
+            document.getElementById('bulkReject').onclick = () => bulkAction('reject', filter);
+            document.getElementById('bulkAddLabel').onclick = () => bulkLabel(true, filter);
+            document.getElementById('bulkRemoveLabel').onclick = () => bulkLabel(false, filter);
+            document.getElementById('bulkExport').onclick = () => bulkExport();
+            ['edSearch','edDateFrom','edDateTo','edLabelFilter','edSort'].forEach(id=>{
+                const el = document.getElementById(id);
+                el.onchange = () => renderEditorStudio(user, filter);
+                if (id==='edSearch') el.oninput = () => renderEditorStudio(user, filter);
             });
         }
 
@@ -2171,7 +2248,11 @@ is staying human, staying.`
                 tags: twTags.value.split(',').map(t => t.trim()).filter(Boolean),
                 notes: twNotes.value.trim(),
                 displayName: profile.displayName,
-                bio: profile.bio
+                bio: profile.bio,
+                labels: [],
+                rating: 0,
+                timeline: [{ action: 'submitted', ts: new Date().toISOString() }],
+                internalNotes: ''
             });
             saveSubmissions(submissions);
             // Also store as draft with status
@@ -2257,6 +2338,209 @@ is staying human, staying.`
             closeProfileModal();
             renderWriterStudio(user);
         });
+
+        /* Labels management */
+        function ensureDefaultLabels() {
+            const labels = loadLabels();
+            if (labels.length === 0) {
+                const seed = [
+                    { name: 'Staff Pick', color: '#c76f51' },
+                    { name: 'Shortlisted', color: '#5a8f7b' },
+                    { name: 'Needs Second Review', color: '#b28c23' },
+                    { name: 'Hold for Next Issue', color: '#7a6fa0' }
+                ];
+                saveLabels(seed);
+            }
+        }
+
+        ensureDefaultLabels();
+
+        function openLabelManager() {
+            const panel = document.createElement('div');
+            panel.className = 'ed-modal active';
+            panel.innerHTML = `
+                <div class="content">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <h4>Labels / Categories</h4>
+                        <button class="ed-btn secondary" data-close>Close</button>
+                    </div>
+                    <div id="labelList"></div>
+                    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+                        <input id="newLabelName" placeholder="Label name" style="flex:1;min-width:140px;padding:0.5rem;border:1px solid rgba(0,0,0,0.12);">
+                        <input id="newLabelColor" type="color" value="#8b7355" style="width:60px;height:42px;border:1px solid rgba(0,0,0,0.12);">
+                        <button class="ed-btn" id="addLabelBtn">Add Label</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(panel);
+
+            function renderLabels() {
+                const labels = loadLabels();
+                const list = panel.querySelector('#labelList');
+                list.innerHTML = labels.map(l => `
+                    <div style="display:flex;align-items:center;gap:0.5rem;margin:0.3rem 0;">
+                        ${renderLabelPill(l.name, labels)}
+                        <button class="ed-btn secondary" data-del="${l.name}">Delete</button>
+                    </div>
+                `).join('') || '<div>No labels yet.</div>';
+                list.querySelectorAll('button[data-del]').forEach(btn => {
+                    btn.onclick = () => {
+                        const updated = loadLabels().filter(x => x.name !== btn.getAttribute('data-del'));
+                        saveLabels(updated);
+                        renderLabels();
+                    };
+                });
+            }
+
+            panel.querySelector('[data-close]').onclick = () => panel.remove();
+            panel.querySelector('#addLabelBtn').onclick = () => {
+                const name = panel.querySelector('#newLabelName').value.trim();
+                const color = panel.querySelector('#newLabelColor').value;
+                if (!name) return;
+                const labels = loadLabels();
+                if (labels.some(l => l.name.toLowerCase() === name.toLowerCase())) return;
+                labels.push({ name, color });
+                saveLabels(labels);
+                panel.querySelector('#newLabelName').value = '';
+                renderLabels();
+            };
+            renderLabels();
+        }
+
+        document.querySelectorAll('.ed-nav button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.ed-nav button').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                if (btn.getAttribute('data-edview') === 'labels') {
+                    openLabelManager();
+                }
+            });
+        });
+
+        /* Bulk actions */
+        function getSelectedIds() {
+            return Array.from(document.querySelectorAll('.ed-check:checked')).map(cb => cb.getAttribute('data-id'));
+        }
+
+        function bulkAction(action, filter) {
+            const ids = getSelectedIds();
+            if (ids.length === 0) return alert('Select submissions first.');
+            const list = loadSubmissions();
+            ids.forEach(id => {
+                const idx = list.findIndex(s => s.id === id);
+                if (idx >= 0) {
+                    list[idx].status = action === 'approve' ? 'approved' : 'rejected';
+                    (list[idx].timeline = list[idx].timeline || []).push({ action: action === 'approve' ? 'approved' : 'rejected', ts: new Date().toISOString() });
+                }
+            });
+            saveSubmissions(list);
+            logActivity(`${action === 'approve' ? 'Approved' : 'Rejected'} ${ids.length} submissions`);
+            renderEditorStudio(getCurrentUser(), filter);
+        }
+
+        function bulkLabel(add, filter) {
+            const ids = getSelectedIds();
+            if (ids.length === 0) return alert('Select submissions first.');
+            const label = prompt(add ? 'Label to add' : 'Label to remove');
+            if (!label) return;
+            const list = loadSubmissions();
+            ids.forEach(id => {
+                const idx = list.findIndex(s => s.id === id);
+                if (idx >= 0) {
+                    list[idx].labels = list[idx].labels || [];
+                    if (add) {
+                        if (!list[idx].labels.includes(label)) list[idx].labels.push(label);
+                    } else {
+                        list[idx].labels = list[idx].labels.filter(l => l !== label);
+                    }
+                }
+            });
+            saveSubmissions(list);
+            logActivity(`${add ? 'Added' : 'Removed'} label "${label}" on ${ids.length} submissions`);
+            renderEditorStudio(getCurrentUser(), filter);
+        }
+
+        function bulkExport() {
+            const ids = getSelectedIds();
+            if (ids.length === 0) return alert('Select submissions first.');
+            const list = loadSubmissions().filter(s => ids.includes(s.id));
+            const blob = new Blob([JSON.stringify(list, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'submissions.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        /* Detail modal */
+        const detailModal = document.getElementById('edDetailModal');
+        const detailNotes = document.getElementById('detailNotes');
+
+        function openDetail(id) {
+            const subs = loadSubmissions();
+            const sub = subs.find(s => s.id === id);
+            if (!sub) return;
+            detailModal.classList.add('active');
+            document.getElementById('detailTitle').textContent = sub.title;
+            document.getElementById('detailMeta').innerHTML = `
+                <div>Author: ${sub.author}${sub.displayName ? ` • ${sub.displayName}` : ''}</div>
+                ${sub.bio ? `<div>${sub.bio}</div>` : ''}
+                ${(sub.tags && sub.tags.length) ? `<div>Tags: ${sub.tags.join(', ')}</div>` : ''}
+                ${(sub.labels && sub.labels.length) ? `<div>Labels: ${sub.labels.join(', ')}</div>` : ''}
+                <div>Submitted: ${new Date(sub.submittedAt || Date.now()).toLocaleString()}</div>
+            `;
+            document.getElementById('detailBody').innerHTML = sub.body.replace(/\n/g, '<br>');
+            document.getElementById('detailProfile').innerHTML = `
+                <div><strong>${sub.displayName || sub.author}</strong></div>
+                ${sub.bio || ''}
+            `;
+            document.getElementById('detailTimeline').innerHTML = (sub.timeline || []).map(t => `<div>• ${t.action} — ${new Date(t.ts).toLocaleString()}</div>`).join('') || '<div>No timeline yet.</div>';
+            detailNotes.value = sub.internalNotes || '';
+            const ratingEl = document.getElementById('detailRating');
+            ratingEl.innerHTML = '';
+            for (let i=1;i<=5;i++) {
+                const b = document.createElement('button');
+                b.className = 'ed-btn secondary';
+                b.textContent = i <= (sub.rating||0) ? '★' : '☆';
+                b.onclick = () => {
+                    sub.rating = i;
+                    saveSubmissions(subs);
+                    renderEditorStudio(getCurrentUser());
+                    openDetail(id);
+                };
+                ratingEl.appendChild(b);
+            }
+            document.getElementById('detailApprove').onclick = () => {
+                sub.status = 'approved';
+                (sub.timeline = sub.timeline || []).push({ action: 'approved', ts: new Date().toISOString() });
+                saveSubmissions(subs);
+                logActivity(`Approved "${sub.title}"`);
+                renderEditorStudio(getCurrentUser());
+                openDetail(id);
+            };
+            document.getElementById('detailReject').onclick = () => {
+                sub.status = 'rejected';
+                (sub.timeline = sub.timeline || []).push({ action: 'rejected', ts: new Date().toISOString() });
+                saveSubmissions(subs);
+                logActivity(`Rejected "${sub.title}"`);
+                renderEditorStudio(getCurrentUser());
+                openDetail(id);
+            };
+            document.getElementById('detailPublish').onclick = () => {
+                publishToGallery(sub.id);
+                logActivity(`Published "${sub.title}"`);
+            };
+            document.getElementById('detailSaveNotes').onclick = () => {
+                sub.internalNotes = detailNotes.value;
+                saveSubmissions(subs);
+                logActivity(`Saved notes for "${sub.title}"`);
+            };
+        }
+
+        function closeDetail() {
+            detailModal.classList.remove('active');
+        }
     </script>
 </body>
 </html>

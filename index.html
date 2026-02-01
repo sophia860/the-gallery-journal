@@ -556,6 +556,56 @@
             font-size: 0.95rem;
         }
 
+        /* Profile */
+        .profile-card {
+            border: 1px solid rgba(139,115,85,0.2);
+            background: #fdfaf6;
+            padding: 1rem;
+            display: grid;
+            gap: 0.35rem;
+            align-items: center;
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .profile-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 6000;
+        }
+
+        .profile-modal.active { display: flex; }
+
+        .profile-modal .content {
+            background: #fffdf8;
+            padding: 1.5rem;
+            width: min(520px, 90vw);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            border: 1px solid rgba(0,0,0,0.1);
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .profile-modal label {
+            font-size: 0.9rem;
+            color: #4a4a4a;
+        }
+
+        .profile-modal input, .profile-modal textarea {
+            width: 100%;
+            padding: 0.6rem 0.75rem;
+            border: 1px solid rgba(0,0,0,0.12);
+            background: #fff;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -1014,6 +1064,19 @@
 
         function saveDrafts(list) {
             localStorage.setItem('drafts', JSON.stringify(list));
+        }
+
+        // Profiles
+        function loadProfiles() {
+            try {
+                return JSON.parse(localStorage.getItem('profiles') || '{}');
+            } catch {
+                return {};
+            }
+        }
+
+        function saveProfiles(obj) {
+            localStorage.setItem('profiles', JSON.stringify(obj));
         }
 
         // Check backend health status
@@ -1532,12 +1595,24 @@ is staying human, staying.`
             const panel = document.getElementById('studioPanel');
             panel.style.display = 'block';
             const submissions = loadSubmissions().filter(s => s.author === user.email);
+            const profile = getProfile(user.email);
             panel.innerHTML = `
                 <h4>Writer's Studio — ${user.email}</h4>
-                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.75rem;">
-                    <button class="studio-btn" onclick="openTypewriter()">Open Focus Mode</button>
+                <div class="profile-card">
+                    <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap;">
+                        ${profile.photo ? `<img src="${profile.photo}" alt="Profile" style="width:60px;height:60px;object-fit:cover;border-radius:50%;border:1px solid rgba(0,0,0,0.1);">` : ''}
+                        <div>
+                            <div><strong>${profile.displayName || 'Set your display name'}</strong></div>
+                            ${profile.bio ? `<div style="font-size:0.9rem;color:#555;max-width:520px;">${profile.bio}</div>` : '<div style="font-size:0.9rem;color:#777;">Add a short bio (max 300 chars).</div>'}
+                            <div style="font-size:0.85rem;color:#777;">${profile.location || ''} ${profile.website ? '• ' + profile.website : ''}</div>
+                        </div>
+                    </div>
+                    <div class="profile-actions">
+                        <button class="studio-btn secondary" onclick="openProfileModal()">Profile Settings</button>
+                        <button class="studio-btn" onclick="openTypewriter()">Open Focus Mode</button>
+                    </div>
                 </div>
-                <div class="studio-list" id="writerSubmissions">
+                <div class="studio-list" id="writerSubmissions" style="margin-top:1rem;">
                     ${submissions.length === 0 ? '<p>No submissions yet.</p>' : ''}
                 </div>
             `;
@@ -1551,6 +1626,8 @@ is staying human, staying.`
                     <div style="font-size:0.9rem;color:#555;">${sub.body.slice(0,140)}${sub.body.length>140?'...':''}</div>
                     ${sub.tags ? `<div style="font-size:0.8rem;color:#777;">Tags: ${sub.tags.join(', ')}</div>` : ''}
                     ${sub.notes ? `<div style="font-size:0.8rem;color:#777;">Notes: ${sub.notes}</div>` : ''}
+                    <div style="font-size:0.8rem;color:#777;">Display name: ${sub.displayName || profile.displayName || 'N/A'}</div>
+                    ${sub.bio ? `<div style="font-size:0.8rem;color:#777;">Bio: ${sub.bio}</div>` : ''}
                 `;
                 listEl.appendChild(card);
             });
@@ -1579,6 +1656,8 @@ is staying human, staying.`
                     <div style="font-size:0.85rem;color:#777;">By ${sub.author}</div>
                     ${sub.tags ? `<div style="font-size:0.8rem;color:#777;">Tags: ${sub.tags.join(', ')}</div>` : ''}
                     ${sub.notes ? `<div style="font-size:0.8rem;color:#777;">Notes: ${sub.notes}</div>` : ''}
+                    ${sub.displayName ? `<div style="font-size:0.8rem;color:#777;">Display name: ${sub.displayName}</div>` : ''}
+                    ${sub.bio ? `<div style="font-size:0.8rem;color:#777;">Bio: ${sub.bio}</div>` : ''}
                     <div class="submission-actions">
                         <button data-action="approve" data-id="${sub.id}">Approve</button>
                         <button data-action="reject" data-id="${sub.id}" class="secondary">Reject</button>
@@ -1725,6 +1804,7 @@ is staying human, staying.`
                 alert('Please write something before submitting.');
                 return;
             }
+            const profile = getProfile(user.email);
             const submissions = loadSubmissions();
             submissions.push({
                 id: Date.now().toString(),
@@ -1734,7 +1814,9 @@ is staying human, staying.`
                 status: 'pending',
                 submittedAt: new Date().toISOString(),
                 tags: twTags.value.split(',').map(t => t.trim()).filter(Boolean),
-                notes: twNotes.value.trim()
+                notes: twNotes.value.trim(),
+                displayName: profile.displayName,
+                bio: profile.bio
             });
             saveSubmissions(submissions);
             // Also store as draft with status
@@ -1757,6 +1839,69 @@ is staying human, staying.`
         });
         document.getElementById('twSubmit').addEventListener('click', submitFromTypewriter);
         document.getElementById('twClose').addEventListener('click', closeTypewriter);
+
+        /* Profile modal */
+        const profileModal = document.createElement('div');
+        profileModal.id = 'profileModal';
+        profileModal.className = 'profile-modal';
+        profileModal.innerHTML = `
+            <div class="content">
+                <h4>Writer Profile</h4>
+                <label>Display Name</label>
+                <input id="pfDisplay" maxlength="80" placeholder="How your name appears on published poems" />
+                <label>Bio (max 300 chars)</label>
+                <textarea id="pfBio" maxlength="300" rows="3" placeholder="A short bio about you"></textarea>
+                <label>Location (optional)</label>
+                <input id="pfLocation" placeholder="City, Country" />
+                <label>Website / Social link (optional)</label>
+                <input id="pfWebsite" placeholder="https://..." />
+                <label>Profile photo URL (optional)</label>
+                <input id="pfPhoto" placeholder="https://example.com/photo.jpg" />
+                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;justify-content:flex-end;">
+                    <button class="studio-btn secondary" id="pfCancel">Cancel</button>
+                    <button class="studio-btn" id="pfSave">Save Profile</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(profileModal);
+
+        function getProfile(email) {
+            const profiles = loadProfiles();
+            return profiles[email] || {};
+        }
+
+        function openProfileModal() {
+            const user = requireRole('writer');
+            if (!user) return;
+            const p = getProfile(user.email);
+            document.getElementById('pfDisplay').value = p.displayName || '';
+            document.getElementById('pfBio').value = p.bio || '';
+            document.getElementById('pfLocation').value = p.location || '';
+            document.getElementById('pfWebsite').value = p.website || '';
+            document.getElementById('pfPhoto').value = p.photo || '';
+            profileModal.classList.add('active');
+        }
+
+        function closeProfileModal() {
+            profileModal.classList.remove('active');
+        }
+
+        document.getElementById('pfCancel').addEventListener('click', closeProfileModal);
+        document.getElementById('pfSave').addEventListener('click', () => {
+            const user = getCurrentUser();
+            if (!user || user.role !== 'writer') return closeProfileModal();
+            const profiles = loadProfiles();
+            profiles[user.email] = {
+                displayName: document.getElementById('pfDisplay').value.trim(),
+                bio: document.getElementById('pfBio').value.trim(),
+                location: document.getElementById('pfLocation').value.trim(),
+                website: document.getElementById('pfWebsite').value.trim(),
+                photo: document.getElementById('pfPhoto').value.trim()
+            };
+            saveProfiles(profiles);
+            closeProfileModal();
+            renderWriterStudio(user);
+        });
     </script>
 </body>
 </html>

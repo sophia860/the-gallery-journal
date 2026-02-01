@@ -546,10 +546,8 @@
 
                 // Backend API Configuration
         const API_CONFIG = {
-            // Change this URL to your actual backend URL
-            baseUrl: 'https://your-backend-api.com',
-            // Or use environment-specific URLs
-            // baseUrl: window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://your-production-api.com',
+            // Use current origin to talk to bundled backend
+            baseUrl: window.location.origin,
             endpoints: {
                 login: '/api/auth/login',
                 health: '/health',

@@ -1,1295 +1,516 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Gallery - Winter 2026</title>
-    <style>
-        :root {
-            --color-cream: #f5f1e8;
-            --color-dark: #2a2a2a;
-            --color-accent: #8b7355;
-            --color-light-accent: #c9b8a3;
-            --font-serif: 'Georgia', 'Times New Roman', serif;
-            --font-sans: 'Helvetica Neue', Arial, sans-serif;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: var(--font-serif);
-            background-color: var(--color-cream);
-            color: var(--color-dark);
-            line-height: 1.7;
-            overflow-x: hidden;
-        }
-
-        .subtle-bg {
-            background: linear-gradient(180deg, rgba(233, 225, 210, 0.6) 0%, rgba(245, 241, 232, 0.9) 50%, rgba(245, 241, 232, 1) 100%);
-        }
-
-        .hero {
-            min-height: 70vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 4rem 2rem;
-            background: linear-gradient(to bottom, #e8e4da 0%, var(--color-cream) 100%);
-            position: relative;
-        }
-
-        .issue-label {
-            font-family: var(--font-sans);
-            font-size: 0.75rem;
-            letter-spacing: 0.3em;
-            text-transform: uppercase;
-            color: var(--color-accent);
-            margin-bottom: 2rem;
-            font-weight: 400;
-        }
-
-        .hero h1 {
-            font-size: clamp(3rem, 8vw, 5.5rem);
-            font-weight: 400;
-            letter-spacing: -0.02em;
-            margin-bottom: 1.5rem;
-            color: var(--color-dark);
-        }
-
-        .hero h1 em {
-            font-style: italic;
-        }
-
-        .tagline {
-            font-size: 1rem;
-            font-style: italic;
-            color: var(--color-accent);
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-
-        .section-header {
-            font-family: var(--font-sans);
-            font-size: 0.7rem;
-            letter-spacing: 0.25em;
-            text-transform: uppercase;
-            color: var(--color-accent);
-            margin: 5rem 0 3rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--color-light-accent);
-        }
-
-        .poem-grid {
-            display: grid;
-            gap: 2rem;
-            margin-bottom: 5rem;
-        }
-
-        .poem-card {
-            padding: 2.5rem 0;
-            border-bottom: 1px solid rgba(139, 115, 85, 0.15);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .poem-card:hover {
-            padding-left: 1rem;
-        }
-
-        .poem-title {
-            font-size: 1.5rem;
-            font-weight: 400;
-            margin-bottom: 0.5rem;
-            color: var(--color-dark);
-        }
-
-        .poem-author {
-            font-family: var(--font-sans);
-            font-size: 0.85rem;
-            color: var(--color-accent);
-            margin-bottom: 0.75rem;
-        }
-
-        .poem-preview {
-            font-size: 0.95rem;
-            line-height: 1.8;
-            color: #5a5a5a;
-            font-style: italic;
-        }
-
-        .read-more {
-            font-family: var(--font-sans);
-            font-size: 0.75rem;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            color: var(--color-accent);
-            margin-top: 1rem;
-            display: inline-block;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.85);
-            z-index: 1000;
-            overflow-y: auto;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .modal.active {
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 4rem 2rem;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .modal-content {
-            background-color: var(--color-cream);
-            padding: 4rem;
-            max-width: 700px;
-            width: 100%;
-            position: relative;
-            animation: slideUp 0.4s ease;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(30px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .close-btn {
-            position: absolute;
-            top: 2rem;
-            right: 2rem;
-            font-size: 2rem;
-            font-weight: 300;
-            color: var(--color-accent);
-            cursor: pointer;
-            background: none;
-            border: none;
-            line-height: 1;
-            transition: color 0.2s ease;
-        }
-
-        .close-btn:hover {
-            color: var(--color-dark);
-        }
-
-        .modal-poem-title {
-            font-size: 2rem;
-            font-weight: 400;
-            margin-bottom: 0.5rem;
-        }
-
-        .modal-poem-author {
-            font-family: var(--font-sans);
-            font-size: 0.9rem;
-            color: var(--color-accent);
-            margin-bottom: 3rem;
-        }
-
-        .modal-poem-text {
-            font-size: 1.05rem;
-            line-height: 2;
-            white-space: pre-line;
-        }
-
-        footer {
-            text-align: center;
-            padding: 4rem 2rem;
-            font-family: var(--font-sans);
-            font-size: 0.75rem;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            color: var(--color-accent);
-        }
-
-        /* Writer's Studio */
-        .studio {
-            padding: 4rem 0 2rem;
-        }
-
-        .studio-intro {
-            max-width: 760px;
-            margin-bottom: 2rem;
-            font-size: 1rem;
-            color: #4a433a;
-        }
-
-        .studio-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .studio-card {
-            background: #fff;
-            padding: 1.5rem;
-            border: 1px solid rgba(139, 115, 85, 0.15);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.04);
-        }
-
-        .studio-card h3 {
-            font-family: var(--font-sans);
-            font-size: 0.9rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: var(--color-accent);
-            margin-bottom: 0.75rem;
-        }
-
-        .control-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 0.75rem;
-            margin: 0.5rem 0 1rem;
-        }
-
-        .control-row.single-column {
-            grid-template-columns: 1fr;
-        }
-
-        .control-row label {
-            display: block;
-            font-family: var(--font-sans);
-            font-size: 0.75rem;
-            color: var(--color-dark);
-            margin-bottom: 0.35rem;
-        }
-
-        .control-row select, .control-row input, .control-row textarea {
-            width: 100%;
-            padding: 0.65rem 0.75rem;
-            border: 1px solid var(--color-light-accent);
-            font-family: var(--font-serif);
-            background: #fdfbf7;
-        }
-
-        .studio-preview {
-            background: #fff;
-            border: 1px solid rgba(139, 115, 85, 0.18);
-            padding: 1.5rem;
-            min-height: 240px;
-            line-height: 1.8;
-            transition: all 0.2s ease;
-        }
-
-        .tag-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin: 0.75rem 0 1rem;
-        }
-
-        .pill {
-            padding: 0.35rem 0.65rem;
-            font-size: 0.75rem;
-            font-family: var(--font-sans);
-            border-radius: 999px;
-            background: rgba(139, 115, 85, 0.12);
-            color: var(--color-dark);
-        }
-
-        .ambient-card {
-            border: 1px dashed rgba(139, 115, 85, 0.3);
-            padding: 1rem;
-            background: rgba(245, 241, 232, 0.6);
-        }
-
-        .ambient-card strong {
-            display: block;
-            margin-bottom: 0.4rem;
-            color: var(--color-dark);
-        }
-
-        .version-list {
-            list-style: none;
-            padding-left: 0;
-            margin: 0;
-        }
-
-        .version-list li {
-            padding: 0.5rem 0;
-            border-bottom: 1px solid rgba(139,115,85,0.1);
-            font-size: 0.9rem;
-        }
-
-        .action-btn {
-            margin-top: 0.5rem;
-            display: inline-block;
-            background: var(--color-dark);
-            color: var(--color-cream);
-            padding: 0.75rem 1rem;
-            border: none;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            font-size: 0.75rem;
-            cursor: pointer;
-        }
-
-        .conversation {
-            background: #fdfaf4;
-            border: 1px solid rgba(139, 115, 85, 0.15);
-            padding: 1rem;
-            margin-top: 0.5rem;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .conversation p {
-            margin-bottom: 0.5rem;
-        }
-
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 0.4rem;
-            background: #6fbf73;
-        }
-
-        /* Top Navigation Bar */
-        .top-nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            padding: 1rem 3rem;
-            background-color: rgba(245, 241, 232, 0.95);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            border-bottom: 1px solid rgba(139, 115, 85, 0.1);
-        }
-
-        .login-buttons {
-            display: flex;
-            gap: 1.5rem;
-            align-items: center;
-        }
-
-        .login-btn {
-            font-family: var(--font-sans);
-            font-size: 0.75rem;
-            font-weight: 500;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            color: var(--color-accent);
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 0.5rem 1rem;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .login-btn:hover {
-            color: var(--color-dark);
-        }
-
-        .login-btn::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            width: 0;
-            height: 1px;
-            background-color: var(--color-dark);
-            transition: all 0.3s ease;
-            transform: translateX(-50%);
-        }
-
-        .login-btn:hover::after {
-            width: 80%;
-        }
-
-        .login-divider {
-            color: var(--color-light-accent);
-            font-weight: 300;
-        }
-
-        /* Login Modal */
-        .login-modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.6);
-            z-index: 3000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .login-modal-overlay.active {
-            display: flex;
-        }
-
-        .login-modal {
-            background: var(--color-cream);
-            padding: 3rem;
-            max-width: 450px;
-            width: 90%;
-            position: relative;
-            animation: slideUp 0.4s ease;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        }
-
-        .login-modal-close {
-            position: absolute;
-            top: 1rem;
-            right: 1.5rem;
-            font-size: 2rem;
-            font-weight: 300;
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: var(--color-accent);
-            transition: color 0.3s ease;
-            line-height: 1;
-        }
-
-        .login-modal-close:hover {
-            color: var(--color-dark);
-        }
-
-        .login-modal h2 {
-            font-size: 2rem;
-            font-weight: 400;
-            margin-bottom: 0.5rem;
-            text-align: center;
-            color: var(--color-dark);
-        }
-
-        .login-modal p {
-            color: var(--color-accent);
-            text-align: center;
-            font-style: italic;
-            margin-bottom: 2rem;
-            font-size: 0.95rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            font-family: var(--font-sans);
-            font-size: 0.7rem;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            color: var(--color-accent);
-            margin-bottom: 0.5rem;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 0.8rem 1rem;
-            font-family: var(--font-serif);
-            font-size: 1rem;
-            border: 1px solid var(--color-light-accent);
-            background: #fff;
-            transition: border-color 0.3s ease;
-            color: var(--color-dark);
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--color-accent);
-        }
-
-        .submit-btn {
-            width: 100%;
-            padding: 1rem;
-            font-family: var(--font-sans);
-            font-size: 0.75rem;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            background: var(--color-dark);
-            color: var(--color-cream);
-            border: none;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-
-        .submit-btn:hover {
-            background: #3a3a3a;
-        }
-
-        @media (max-width: 768px) {
-            .top-nav {
-                padding: 1rem 1.5rem;
-            }
-
-            .login-btn {
-                font-size: 0.65rem;
-                padding: 0.5rem 0.5rem;
-            }
-
-            .hero {
-                min-height: 60vh;
-                padding: 6rem 1.5rem 3rem;
-            }
-
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-
-            .modal-content {
-                padding: 2.5rem 1.5rem;
-            }
-
-            .modal-poem-title {
-                font-size: 1.5rem;
-            }
-
-            .section-header {
-                margin: 3rem 0 2rem;
-            }
-
-            .login-modal {
-                padding: 2rem 1.5rem;
-            }
-
-            .studio-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Writer's Studio</title>
+  <style>
+    :root {
+      --bg: #f8f6f2;
+      --paper: #ffffff;
+      --ink: #1f1f1f;
+      --muted: #6e6a63;
+      --border: #e5e1da;
+      --accent: #c07a5c;
+      --accent-2: #a06043;
+      --soft: #f1ece4;
+      --mono: "IBM Plex Mono", "SFMono-Regular", Menlo, monospace;
+      --serif: "IBM Plex Serif", "Georgia", serif;
+      --sans: "Inter", "Helvetica Neue", Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--serif);
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.6;
+    }
+    a { color: inherit; }
+
+    .app-shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Login */
+    .login-shell {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top left, rgba(212,175,55,0.16), transparent 55%),
+                  radial-gradient(circle at bottom right, rgba(193,122,92,0.18), transparent 55%),
+                  #f7f4ee;
+      padding: 2.5rem 1.25rem;
+    }
+    .login-card {
+      width: 100%;
+      max-width: 1100px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+      gap: 2rem;
+      background: rgba(255,255,255,0.94);
+      border-radius: 18px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.12);
+      overflow: hidden;
+      border: 1px solid rgba(0,0,0,0.04);
+    }
+    .login-left {
+      padding: 3rem 3.25rem;
+      border-right: 1px solid var(--border);
+      background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255,250,245,0.96));
+    }
+    .login-right {
+      padding: 2.75rem 3rem;
+      background: radial-gradient(circle at top, rgba(212,175,55,0.12), transparent 55%),
+                  linear-gradient(180deg, #101010, #191919);
+      color: #f5f2ea;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .logo { text-transform: uppercase; letter-spacing: 0.14em; font-size: 0.82rem; color: var(--muted); }
+    .title { font-size: 2.6rem; font-weight: 300; margin: 0.5rem 0 0; color: var(--ink); }
+    .tagline { color: var(--accent); font-style: italic; margin: 0.2rem 0 2rem; }
+    .tabs { display: inline-flex; padding: 0.25rem; background: var(--soft); border-radius: 999px; margin-bottom: 1.5rem; }
+    .tab {
+      border: none; background: transparent; padding: 0.55rem 1.2rem; border-radius: 999px; cursor: pointer;
+      font-family: var(--serif); color: var(--muted); letter-spacing: 0.02em;
+    }
+    .tab.active { background: #fff; color: var(--ink); box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+    .form-group { margin-bottom: 1.2rem; }
+    label { display: block; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 0.4rem; }
+    input, textarea, select {
+      width: 100%; border: 1px solid var(--border); border-radius: 12px; padding: 0.85rem 1rem; font-family: var(--serif);
+      font-size: 1rem; background: #fff; transition: border 0.2s, box-shadow 0.2s;
+    }
+    input:focus, textarea:focus, select:focus {
+      outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(192,122,92,0.2);
+    }
+    .btn {
+      width: 100%; border: none; padding: 0.95rem 1rem; border-radius: 12px; background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #fff; font-family: var(--sans); text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; font-weight: 600;
+      box-shadow: 0 14px 30px rgba(192,122,92,0.4); transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 16px 34px rgba(192,122,92,0.45); }
+    .error { color: #d9534f; font-size: 0.9rem; margin-top: 0.5rem; display: none; }
+
+    .demo-row { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 1rem; }
+    .pill {
+      flex: 1 1 180px; border-radius: 999px; padding: 0.55rem 0.8rem; background: #fff; border: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center; color: var(--ink); cursor: pointer;
+    }
+    .pill strong { color: var(--accent-2); font-weight: 600; }
+    .pill span { color: var(--muted); font-size: 0.86rem; }
+    .pill:hover { border-color: var(--accent); }
+
+    .right-header { text-transform: uppercase; letter-spacing: 0.18em; font-size: 0.78rem; color: rgba(245,242,234,0.72); }
+    .right-quote-title { font-size: 1.3rem; margin: 0.9rem 0; font-weight: 300; }
+    .right-quote { color: rgba(245,242,234,0.9); line-height: 1.7; }
+    .excerpt-card { margin-top: 1.6rem; padding: 1.2rem; border-radius: 14px; background: rgba(12,12,12,0.72); border: 1px solid rgba(255,255,255,0.06); }
+    .badge { display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.35rem 0.75rem; border-radius: 999px; border: 1px solid rgba(245,242,234,0.36); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.14em; margin-top: 1.4rem; color: rgba(245,242,234,0.85); }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: #7d9b7a; box-shadow: 0 0 10px rgba(125,155,122,0.7); }
+
+    /* App layout */
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; background: #fff; border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 10;
+    }
+    .nav { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+    .nav button {
+      border: 1px solid var(--border); background: #fff; padding: 0.65rem 0.9rem; border-radius: 10px; cursor: pointer;
+      font-family: var(--sans); color: var(--ink);
+    }
+    .nav button.active { border-color: var(--accent); color: var(--accent-2); background: #fff7f2; }
+    .pill-user { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.55rem 0.9rem; border: 1px solid var(--border); border-radius: 12px; background: #fff; }
+    .layout {
+      display: grid; grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr); gap: 1.25rem; padding: 1.25rem 1.5rem 2rem;
+    }
+    .card {
+      background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 1.2rem 1.25rem; box-shadow: 0 10px 24px rgba(0,0,0,0.04);
+    }
+    h2 { margin-top: 0; font-weight: 500; letter-spacing: -0.01em; }
+    .subtle { color: var(--muted); font-size: 0.95rem; }
+    .list { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.65rem; }
+    .list li { padding: 0.65rem 0.75rem; border: 1px solid var(--border); border-radius: 10px; background: #fff; display: flex; justify-content: space-between; align-items: center; }
+
+    .editor-shell { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr); gap: 1rem; }
+    .textarea {
+      width: 100%; min-height: 260px; border-radius: 12px; border: 1px solid var(--border); padding: 1rem; font-family: var(--serif); font-size: 1rem; background: #fff;
+    }
+    .preview {
+      border: 1px solid var(--border); border-radius: 12px; background: var(--paper); padding: 1.25rem; min-height: 260px; line-height: 1.8;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+    }
+    .lab-controls { display: grid; gap: 0.75rem; }
+    .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 0.9rem; }
+    .gallery-card { padding: 0.95rem; border: 1px solid var(--border); border-radius: 12px; background: #fff; }
+    .status-tag { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.3rem 0.6rem; border-radius: 999px; border: 1px solid var(--border); font-size: 0.82rem; }
+
+    @media (max-width: 980px) {
+      .login-card { grid-template-columns: 1fr; }
+      .login-left { border-right: none; border-bottom: 1px solid var(--border); }
+      .layout, .editor-shell { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
-    <!-- Top Navigation -->
-    <nav class="top-nav">
-        <div class="login-buttons">
-            <button class="login-btn" onclick="openLoginModal('editor')">Editor Log In</button>
-            <span class="login-divider">|</span>
-            <button class="login-btn" onclick="openLoginModal('writer')">Writer Log In</button>
-        </div>
-    </nav>
+  <div id="app" class="app-shell"></div>
 
-    <div class="hero">
-        <div class="issue-label">Winter 2026</div>
-        <h1>The <em>Gallery</em></h1>
-        <p class="tagline">Where poetry passes through like light through glass</p>
-    </div>
+  <script>
+    // Data stores
+    let users = JSON.parse(localStorage.getItem('studioUsers') || '[]');
+    let drafts = JSON.parse(localStorage.getItem('studioDrafts') || '[]');
+    let currentUser = JSON.parse(sessionStorage.getItem('currentUser') || 'null');
 
-    <div class="container">
-        <div class="section-header">Featured</div>
-        
-        <div class="poem-grid" id="poemGrid">
-            <div class="poem-card" data-poem-id="1">
-                <div class="poem-title">Liminal Spaces</div>
-                <div class="poem-author">by Sarah Chen</div>
-                <div class="poem-preview">Between the wanting and the wound,<br>I found a door that opened inward...</div>
-                <div class="read-more">Read Full Poem →</div>
-            </div>
+    function persist() {
+      localStorage.setItem('studioUsers', JSON.stringify(users));
+      localStorage.setItem('studioDrafts', JSON.stringify(drafts));
+      if (currentUser) sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+    }
 
-            <div class="poem-card" data-poem-id="2">
-                <div class="poem-title">The Light Collector</div>
-                <div class="poem-author">by Marcus Webb</div>
-                <div class="poem-preview">She kept jars of morning light,<br>arranged them on the windowsill...</div>
-                <div class="read-more">Read Full Poem →</div>
-            </div>
+    const demoUsers = [
+      { email: 'anna@example.com', password: 'writer123', name: 'Anna Reyes', role: 'writer' },
+      { email: 'editor@example.com', password: 'editor123', name: 'Morgan Hill', role: 'editor' },
+    ];
+    demoUsers.forEach(d => { if (!users.find(u => u.email === d.email)) users.push({ id: 'demo-' + d.email, ...d }); });
+    persist();
 
-            <div class="poem-card" data-poem-id="3">
-                <div class="poem-title">Inheritance</div>
-                <div class="poem-author">by Priya Sharma</div>
-                <div class="poem-preview">My grandmother's hands speak<br>a language I'm still learning...</div>
-                <div class="read-more">Read Full Poem →</div>
-            </div>
-
-            <div class="poem-card" data-poem-id="4">
-                <div class="poem-title">Urban Pastoral</div>
-                <div class="poem-author">by James Liu</div>
-                <div class="poem-preview">The subway busker's violin<br>carves a chapel from concrete...</div>
-                <div class="read-more">Read Full Poem →</div>
-            </div>
-
-            <div class="poem-card" data-poem-id="5">
-                <div class="poem-title">What the Ocean Said</div>
-                <div class="poem-author">by Elena Vasquez</div>
-                <div class="poem-preview">Come back when you're ready<br>to remember what you've forgotten...</div>
-                <div class="read-more">Read Full Poem →</div>
-            </div>
-
-            <div class="poem-card" data-poem-id="6">
-                <div class="poem-title">Anatomy of Silence</div>
-                <div class="poem-author">by David Okonkwo</div>
-                <div class="poem-preview">There are silences that sing<br>and silences that suffocate...</div>
-                <div class="read-more">Read Full Poem →</div>
-            </div>
-
-            <div class="poem-card" data-poem-id="7">
-                <div class="poem-title">The Cartographer's Daughter</div>
-                <div class="poem-author">by Lily Morrison</div>
-                <div class="poem-preview">She drew maps of places<br>that existed only in translation...</div>
-                <div class="read-more">Read Full Poem →</div>
-            </div>
-
-            <div class="poem-card" data-poem-id="8">
-                <div class="poem-title">Midnight Economy</div>
-                <div class="poem-author">by Rafael Torres</div>
-                <div class="poem-preview">The diner at 3am trades in confessions,<br>currency of the sleepless...</div>
-                <div class="read-more">Read Full Poem →</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="container studio subtle-bg" id="writersStudio">
-        <div class="section-header">Writer's Studio</div>
-        <p class="studio-intro">A personal studio where you design first, submit second. Craft your piece with typography controls, set visibility, keep versions, and send it to the Gallery when ready.</p>
-
-        <div class="studio-grid">
-            <div class="studio-card">
-                <h3>Active Calls (Ambient)</h3>
-                <div class="ambient-card">
-                    <strong>Light Through Glass</strong>
-                    <div class="pill">Theme: Liminality</div>
-                    <small>Invitation · Rolling | Typography preserved</small>
+    function showLogin() {
+      const app = document.getElementById('app');
+      app.innerHTML = `
+        <div class="login-shell">
+          <div class="login-card">
+            <div class="login-left">
+              <div>
+                <div class="logo">The Gallery Journal</div>
+                <h1 class="title">The Writer's Studio</h1>
+                <div class="tagline">Step into a quiet room built for your pages.</div>
+                <div class="tabs">
+                  <button class="tab active" id="tab-signin">Sign in</button>
+                  <button class="tab" id="tab-new">New writer</button>
                 </div>
-                <div class="ambient-card">
-                    <strong>City Sonics</strong>
-                    <div class="pill">Theme: Urban sound</div>
-                    <small>Invitation · Gentle deadline</small>
-                </div>
-            </div>
-
-            <div class="studio-card">
-                <h3>Typography Lab</h3>
-                <div class="control-row">
-                    <div>
-                        <label for="fontControl">Font</label>
-                        <select id="fontControl">
-                            <option value="serif">Serif</option>
-                            <option value="sans">Sans</option>
-                            <option value="mono">Mono</option>
-                            <option value="display">Display</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="lineHeightControl">Line Spacing</label>
-                        <input id="lineHeightControl" type="range" min="1.2" max="2.2" step="0.1" value="1.8">
-                    </div>
-                    <div>
-                        <label for="marginControl">Margins</label>
-                        <select id="marginControl">
-                            <option value="compact">Compact</option>
-                            <option value="standard" selected>Standard</option>
-                            <option value="wide">Wide</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="themeControl">Page</label>
-                        <select id="themeControl">
-                            <option value="cream">Cream</option>
-                            <option value="white">White</option>
-                            <option value="ink">Soft Grey</option>
-                            <option value="midnight">Midnight</option>
-                        </select>
-                    </div>
-                </div>
-                <textarea id="studioDraftInput" rows="4" placeholder="Draft your piece here..."></textarea>
-                <div class="studio-preview" id="studioPreview">
-                    The work looks how you imagine it should be read. Adjust typography to feel into the voice.
-                </div>
-            </div>
-
-            <div class="studio-card">
-                <h3>Submission as Publication</h3>
-                <div class="tag-row">
-                    <label><input type="radio" name="visibility" value="private" checked> Private</label>
-                    <label><input type="radio" name="visibility" value="studio"> Studio-only</label>
-                    <label><input type="radio" name="visibility" value="public"> Public</label>
-                </div>
-                <div class="pill" id="visibilityBadge"><span class="status-dot"></span>Private draft URL</div>
-                <div class="control-row single-column">
-                    <div>
-                        <label for="draftState">Draft State</label>
-                        <select id="draftState">
-                            <option value="wip">Work in progress</option>
-                            <option value="ready">Ready to share</option>
-                            <option value="submitted">Submitted to gallery</option>
-                        </select>
-                    </div>
-                </div>
-                <button class="action-btn" id="submitToGallery">Send to Gallery</button>
-                <div id="submissionStatus" style="margin-top:0.5rem;font-family:var(--font-sans);color:var(--color-accent);"></div>
-            </div>
-
-            <div class="studio-card">
-                <h3>Version History</h3>
-                <button class="action-btn" id="saveDraft">Save Version</button>
-                <ul class="version-list" id="versionList"></ul>
-            </div>
-
-            <div class="studio-card">
-                <h3>Conversation Threads</h3>
-                <div class="conversation" id="conversation">
-                    <p><strong>Editor:</strong> Consider trying this in a sans serif—the rhythm might open up.</p>
-                    <p><strong>You:</strong> Noted. Testing Helvetica + wider margins.</p>
-                </div>
-                <textarea id="conversationInput" rows="2" placeholder="Add a thread note..."></textarea>
-                <button class="action-btn" id="addNote">Add Note</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal" id="poemModal">
-        <div class="modal-content">
-            <button class="close-btn" id="closeModal">&times;</button>
-            <div class="modal-poem-title" id="modalTitle"></div>
-            <div class="modal-poem-author" id="modalAuthor"></div>
-            <div class="modal-poem-text" id="modalText"></div>
-        </div>
-    </div>
-
-    <!-- Login Modal -->
-    <div class="login-modal-overlay" id="loginModal">
-        <div class="login-modal">
-            <button class="login-modal-close" onclick="closeLoginModal()">&times;</button>
-            <h2 id="loginTitle">Log In</h2>
-            <p id="loginSubtitle">Access your account</p>
-            <form onsubmit="handleLogin(event)">
-                <div class="form-group">
+                <form id="signin-form">
+                  <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <div class="form-group">
+                    <input type="email" id="email" placeholder="anna@example.com" required autocomplete="username">
+                  </div>
+                  <div class="form-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required>
+                    <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
+                  </div>
+                  <button class="btn" type="submit">Enter studio</button>
+                  <div class="error" id="login-error">Invalid credentials</div>
+                  <p class="subtle" style="margin-top:0.6rem;">Use the demo accounts below, or sign in with a stored account.</p>
+                </form>
+                <form id="new-form" style="display:none;">
+                  <div class="form-group">
+                    <label for="new-name">Your name</label>
+                    <input type="text" id="new-name" placeholder="Type your name to begin" required>
+                  </div>
+                  <button class="btn" type="submit">Create my studio</button>
+                  <p class="subtle" style="margin-top:0.6rem;">We'll create a local writer account in this browser so you can start drafting immediately.</p>
+                </form>
+                <div class="demo-row">
+                  <div class="pill" onclick="fillDemo('anna@example.com','writer123')"><strong>Writer</strong><span>anna@example.com · writer123</span></div>
+                  <div class="pill" onclick="fillDemo('editor@example.com','editor123')"><strong>Editor</strong><span>editor@example.com · editor123</span></div>
                 </div>
-                <button type="submit" class="submit-btn">Enter</button>
-            </form>
+              </div>
+              <div class="subtle" style="margin-top:2rem;">Your work lives only in this browser. Clear storage to reset.</div>
+            </div>
+            <div class="login-right">
+              <div>
+                <div class="right-header">A desk, a deadline, a door you can close</div>
+                <div class="right-quote-title">For writers between drafts</div>
+                <div class="right-quote">
+                  Design the way your work appears on the page, sit with the language until it hums, then send it across to the editors when you are ready.
+                  <br><br><small style="text-transform:uppercase; letter-spacing:0.14em; font-size:0.78rem; color:rgba(245,242,234,0.7);">Winter 2026 · Online Studio</small>
+                </div>
+                <div class="excerpt-card">
+                  <div style="text-transform:uppercase; letter-spacing:0.16em; font-size:0.72rem; color:rgba(245,242,234,0.6); margin-bottom:0.5rem;">From the gallery</div>
+                  <div style="font-style: italic;">The light comes through in slanted geometry—<br>afternoon angles that make ordinary rooms sacred.<br>This is where the drafts learn how to speak.</div>
+                </div>
+              </div>
+              <div>
+                <div style="font-size:0.9rem; color:rgba(245,242,234,0.8);">Active calls, live typography sandbox, editorial queue—waiting inside.</div>
+                <div class="badge"><span class="dot"></span>Studio status: Open</div>
+              </div>
+            </div>
+          </div>
         </div>
-    </div>
+      `;
+      const tabSignin = document.getElementById('tab-signin');
+      const tabNew = document.getElementById('tab-new');
+      const signinForm = document.getElementById('signin-form');
+      const newForm = document.getElementById('new-form');
+      tabSignin.onclick = () => { tabSignin.classList.add('active'); tabNew.classList.remove('active'); signinForm.style.display='block'; newForm.style.display='none'; };
+      tabNew.onclick = () => { tabNew.classList.add('active'); tabSignin.classList.remove('active'); signinForm.style.display='none'; newForm.style.display='block'; document.getElementById('new-name').focus(); };
+      signinForm.onsubmit = handleLogin;
+      newForm.onsubmit = handleQuickStart;
+    }
 
-    <footer>
-        The Gallery &copy; 2026 &nbsp;&middot;&nbsp; A Space for Poetry
-    </footer>
+    function fillDemo(email, password) {
+      const e = document.getElementById('email'); const p = document.getElementById('password');
+      if (!e || !p) return; e.value = email; p.value = password; e.focus();
+    }
 
-    <script>
+    function handleLogin(ev) {
+      ev.preventDefault();
+      const email = (document.getElementById('email').value || '').trim().toLowerCase();
+      const password = document.getElementById('password').value;
+      const err = document.getElementById('login-error');
+      const user = users.find(u => u.email.toLowerCase() === email && u.password === password);
+      if (!user) { err.style.display = 'block'; return; }
+      err.style.display = 'none';
+      currentUser = { id: user.id, name: user.name, role: user.role };
+      persist();
+      renderApp();
+    }
 
-                // Backend API Configuration
-        const API_CONFIG = {
-            // Change this URL to your actual backend URL
-            baseUrl: 'https://your-backend-api.com',
-            // Or use environment-specific URLs
-            // baseUrl: window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://your-production-api.com',
-            endpoints: {
-                login: '/api/auth/login',
-                health: '/health',
-                ready: '/ready'
-            }
+    function handleQuickStart(ev) {
+      ev.preventDefault();
+      const nameInput = document.getElementById('new-name');
+      const name = (nameInput?.value || '').trim();
+      if (!name) return;
+      const id = 'user-' + Date.now();
+      const newUser = { id, email: `${id}@local`, password: null, name, role: 'writer' };
+      users.push(newUser);
+      currentUser = { id, name, role: 'writer' };
+      persist();
+      renderApp();
+    }
+
+    function logout() {
+      currentUser = null;
+      sessionStorage.removeItem('currentUser');
+      renderApp();
+    }
+
+    // Views
+    let activeView = 'studio';
+    let activeDraftId = null;
+
+    function renderApp() {
+      if (!currentUser) { showLogin(); return; }
+      const app = document.getElementById('app');
+      const userDrafts = drafts.filter(d => d.owner === currentUser.id);
+      const activeDraft = activeDraftId ? userDrafts.find(d => d.id === activeDraftId) : userDrafts[0];
+      activeDraftId = activeDraft ? activeDraft.id : null;
+
+      app.innerHTML = `
+        <div class="topbar">
+          <div class="logo">The Writer's Studio</div>
+          <div class="nav">
+            <button class="${activeView==='studio'?'active':''}" onclick="switchView('studio')">My Studio</button>
+            <button class="${activeView==='editor'?'active':''}" onclick="switchView('editor')">Editor</button>
+            <button class="${activeView==='gallery'?'active':''}" onclick="switchView('gallery')">Gallery</button>
+            <button class="${activeView==='dashboard'?'active':''}" onclick="switchView('dashboard')">Editorial</button>
+          </div>
+          <div class="pill-user">
+            <div>
+              <div style="font-weight:600;">${currentUser.name}</div>
+              <div class="subtle" style="font-size:0.85rem;">${currentUser.role}</div>
+            </div>
+            <button style="border:none; background:#fff; color:var(--accent);" onclick="logout()">Logout</button>
+          </div>
+        </div>
+        <div class="layout">
+          <div class="card" id="main-pane"></div>
+          <div class="card" id="side-pane"></div>
+        </div>
+      `;
+      renderMain(userDrafts, activeDraft);
+    }
+
+    function switchView(view) { activeView = view; renderApp(); }
+
+    function renderMain(userDrafts, activeDraft) {
+      const main = document.getElementById('main-pane');
+      const side = document.getElementById('side-pane');
+      if (activeView === 'studio') {
+        main.innerHTML = `
+          <h2>My Studio</h2>
+          <p class="subtle">Drafts that live only in this browser. Create, iterate, and send to the gallery.</p>
+          <button class="btn" style="width:auto;" onclick="createDraft()">New draft</button>
+          <ul class="list" style="margin-top:1rem;">
+            ${userDrafts.map(d => `
+              <li onclick="selectDraft('${d.id}')" style="cursor:pointer; border-color:${d.id===activeDraftId? 'var(--accent)': 'var(--border)'}">
+                <div>
+                  <div style="font-weight:600;">${d.title || 'Untitled draft'}</div>
+                  <div class="subtle" style="font-size:0.9rem;">Updated ${new Date(d.updated).toLocaleString()}</div>
+                </div>
+                <span class="status-tag">${d.status || 'Draft'}</span>
+              </li>
+            `).join('') || '<div class="subtle">No drafts yet. Create one to begin.</div>'}
+          </ul>
+        `;
+        side.innerHTML = `
+          <h3>Draft Info</h3>
+          ${activeDraft ? `
+            <div class="subtle">Title: ${activeDraft.title || 'Untitled'}</div>
+            <div class="subtle">Visibility: ${activeDraft.visibility}</div>
+            <div class="subtle">Status: ${activeDraft.status || 'Draft'}</div>
+            <button class="btn" style="margin-top:0.8rem;" onclick="switchView('editor')">Open in Editor</button>
+          ` : '<div class="subtle">Select a draft to view details.</div>'}
+        `;
+      } else if (activeView === 'editor') {
+        main.innerHTML = `
+          <h2>Editor</h2>
+          ${activeDraft ? `
+          <div class="editor-shell">
+            <div>
+              <input type="text" id="draft-title" placeholder="Title" value="${activeDraft.title || ''}" style="margin-bottom:0.6rem; font-size:1.1rem;">
+              <textarea id="draft-body" class="textarea" placeholder="Write your piece...">${activeDraft.body || ''}</textarea>
+            </div>
+            <div class="preview" id="draft-preview"></div>
+          </div>
+          ` : '<div class="subtle">Create a draft first.</div>'}
+        `;
+        side.innerHTML = `
+          <h3>Typography Lab</h3>
+          <div class="lab-controls">
+            <div>
+              <label for="font">Font</label>
+              <select id="font">
+                <option value="serif">Serif</option>
+                <option value="sans">Sans</option>
+                <option value="mono">Mono</option>
+              </select>
+            </div>
+            <div>
+              <label for="lineHeight">Line height</label>
+              <input type="range" id="lineHeight" min="1.2" max="2.2" step="0.05" value="${activeDraft?.lineHeight || 1.8}">
+            </div>
+            <div>
+              <label for="theme">Page</label>
+              <select id="theme">
+                <option value="paper">Paper</option>
+                <option value="cream">Cream</option>
+                <option value="ink">Ink</option>
+                <option value="night">Night</option>
+              </select>
+            </div>
+            <button class="btn" onclick="saveDraft()">Save</button>
+          </div>
+          <div style="margin-top:1rem;">
+            <label for="visibility">Visibility</label>
+            <select id="visibility">
+              <option value="private">Private</option>
+              <option value="studio">Studio</option>
+              <option value="public">Public</option>
+            </select>
+          </div>
+        `;
+        if (activeDraft) attachEditorHandlers(activeDraft);
+      } else if (activeView === 'gallery') {
+        const publicDrafts = drafts.filter(d => d.visibility === 'public');
+        main.innerHTML = `
+          <h2>Gallery</h2>
+          <div class="gallery-grid">
+            ${publicDrafts.map(d => `
+              <div class="gallery-card">
+                <div style="font-weight:600;">${d.title || 'Untitled'}</div>
+                <div class="subtle">by ${userName(d.owner)}</div>
+                <div style="margin-top:0.6rem; font-size:0.95rem; line-height:1.6;">${(d.body || '').slice(0,140)}...</div>
+              </div>
+            `).join('') || '<div class="subtle">No public pieces yet.</div>'}
+          </div>
+        `;
+        side.innerHTML = `
+          <h3>About the Gallery</h3>
+          <p class="subtle">Accepted works flow here with author styling preserved. Toggle visibility in the editor.</p>
+        `;
+      } else if (activeView === 'dashboard') {
+        const submissions = drafts.map(d => ({...d, author: userName(d.owner)}));
+        main.innerHTML = `
+          <h2>Editorial Dashboard</h2>
+          <ul class="list">
+            ${submissions.map(d => `
+              <li>
+                <div>
+                  <div style="font-weight:600;">${d.title || 'Untitled'}</div>
+                  <div class="subtle" style="font-size:0.9rem;">${d.author}</div>
+                </div>
+                <span class="status-tag">${d.visibility}</span>
+              </li>
+            `).join('') || '<div class="subtle">No submissions yet.</div>'}
+          </ul>
+        `;
+        side.innerHTML = `<h3>Workflow</h3><p class="subtle">Review pieces, adjust status, and coordinate edits. (Demo static flow)</p>`;
+      }
+    }
+
+    function userName(id) {
+      const u = users.find(x => x.id === id); return u ? u.name : 'Unknown';
+    }
+
+    function createDraft() {
+      const id = 'draft-' + Date.now();
+      drafts.unshift({
+        id, owner: currentUser.id, title: 'Untitled draft', body: '',
+        visibility: 'private', status: 'Draft', lineHeight: 1.8, theme: 'paper',
+        updated: Date.now()
+      });
+      activeDraftId = id;
+      persist();
+      renderApp();
+    }
+
+    function selectDraft(id) { activeDraftId = id; renderApp(); }
+
+    function attachEditorHandlers(draft) {
+      const titleEl = document.getElementById('draft-title');
+      const bodyEl = document.getElementById('draft-body');
+      const preview = document.getElementById('draft-preview');
+      const font = document.getElementById('font');
+      const lineHeight = document.getElementById('lineHeight');
+      const theme = document.getElementById('theme');
+      const visibility = document.getElementById('visibility');
+
+      font.value = draft.font || 'serif';
+      lineHeight.value = draft.lineHeight || 1.8;
+      theme.value = draft.theme || 'paper';
+      visibility.value = draft.visibility || 'private';
+
+      function renderPreview() {
+        preview.textContent = bodyEl.value || 'Your words will appear here.';
+        preview.style.lineHeight = lineHeight.value;
+        const fontMap = { serif: 'var(--serif)', sans: 'var(--sans)', mono: 'var(--mono)' };
+        preview.style.fontFamily = fontMap[font.value] || 'var(--serif)';
+        const themes = {
+          paper: { bg:'#fff', color:'var(--ink)' },
+          cream: { bg:'#fdf7ec', color:'var(--ink)' },
+          ink: { bg:'#111', color:'#f7f4ee' },
+          night: { bg:'#0d0f11', color:'#f5f2ea' }
         };
+        const t = themes[theme.value] || themes.paper;
+        preview.style.background = t.bg; preview.style.color = t.color;
+      }
 
-        // Check backend health status
-        async function checkBackendHealth() {
-            try {
-                const response = await fetch(API_CONFIG.baseUrl + API_CONFIG.endpoints.health);
-                const data = await response.json();
-                console.log('Backend health:', data);
-                return data.status === 'ok';
-            } catch (error) {
-                console.warn('Backend health check failed:', error);
-                return false;
-            }
-        }
+      [titleEl, bodyEl, font, lineHeight, theme, visibility].forEach(el => el.addEventListener('input', renderPreview));
+      renderPreview();
+    }
 
-        const poems = {
-            1: {
-                title: "Liminal Spaces",
-                author: "Sarah Chen",
-                text: `Between the wanting and the wound,
-I found a door that opened inward—
-not to darkness, but to a room
-where time pools like water
-at the bottom of a well.
+    function saveDraft() {
+      const userDrafts = drafts.filter(d => d.owner === currentUser.id);
+      const draft = drafts.find(d => d.id === activeDraftId);
+      if (!draft) return;
+      draft.title = document.getElementById('draft-title').value;
+      draft.body = document.getElementById('draft-body').value;
+      draft.font = document.getElementById('font').value;
+      draft.lineHeight = parseFloat(document.getElementById('lineHeight').value);
+      draft.theme = document.getElementById('theme').value;
+      draft.visibility = document.getElementById('visibility').value;
+      draft.updated = Date.now();
+      persist();
+      renderApp();
+    }
 
-Here, the air tastes of almonds
-and forgotten names. Here,
-every surface reflects something
-other than what stands before it.
-
-I am learning to live
-in the threshold, to make a home
-of the in-between, where nothing
-is certain except the quality
-of light on the edge of decision.
-
-My mother called this indecision.
-My lover called it fear.
-But I know it as the place
-where all things are still possible,
-where the future hasn't chosen me yet.`
-            },
-            2: {
-                title: "The Light Collector",
-                author: "Marcus Webb",
-                text: `She kept jars of morning light,
-arranged them on the windowsill
-like a lexicon of brightness—
-March light thick as honey,
-August light sharp as gin.
-
-The neighbors thought her strange,
-this woman who woke before dawn
-to trap gold in glass,
-who labeled each vessel
-with dates and weather patterns.
-
-But she knew what they didn't:
-that winter would come,
-that darkness is a hunger,
-that memory needs something
-to illuminate its corridors.
-
-On the year's shortest day,
-she unscrewed every lid,
-let six months of mornings
-fill her small apartment
-until even the shadows glowed.`
-            },
-            3: {
-                title: "Inheritance",
-                author: "Priya Sharma",
-                text: `My grandmother's hands speak
-a language I'm still learning—
-the grammar of ghee and turmeric,
-syntax of gold thread through silk.
-
-She teaches me to make rotis
-perfect as full moons, tells me
-the secret is in the pressure,
-knowing when to push and when to yield.
-
-But there are other lessons
-in the way she folds her grief
-into the dough, works it smooth
-until it stops resisting.
-
-I inherit her recipes,
-her gold bangles, the way
-she says my name with all
-its English angles softened.
-
-What I can't inherit: her fluency
-in leaving, her doctorate in survival,
-the way she carried an entire country
-in the folds of her sari.
-
-Still, I'm learning. Still,
-my hands remember what
-my tongue has forgotten,
-kneading history into sustenance.`
-            },
-            4: {
-                title: "Urban Pastoral",
-                author: "James Liu",
-                text: `The subway busker's violin
-carves a chapel from concrete,
-makes the morning commute
-a pilgrimage of sound.
-
-We are all converts here,
-clutching our coffee like prayer beads,
-seeking grace in the gap
-between stations, between breaths.
-
-Above us, the city grows
-its peculiar garden—
-fire escapes bloom with laundry,
-pigeons negotiate for bread.
-
-Someone's Bach, someone's baby
-crying, someone's argument
-in a language I almost understand—
-all of it sacred, all of it psalm.
-
-This is my church: the 6 train
-at rush hour, the democratic
-crush of bodies, each of us
-alone together, going home.`
-            },
-            5: {
-                title: "What the Ocean Said",
-                author: "Elena Vasquez",
-                text: `Come back when you're ready
-to remember what you've forgotten—
-that you are mostly water,
-that salt is your first language.
-
-Come back when the city
-has made you too solid,
-when you need reminding
-that boundaries are illusion.
-
-I will take your sharp edges,
-tumble them smooth,
-give you back to yourself
-grain by grain, wave by wave.
-
-You think you are separate,
-but I know you—
-every tear you've cried
-has found its way back to me.
-
-Come back. The tide
-is always turning.
-Every ending
-is just water, returning.`
-            },
-            6: {
-                title: "Anatomy of Silence",
-                author: "David Okonkwo",
-                text: `There are silences that sing
-and silences that suffocate—
-I learned to tell the difference
-in my father's house.
-
-The silence before speech:
-a held breath, a loading gun,
-potential humming like power lines
-before the storm.
-
-The silence after: a aftermath,
-debris settling, trying to determine
-if it's safe yet to uncover
-your head, to stand upright.
-
-And then there are the silences
-that love speaks—
-my mother's hand on my father's shoulder,
-a whole conversation in the pressure.
-
-Now I practice a silence
-that is neither weapon nor wound,
-but a clearing in the forest,
-a space for something new to grow.
-
-I am learning that silence
-can be a gift you give yourself,
-a room where you finally
-hear your own name.`
-            },
-            7: {
-                title: "The Cartographer's Daughter",
-                author: "Lily Morrison",
-                text: `She drew maps of places
-that existed only in translation—
-the country between two languages,
-the border zone of almost-understanding.
-
-Her father mapped the measurable world:
-coastlines, mountains, rivers.
-She mapped the territories
-no compass could find.
-
-Here is the island of First Kiss.
-Here is the desert of Father's Silence.
-Here is the ocean of Mother's Humming,
-vast and uncharted.
-
-She knew that all maps lie,
-that the territory always exceeds
-its representation, that grief
-is a country with no fixed borders.
-
-Still, she drew. Still, she tried
-to make sense of the senseless,
-to chart a course through the unmappable
-country of being alive.
-
-Her inheritance: understanding
-that to be lost is sometimes
-the only way to find
-where you actually are.`
-            },
-            8: {
-                title: "Midnight Economy",
-                author: "Rafael Torres",
-                text: `The diner at 3am trades in confessions,
-currency of the sleepless,
-where the coffee's always fresh
-and the waitress knows everyone's story.
-
-Here, the nurse from the night shift
-sits across from the insomniac poet,
-neither one asking the other
-why they're still awake.
-
-The divorced man studies his pie
-like it holds answers.
-The student, wired on deadline panic,
-types prayers to the gods of GPA.
-
-We are the after-hours people,
-the ones who don't fit
-into daylight's neat categories,
-who do our living in the margins.
-
-The fluorescent lights hum
-their tuneless song. The waitress
-refills our cups without asking,
-knows we're here for the warmth
-
-as much as the coffee,
-this church of the sleepless,
-where the only sacrament
-is staying human, staying.`
-            }
-        };
-
-        const poemCards = document.querySelectorAll('.poem-card');
-        const modal = document.getElementById('poemModal');
-        const closeBtn = document.getElementById('closeModal');
-        const modalTitle = document.getElementById('modalTitle');
-        const modalAuthor = document.getElementById('modalAuthor');
-        const modalText = document.getElementById('modalText');
-
-        poemCards.forEach(card => {
-            card.addEventListener('click', () => {
-                const poemId = card.getAttribute('data-poem-id');
-                const poem = poems[poemId];
-                
-                modalTitle.textContent = poem.title;
-                modalAuthor.textContent = `by ${poem.author}`;
-                modalText.textContent = poem.text;
-                
-                modal.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            });
-        });
-
-        closeBtn.addEventListener('click', () => {
-            modal.classList.remove('active');
-            document.body.style.overflow = 'auto';
-        });
-
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.classList.remove('active');
-                document.body.style.overflow = 'auto';
-            }
-        });
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                if (modal.classList.contains('active')) {
-                    modal.classList.remove('active');
-                    document.body.style.overflow = 'auto';
-                }
-                closeLoginModal();
-            }
-        });
-
-        // Open login modal
-        function openLoginModal(type) {
-            const loginModal = document.getElementById('loginModal');
-            const title = document.getElementById('loginTitle');
-            const subtitle = document.getElementById('loginSubtitle');
-
-            if (type === 'editor') {
-                title.textContent = 'Editor Log In';
-                subtitle.textContent = 'Access the editorial dashboard';
-            } else {
-                title.textContent = 'Writer Log In';
-                subtitle.textContent = 'Submit and manage your work';
-            }
-
-            loginModal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        // Close login modal
-        function closeLoginModal() {
-            const loginModal = document.getElementById('loginModal');
-            loginModal.classList.remove('active');
-            document.body.style.overflow = 'auto';
-        }
-
-// Handle login form submission - connects to backend API
-        async function handleLogin(event) {
-            event.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const submitBtn = event.target.querySelector('.submit-btn');
-            const originalText = submitBtn.textContent;
-
-            // Update button state
-            submitBtn.textContent = 'Signing in...';
-            submitBtn.disabled = true;
-
-            try {
-                // Make API call to backend
-                const response = await fetch(API_CONFIG.baseUrl + API_CONFIG.endpoints.login, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ email, password })
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    // Login successful
-                    console.log('Login successful:', data);
-                    
-                    // Store token if provided
-                    if (data.token) {
-                        localStorage.setItem('authToken', data.token);
-                    }
-                    
-                    // Store user info
-                    if (data.user) {
-                        localStorage.setItem('user', JSON.stringify(data.user));
-                    }
-
-                    closeLoginModal();
-                    alert('Login successful! Welcome back.');
-                    
-                    // Optionally redirect to dashboard
-                    // window.location.href = data.user.role === 'editor' ? '/editor-dashboard' : '/writer-dashboard';
-                } else {
-                    // Login failed
-                    throw new Error(data.message || 'Login failed. Please check your credentials.');
-                }
-            } catch (error) {
-                console.error('Login error:', error);
-                alert(error.message || 'Unable to connect to server. Please try again later.');
-            } finally {
-                // Reset button state
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-            }
-
-            // Reset form
-            event.target.reset();
-        }
-        // Close login modal when clicking outside
-        document.getElementById('loginModal').addEventListener('click', (e) => {
-            if (e.target.id === 'loginModal') {
-                closeLoginModal();
-            }
-        });
-
-        // Writer's Studio interactions
-        const studioPreview = document.getElementById('studioPreview');
-        const draftInput = document.getElementById('studioDraftInput');
-        const lineHeightControl = document.getElementById('lineHeightControl');
-        const fontControl = document.getElementById('fontControl');
-        const marginControl = document.getElementById('marginControl');
-        const themeControl = document.getElementById('themeControl');
-        const visibilityBadge = document.getElementById('visibilityBadge');
-        const versionList = document.getElementById('versionList');
-        const submissionStatus = document.getElementById('submissionStatus');
-
-        function applyPreview() {
-            studioPreview.textContent = draftInput.value || 'The work looks how you imagine it should be read. Adjust typography to feel into the voice.';
-            studioPreview.style.lineHeight = lineHeightControl.value;
-            const fontChoice = fontControl.value;
-            const fontMap = {
-                serif: "var(--font-serif)",
-                sans: "var(--font-sans)",
-                mono: "'Menlo', 'Courier New', monospace",
-                display: "'Playfair Display', 'Georgia', serif"
-            };
-            studioPreview.style.fontFamily = fontMap[fontChoice];
-
-            const marginChoice = marginControl.value;
-            const paddingMap = { compact: '1rem', standard: '1.5rem', wide: '2.25rem' };
-            studioPreview.style.padding = paddingMap[marginChoice] || '1.5rem';
-
-            const theme = themeControl.value;
-            const themes = {
-                cream: { bg: '#fffdf8', color: '#2a2a2a' },
-                white: { bg: '#ffffff', color: '#1f1f1f' },
-                ink: { bg: '#f1f1f5', color: '#1e1f2a' },
-                midnight: { bg: '#0f1115', color: '#f5f5f5' }
-            };
-            studioPreview.style.background = themes[theme].bg;
-            studioPreview.style.color = themes[theme].color;
-        }
-
-        [draftInput, lineHeightControl, fontControl, marginControl, themeControl].forEach(el => {
-            el.addEventListener('input', applyPreview);
-            el.addEventListener('change', applyPreview);
-        });
-
-        applyPreview();
-
-        document.querySelectorAll('input[name="visibility"]').forEach(radio => {
-            radio.addEventListener('change', () => {
-                const value = radio.value;
-                const labels = {
-                    private: 'Private draft URL',
-                    studio: 'Studio-only sharing',
-                    public: 'Public share link'
-                };
-                const dot = document.createElement('span');
-                dot.className = 'status-dot';
-                dot.style.background = value === 'public' ? '#4caf50' : value === 'studio' ? '#f0ad4e' : '#6fbf73';
-                visibilityBadge.textContent = '';
-                visibilityBadge.appendChild(dot);
-                visibilityBadge.appendChild(document.createTextNode(labels[value]));
-            });
-        });
-
-        document.getElementById('saveDraft').addEventListener('click', () => {
-            const content = draftInput.value.trim();
-            if (!content) {
-                submissionStatus.textContent = 'Add text before saving a version.';
-                return;
-            }
-            const timestamp = new Date().toLocaleString();
-            const li = document.createElement('li');
-            li.textContent = `Saved ${timestamp} • ${Math.min(content.length, 120)} chars`;
-            versionList.prepend(li);
-        });
-
-        document.getElementById('submitToGallery').addEventListener('click', () => {
-            submissionStatus.textContent = 'Sent to Gallery as designed. Your typography is preserved.';
-        });
-
-        document.getElementById('addNote').addEventListener('click', () => {
-            const note = document.getElementById('conversationInput').value.trim();
-            if (!note) return;
-            const p = document.createElement('p');
-            const strong = document.createElement('strong');
-            strong.textContent = 'You:';
-            p.appendChild(strong);
-            p.appendChild(document.createTextNode(` ${note}`));
-            document.getElementById('conversation').appendChild(p);
-            document.getElementById('conversationInput').value = '';
-        });
-    </script>
+    // Initialize
+    renderApp();
+  </script>
 </body>
 </html>

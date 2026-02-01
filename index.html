@@ -306,6 +306,49 @@
             opacity: 0.8;
         }
 
+        .collections-nav {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .collection-tab {
+            border: 1px solid rgba(139, 115, 85, 0.25);
+            background: #fdfaf6;
+            color: var(--color-dark);
+            padding: 0.75rem 1.1rem;
+            font-family: var(--font-sans);
+            font-size: 0.85rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .collection-tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 18px rgba(0,0,0,0.08);
+        }
+
+        .collection-tab.active {
+            background: var(--color-dark);
+            color: var(--color-cream);
+            border-color: var(--color-dark);
+        }
+
+        .collection-title {
+            font-size: 1.25rem;
+            letter-spacing: 0.04em;
+            margin-bottom: 0.35rem;
+        }
+
+        .collection-desc {
+            color: #4a4a4a;
+            margin-bottom: 2rem;
+            max-width: 720px;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -646,106 +689,20 @@
     </div>
 
     <div class="container">
-        <div class="section-header">Featured</div>
-        
-            <div class="gallery-wall">
-            <div class="poem-grid" id="poemGrid">
-            <div class="poem-card" data-poem-id="1">
-                <div class="poem-frame">
-                    <div class="poem-main">
-                        <div class="poem-title">Liminal Spaces</div>
-                        <div class="poem-author">by Sarah Chen</div>
-                        <div class="poem-preview">Between the wanting and the wound,<br>I found a door that opened inward...</div>
-                        <div class="read-more">Read Full Poem →</div>
-                    </div>
-                    <div class="poem-meta">Wall 01</div>
-                </div>
-            </div>
+        <div class="section-header">Collections</div>
 
-            <div class="poem-card" data-poem-id="2">
-                <div class="poem-frame">
-                    <div class="poem-main">
-                        <div class="poem-title">The Light Collector</div>
-                        <div class="poem-author">by Marcus Webb</div>
-                        <div class="poem-preview">She kept jars of morning light,<br>arranged them on the windowsill...</div>
-                        <div class="read-more">Read Full Poem →</div>
-                    </div>
-                    <div class="poem-meta">Wall 02</div>
-                </div>
-            </div>
-
-            <div class="poem-card" data-poem-id="3">
-                <div class="poem-frame">
-                    <div class="poem-main">
-                        <div class="poem-title">Inheritance</div>
-                        <div class="poem-author">by Priya Sharma</div>
-                        <div class="poem-preview">My grandmother's hands speak<br>a language I'm still learning...</div>
-                        <div class="read-more">Read Full Poem →</div>
-                    </div>
-                    <div class="poem-meta">Wall 03</div>
-                </div>
-            </div>
-
-            <div class="poem-card" data-poem-id="4">
-                <div class="poem-frame">
-                    <div class="poem-main">
-                        <div class="poem-title">Urban Pastoral</div>
-                        <div class="poem-author">by James Liu</div>
-                        <div class="poem-preview">The subway busker's violin<br>carves a chapel from concrete...</div>
-                        <div class="read-more">Read Full Poem →</div>
-                    </div>
-                    <div class="poem-meta">Wall 04</div>
-                </div>
-            </div>
-
-            <div class="poem-card" data-poem-id="5">
-                <div class="poem-frame">
-                    <div class="poem-main">
-                        <div class="poem-title">What the Ocean Said</div>
-                        <div class="poem-author">by Elena Vasquez</div>
-                        <div class="poem-preview">Come back when you're ready<br>to remember what you've forgotten...</div>
-                        <div class="read-more">Read Full Poem →</div>
-                    </div>
-                    <div class="poem-meta">Wall 05</div>
-                </div>
-            </div>
-
-            <div class="poem-card" data-poem-id="6">
-                <div class="poem-frame">
-                    <div class="poem-main">
-                        <div class="poem-title">Anatomy of Silence</div>
-                        <div class="poem-author">by David Okonkwo</div>
-                        <div class="poem-preview">There are silences that sing<br>and silences that suffocate...</div>
-                        <div class="read-more">Read Full Poem →</div>
-                    </div>
-                    <div class="poem-meta">Wall 06</div>
-                </div>
-            </div>
-
-            <div class="poem-card" data-poem-id="7">
-                <div class="poem-frame">
-                    <div class="poem-main">
-                        <div class="poem-title">The Cartographer's Daughter</div>
-                        <div class="poem-author">by Lily Morrison</div>
-                        <div class="poem-preview">She drew maps of places<br>that existed only in translation...</div>
-                        <div class="read-more">Read Full Poem →</div>
-                    </div>
-                    <div class="poem-meta">Wall 07</div>
-                </div>
-            </div>
-
-            <div class="poem-card" data-poem-id="8">
-                <div class="poem-frame">
-                    <div class="poem-main">
-                        <div class="poem-title">Midnight Economy</div>
-                        <div class="poem-author">by Rafael Torres</div>
-                        <div class="poem-preview">The diner at 3am trades in confessions,<br>currency of the sleepless...</div>
-                        <div class="read-more">Read Full Poem →</div>
-                    </div>
-                    <div class="poem-meta">Wall 08</div>
-                </div>
-            </div>
+        <div class="collections-nav" id="collectionsNav">
+            <button class="collection-tab active" data-collection="nature">Nature &amp; Light</button>
+            <button class="collection-tab" data-collection="memory">Memory &amp; Identity</button>
+            <button class="collection-tab" data-collection="urban">Urban Landscapes</button>
         </div>
+
+        <div class="collection-title" id="collectionTitle">Nature &amp; Light — Gallery Room</div>
+        <p class="collection-desc" id="collectionDesc">A quiet wing where light, water, and the natural world bend through language.</p>
+
+        <div class="gallery-wall">
+            <div class="poem-grid" id="poemGrid">
+            </div>
         </div>
     </div>
 
@@ -814,6 +771,7 @@
             1: {
                 title: "Liminal Spaces",
                 author: "Sarah Chen",
+                collection: "memory",
                 text: `Between the wanting and the wound,
 I found a door that opened inward—
 not to darkness, but to a room
@@ -840,6 +798,7 @@ where the future hasn't chosen me yet.`
             2: {
                 title: "The Light Collector",
                 author: "Marcus Webb",
+                collection: "nature",
                 text: `She kept jars of morning light,
 arranged them on the windowsill
 like a lexicon of brightness—
@@ -867,6 +826,7 @@ until even the shadows glowed.`
             3: {
                 title: "Inheritance",
                 author: "Priya Sharma",
+                collection: "memory",
                 text: `My grandmother's hands speak
 a language I'm still learning—
 the grammar of ghee and turmeric,
@@ -900,6 +860,7 @@ kneading history into sustenance.`
             4: {
                 title: "Urban Pastoral",
                 author: "James Liu",
+                collection: "urban",
                 text: `The subway busker's violin
 carves a chapel from concrete,
 makes the morning commute
@@ -928,6 +889,7 @@ alone together, going home.`
             5: {
                 title: "What the Ocean Said",
                 author: "Elena Vasquez",
+                collection: "nature",
                 text: `Come back when you're ready
 to remember what you've forgotten—
 that you are mostly water,
@@ -956,6 +918,7 @@ is just water, returning.`
             6: {
                 title: "Anatomy of Silence",
                 author: "David Okonkwo",
+                collection: "memory",
                 text: `There are silences that sing
 and silences that suffocate—
 I learned to tell the difference
@@ -989,6 +952,7 @@ hear your own name.`
             7: {
                 title: "The Cartographer's Daughter",
                 author: "Lily Morrison",
+                collection: "memory",
                 text: `She drew maps of places
 that existed only in translation—
 the country between two languages,
@@ -1022,6 +986,7 @@ where you actually are.`
             8: {
                 title: "Midnight Economy",
                 author: "Rafael Torres",
+                collection: "urban",
                 text: `The diner at 3am trades in confessions,
 currency of the sleepless,
 where the coffee's always fresh
@@ -1054,38 +1019,88 @@ is staying human, staying.`
             }
         };
 
-        const poemCards = document.querySelectorAll('.poem-card');
+        const poemGrid = document.getElementById('poemGrid');
+        const collectionTitle = document.getElementById('collectionTitle');
+        const collectionDesc = document.getElementById('collectionDesc');
+        const collectionTabs = document.querySelectorAll('.collection-tab');
+
         const modal = document.getElementById('poemModal');
         const closeBtn = document.getElementById('closeModal');
         const modalTitle = document.getElementById('modalTitle');
         const modalAuthor = document.getElementById('modalAuthor');
         const modalText = document.getElementById('modalText');
-        const poemGrid = document.getElementById('poemGrid');
 
-        poemCards.forEach((card, idx) => {
-            card.addEventListener('click', () => {
-                const poemId = card.getAttribute('data-poem-id');
-                const poem = poems[poemId];
-                activeIndex = idx;
-                highlightCard(activeIndex);
-                
-                modalTitle.textContent = poem.title;
-                modalAuthor.textContent = `by ${poem.author}`;
-                modalText.textContent = poem.text;
-                
-                modal.classList.add('active');
-                document.body.style.overflow = 'hidden';
+        const collectionCopy = {
+            nature: {
+                title: "Nature & Light — Gallery Room",
+                desc: "A quiet wing where light, water, and the natural world bend through language."
+            },
+            memory: {
+                title: "Memory & Identity — Gallery Room",
+                desc: "Echoes, lineage, and the self unfolding across time and inheritance."
+            },
+            urban: {
+                title: "Urban Landscapes — Gallery Room",
+                desc: "City soundscapes, midnight diners, and the sacred in concrete corridors."
+            }
+        };
+
+        let poemCards = [];
+        let activeIndex = 0;
+
+        function renderCollection(collectionKey) {
+            poemGrid.innerHTML = '';
+            const entries = Object.entries(poems).filter(([, poem]) => poem.collection === collectionKey);
+            entries.forEach(([id, poem], idx) => {
+                const card = document.createElement('div');
+                card.className = 'poem-card';
+                card.setAttribute('data-poem-id', id);
+                card.innerHTML = `
+                    <div class="poem-frame">
+                        <div class="poem-main">
+                            <div class="poem-title">${poem.title}</div>
+                            <div class="poem-author">by ${poem.author}</div>
+                            <div class="poem-preview">${poem.text.split('\\n').slice(0,3).join('<br>')}...</div>
+                            <div class="read-more">Enter the piece →</div>
+                        </div>
+                        <div class="poem-meta">Wall ${String(idx + 1).padStart(2, '0')}</div>
+                    </div>
+                `;
+                poemGrid.appendChild(card);
             });
-        });
+            poemCards = Array.from(document.querySelectorAll('.poem-card'));
+            activeIndex = 0;
+            bindCardEvents();
+            highlightCard(activeIndex);
+        }
+
+        function bindCardEvents() {
+            poemCards.forEach((card, idx) => {
+                card.addEventListener('click', () => {
+                    const poemId = card.getAttribute('data-poem-id');
+                    const poem = poems[poemId];
+                    activeIndex = idx;
+                    highlightCard(activeIndex);
+                    
+                    modalTitle.textContent = poem.title;
+                    modalAuthor.textContent = `by ${poem.author}`;
+                    modalText.textContent = poem.text;
+                    
+                    modal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                });
+            });
+        }
 
         // Allow keyboard navigation like a magazine (arrow keys to move selection)
-        let activeIndex = 0;
         function highlightCard(index) {
             poemCards.forEach((card, i) => {
                 card.style.opacity = i === index ? '1' : '0.6';
                 card.style.transform = i === index ? 'translateX(6px)' : 'translateX(0)';
             });
-            poemCards[index].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            if (poemCards[index]) {
+                poemCards[index].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
         }
 
         function openActiveCard() {
@@ -1112,13 +1127,19 @@ is staying human, staying.`
                 }
                 closeLoginModal();
             } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
-                activeIndex = (activeIndex + 1) % poemCards.length;
-                highlightCard(activeIndex);
+                if (poemCards.length > 0) {
+                    activeIndex = (activeIndex + 1) % poemCards.length;
+                    highlightCard(activeIndex);
+                }
             } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
-                activeIndex = (activeIndex - 1 + poemCards.length) % poemCards.length;
-                highlightCard(activeIndex);
+                if (poemCards.length > 0) {
+                    activeIndex = (activeIndex - 1 + poemCards.length) % poemCards.length;
+                    highlightCard(activeIndex);
+                }
             } else if (e.key === 'Enter') {
-                openActiveCard();
+                if (poemCards.length > 0) {
+                    openActiveCard();
+                }
             }
         });
 
@@ -1221,8 +1242,20 @@ is staying human, staying.`
             }
         }
 
-        // Initialize highlight on load
-        highlightCard(activeIndex);
+        // Collections navigation
+        collectionTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                collectionTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                const key = tab.getAttribute('data-collection');
+                collectionTitle.textContent = collectionCopy[key].title;
+                collectionDesc.textContent = collectionCopy[key].desc;
+                renderCollection(key);
+            });
+        });
+
+        // Initialize with default collection
+        renderCollection('nature');
     </script>
 </body>
 </html>

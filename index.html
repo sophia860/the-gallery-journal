@@ -1947,10 +1947,8 @@ is staying human, staying.`
             document.getElementById('editorDashboard').style.display = 'none';
             const user = getCurrentUser();
             if (user && user.role === 'editor') {
-                // return to studio panel area
-                const panel = document.getElementById('studioPanel');
-                panel.style.display = 'block';
-                panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // hide writer panel by default to keep homepage focused on reading
+                document.getElementById('studioPanel').style.display = 'none';
             }
         }
 

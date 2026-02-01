@@ -1699,8 +1699,10 @@ is staying human, staying.`
 
         let poemCards = [];
         let activeIndex = 0;
+        let currentCollection = 'nature';
 
         function renderCollection(collectionKey) {
+            currentCollection = collectionKey;
             poemGrid.innerHTML = '';
             const entries = Object.entries(poems).filter(([, poem]) => poem.collection === collectionKey);
             entries.forEach(([id, poem], idx) => {
@@ -1877,19 +1879,31 @@ is staying human, staying.`
             }
         }
 
-        // Publish submission into gallery as a new poem card (simple append)
+        // Publish submission into gallery as a new poem card and persist to localStorage
         function publishToGallery(id) {
             const list = loadSubmissions();
             const sub = list.find(s => s.id === id);
             if (!sub) return;
             const newId = `pub-${id}`;
+            const stored = JSON.parse(localStorage.getItem('publishedPoems') || '[]');
+            if (!stored.find(p => p.id === newId)) {
+                stored.push({
+                    id: newId,
+                    title: sub.title,
+                    author: sub.displayName || sub.author,
+                    collection: sub.collection || currentCollection || 'memory',
+                    text: sub.body
+                });
+                localStorage.setItem('publishedPoems', JSON.stringify(stored));
+            }
+            // Sync into poems map for immediate render
             poems[newId] = {
                 title: sub.title,
                 author: sub.displayName || sub.author,
-                collection: 'memory',
+                collection: sub.collection || currentCollection || 'memory',
                 text: sub.body
             };
-            renderCollection('memory');
+            renderCollection(currentCollection || 'memory');
             logActivity(`Published "${sub.title}" to gallery`);
         }
 
@@ -2116,7 +2130,13 @@ is staying human, staying.`
             });
 
             document.getElementById('edLabelFilter').innerHTML = '<option value="">Label filter</option>' + labels.map(l=>`<option value="${l.name}">${l.name}</option>`).join('');
-            document.getElementById('activityFeed').innerHTML = loadActivity().map(a => `<div>• ${a.text} — ${new Date(a.ts).toLocaleTimeString()}</div>`).join('') || '<div>No recent activity.</div>';
+            const feedEl = document.getElementById('activityFeed');
+            feedEl.innerHTML = loadActivity().map(a => `<div>• ${a.text} — ${new Date(a.ts).toLocaleTimeString()}</div>`).join('') || '<div>No recent activity.</div>';
+            // Auto-refresh feed on actions via a small timeout to avoid flicker
+            clearTimeout(feedEl._refreshTimer);
+            feedEl._refreshTimer = setTimeout(() => {
+                feedEl.innerHTML = loadActivity().map(a => `<div>• ${a.text} — ${new Date(a.ts).toLocaleTimeString()}</div>`).join('') || '<div>No recent activity.</div>';
+            }, 150);
             document.getElementById('bulkApprove').onclick = () => bulkAction('approve', filter);
             document.getElementById('bulkReject').onclick = () => bulkAction('reject', filter);
             document.getElementById('bulkAddLabel').onclick = () => bulkLabel(true, filter);
@@ -2518,7 +2538,7 @@ is staying human, staying.`
                 <div><strong>${sub.displayName || sub.author}</strong></div>
                 ${sub.bio || ''}
             `;
-            document.getElementById('detailTimeline').innerHTML = (sub.timeline || []).map(t => `<div>• ${t.action} — ${new Date(t.ts).toLocaleString()}</div>`).join('') || '<div>No timeline yet.</div>';
+            renderTimeline(sub.timeline);
             detailNotes.value = sub.internalNotes || '';
             const ratingEl = document.getElementById('detailRating');
             ratingEl.innerHTML = '';
@@ -2567,6 +2587,11 @@ is staying human, staying.`
 
         function closeDetail() {
             detailModal.classList.remove('active');
+        }
+
+        function renderTimeline(timeline = []) {
+            const tl = document.getElementById('detailTimeline');
+            tl.innerHTML = timeline.map(t => `<div>• ${t.action} — ${new Date(t.ts).toLocaleString()}</div>`).join('') || '<div>No timeline yet.</div>';
         }
     </script>
 </body>

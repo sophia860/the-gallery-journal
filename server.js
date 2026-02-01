@@ -19,7 +19,7 @@ app.post('/api/auth/login', (req, res) => {
 
   // For demo purposes, accept any credentials and return a mock token/user
   return res.status(200).json({
-    token: 'mock-token',
+    token: 'demo-mock-token',
     user: {
       email,
       role: 'writer'
@@ -27,8 +27,9 @@ app.post('/api/auth/login', (req, res) => {
   });
 });
 
-// Serve frontend entry
-app.get('*', (req, res) => {
+// Serve frontend entry for non-API GET requests
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api/')) return next();
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 

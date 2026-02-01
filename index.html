@@ -28,6 +28,10 @@
             overflow-x: hidden;
         }
 
+        .subtle-bg {
+            background: linear-gradient(180deg, rgba(233, 225, 210, 0.6) 0%, rgba(245, 241, 232, 0.9) 50%, rgba(245, 241, 232, 1) 100%);
+        }
+
         .hero {
             min-height: 70vh;
             display: flex;
@@ -220,6 +224,148 @@
             letter-spacing: 0.15em;
             text-transform: uppercase;
             color: var(--color-accent);
+        }
+
+        /* Writer's Studio */
+        .studio {
+            padding: 4rem 0 2rem;
+        }
+
+        .studio-intro {
+            max-width: 760px;
+            margin-bottom: 2rem;
+            font-size: 1rem;
+            color: #4a433a;
+        }
+
+        .studio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .studio-card {
+            background: #fff;
+            padding: 1.5rem;
+            border: 1px solid rgba(139, 115, 85, 0.15);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+        }
+
+        .studio-card h3 {
+            font-family: var(--font-sans);
+            font-size: 0.9rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--color-accent);
+            margin-bottom: 0.75rem;
+        }
+
+        .control-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.75rem;
+            margin: 0.5rem 0 1rem;
+        }
+
+        .control-row label {
+            display: block;
+            font-family: var(--font-sans);
+            font-size: 0.75rem;
+            color: var(--color-dark);
+            margin-bottom: 0.35rem;
+        }
+
+        .control-row select, .control-row input, .control-row textarea {
+            width: 100%;
+            padding: 0.65rem 0.75rem;
+            border: 1px solid var(--color-light-accent);
+            font-family: var(--font-serif);
+            background: #fdfbf7;
+        }
+
+        .studio-preview {
+            background: #fff;
+            border: 1px solid rgba(139, 115, 85, 0.18);
+            padding: 1.5rem;
+            min-height: 240px;
+            line-height: 1.8;
+            transition: all 0.2s ease;
+        }
+
+        .tag-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 0.75rem 0 1rem;
+        }
+
+        .pill {
+            padding: 0.35rem 0.65rem;
+            font-size: 0.75rem;
+            font-family: var(--font-sans);
+            border-radius: 999px;
+            background: rgba(139, 115, 85, 0.12);
+            color: var(--color-dark);
+        }
+
+        .ambient-card {
+            border: 1px dashed rgba(139, 115, 85, 0.3);
+            padding: 1rem;
+            background: rgba(245, 241, 232, 0.6);
+        }
+
+        .ambient-card strong {
+            display: block;
+            margin-bottom: 0.4rem;
+            color: var(--color-dark);
+        }
+
+        .version-list {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+        }
+
+        .version-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(139,115,85,0.1);
+            font-size: 0.9rem;
+        }
+
+        .action-btn {
+            margin-top: 0.5rem;
+            display: inline-block;
+            background: var(--color-dark);
+            color: var(--color-cream);
+            padding: 0.75rem 1rem;
+            border: none;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        .conversation {
+            background: #fdfaf4;
+            border: 1px solid rgba(139, 115, 85, 0.15);
+            padding: 1rem;
+            margin-top: 0.5rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .conversation p {
+            margin-bottom: 0.5rem;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 0.4rem;
+            background: #6fbf73;
         }
 
         /* Top Navigation Bar */
@@ -428,6 +574,10 @@
             .login-modal {
                 padding: 2rem 1.5rem;
             }
+
+            .studio-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -505,6 +655,105 @@
                 <div class="poem-author">by Rafael Torres</div>
                 <div class="poem-preview">The diner at 3am trades in confessions,<br>currency of the sleepless...</div>
                 <div class="read-more">Read Full Poem →</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container studio subtle-bg" id="writersStudio">
+        <div class="section-header">Writer's Studio</div>
+        <p class="studio-intro">A personal studio where you design first, submit second. Craft your piece with typography controls, set visibility, keep versions, and send it to the Gallery when ready.</p>
+
+        <div class="studio-grid">
+            <div class="studio-card">
+                <h3>Active Calls (Ambient)</h3>
+                <div class="ambient-card">
+                    <strong>Light Through Glass</strong>
+                    <div class="pill">Theme: Liminality</div>
+                    <small>Invitation · Rolling | Typography preserved</small>
+                </div>
+                <div class="ambient-card" style="margin-top:0.75rem;">
+                    <strong>City Sonics</strong>
+                    <div class="pill">Theme: Urban sound</div>
+                    <small>Invitation · Gentle deadline</small>
+                </div>
+            </div>
+
+            <div class="studio-card">
+                <h3>Typography Lab</h3>
+                <div class="control-row">
+                    <div>
+                        <label for="fontControl">Font</label>
+                        <select id="fontControl">
+                            <option value="serif">Serif</option>
+                            <option value="sans">Sans</option>
+                            <option value="mono">Mono</option>
+                            <option value="display">Display</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="lineHeightControl">Line Spacing</label>
+                        <input id="lineHeightControl" type="range" min="1.2" max="2.2" step="0.1" value="1.8">
+                    </div>
+                    <div>
+                        <label for="marginControl">Margins</label>
+                        <select id="marginControl">
+                            <option value="compact">Compact</option>
+                            <option value="standard" selected>Standard</option>
+                            <option value="wide">Wide</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="themeControl">Page</label>
+                        <select id="themeControl">
+                            <option value="cream">Cream</option>
+                            <option value="white">White</option>
+                            <option value="ink">Soft Grey</option>
+                            <option value="midnight">Midnight</option>
+                        </select>
+                    </div>
+                </div>
+                <textarea id="studioDraftInput" rows="4" placeholder="Draft your piece here..."></textarea>
+                <div class="studio-preview" id="studioPreview">
+                    The work looks how you imagine it should be read. Adjust typography to feel into the voice.
+                </div>
+            </div>
+
+            <div class="studio-card">
+                <h3>Submission as Publication</h3>
+                <div class="tag-row">
+                    <label><input type="radio" name="visibility" value="private" checked> Private</label>
+                    <label><input type="radio" name="visibility" value="studio"> Studio-only</label>
+                    <label><input type="radio" name="visibility" value="public"> Public</label>
+                </div>
+                <div class="pill" id="visibilityBadge"><span class="status-dot"></span>Private draft URL</div>
+                <div class="control-row" style="grid-template-columns:1fr;">
+                    <div>
+                        <label for="draftState">Draft State</label>
+                        <select id="draftState">
+                            <option value="wip">Work in progress</option>
+                            <option value="ready">Ready to share</option>
+                            <option value="submitted">Submitted to gallery</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="action-btn" id="submitToGallery">Send to Gallery</button>
+                <div id="submissionStatus" style="margin-top:0.5rem;font-family:var(--font-sans);color:var(--color-accent);"></div>
+            </div>
+
+            <div class="studio-card">
+                <h3>Version History</h3>
+                <button class="action-btn" id="saveDraft">Save Version</button>
+                <ul class="version-list" id="versionList"></ul>
+            </div>
+
+            <div class="studio-card">
+                <h3>Conversation Threads</h3>
+                <div class="conversation" id="conversation">
+                    <p><strong>Editor:</strong> Consider trying this in a sans serif—the rhythm might open up.</p>
+                    <p><strong>You:</strong> Noted. Testing Helvetica + wider margins.</p>
+                </div>
+                <textarea id="conversationInput" rows="2" placeholder="Add a thread note..."></textarea>
+                <button class="action-btn" id="addNote">Add Note</button>
             </div>
         </div>
     </div>
@@ -946,6 +1195,88 @@ is staying human, staying.`
             if (e.target.id === 'loginModal') {
                 closeLoginModal();
             }
+        });
+
+        // Writer's Studio interactions
+        const studioPreview = document.getElementById('studioPreview');
+        const draftInput = document.getElementById('studioDraftInput');
+        const lineHeightControl = document.getElementById('lineHeightControl');
+        const fontControl = document.getElementById('fontControl');
+        const marginControl = document.getElementById('marginControl');
+        const themeControl = document.getElementById('themeControl');
+        const visibilityBadge = document.getElementById('visibilityBadge');
+        const versionList = document.getElementById('versionList');
+        const submissionStatus = document.getElementById('submissionStatus');
+
+        function applyPreview() {
+            studioPreview.textContent = draftInput.value || 'The work looks how you imagine it should be read. Adjust typography to feel into the voice.';
+            studioPreview.style.lineHeight = lineHeightControl.value;
+            const fontChoice = fontControl.value;
+            const fontMap = {
+                serif: "var(--font-serif)",
+                sans: "var(--font-sans)",
+                mono: "'Menlo', 'Courier New', monospace",
+                display: "'Playfair Display', 'Georgia', serif"
+            };
+            studioPreview.style.fontFamily = fontMap[fontChoice];
+
+            const marginChoice = marginControl.value;
+            const paddingMap = { compact: '1rem', standard: '1.5rem', wide: '2.25rem' };
+            studioPreview.style.padding = paddingMap[marginChoice] || '1.5rem';
+
+            const theme = themeControl.value;
+            const themes = {
+                cream: { bg: '#fffdf8', color: '#2a2a2a' },
+                white: { bg: '#ffffff', color: '#1f1f1f' },
+                ink: { bg: '#f1f1f5', color: '#1e1f2a' },
+                midnight: { bg: '#0f1115', color: '#f5f5f5' }
+            };
+            studioPreview.style.background = themes[theme].bg;
+            studioPreview.style.color = themes[theme].color;
+        }
+
+        [draftInput, lineHeightControl, fontControl, marginControl, themeControl].forEach(el => {
+            el.addEventListener('input', applyPreview);
+            el.addEventListener('change', applyPreview);
+        });
+
+        applyPreview();
+
+        document.querySelectorAll('input[name="visibility"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                const value = radio.value;
+                const labels = {
+                    private: 'Private draft URL',
+                    studio: 'Studio-only sharing',
+                    public: 'Public share link'
+                };
+                visibilityBadge.innerHTML = `<span class="status-dot" style="background:${value === 'public' ? '#4caf50' : value === 'studio' ? '#f0ad4e' : '#6fbf73'}"></span>${labels[value]}`;
+            });
+        });
+
+        document.getElementById('saveDraft').addEventListener('click', () => {
+            const content = draftInput.value.trim();
+            if (!content) {
+                alert('Add some text to save a version.');
+                return;
+            }
+            const timestamp = new Date().toLocaleString();
+            const li = document.createElement('li');
+            li.textContent = `Saved ${timestamp} • ${Math.min(content.length, 120)} chars`;
+            versionList.prepend(li);
+        });
+
+        document.getElementById('submitToGallery').addEventListener('click', () => {
+            submissionStatus.textContent = 'Sent to Gallery as designed. Your typography is preserved.';
+        });
+
+        document.getElementById('addNote').addEventListener('click', () => {
+            const note = document.getElementById('conversationInput').value.trim();
+            if (!note) return;
+            const p = document.createElement('p');
+            p.innerHTML = `<strong>You:</strong> ${note}`;
+            document.getElementById('conversation').appendChild(p);
+            document.getElementById('conversationInput').value = '';
         });
     </script>
 </body>

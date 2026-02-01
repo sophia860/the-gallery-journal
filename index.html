@@ -1992,17 +1992,22 @@ is staying human, staying.`
             const user = requireRole('writer');
             if (!user) return;
             renderWriterStudio(user);
+            const panel = document.getElementById('studioPanel');
+            panel.style.display = 'block';
+            panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         function openEditorStudio(fromLogin = false) {
             const user = requireRole('editor');
             if (!user) return;
             renderEditorStudio(user);
+            document.getElementById('studioPanel').style.display = 'none'; // hide writer panel area
+            document.getElementById('editorDashboard').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         function renderWriterStudio(user) {
             const panel = document.getElementById('studioPanel');
-            panel.style.display = 'block';
+            // only render content when explicitly opened; panel visibility is controlled by caller
             const submissions = loadSubmissions().filter(s => s.author === user.email);
             const profile = getProfile(user.email);
             panel.innerHTML = `
@@ -2178,16 +2183,7 @@ is staying human, staying.`
             });
         }
 
-        // Auto-open studio if already logged in
-        const existingUser = getCurrentUser();
-        if (existingUser) {
-            if (existingUser.role === 'editor') {
-                renderEditorStudio(existingUser);
-            } else {
-                renderWriterStudio(existingUser);
-            }
-            document.getElementById('studioPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+        // Do not auto-open studios; keep homepage focused on reading.
 
         /* Typewriter overlay logic */
         const overlay = document.getElementById('typewriterOverlay');

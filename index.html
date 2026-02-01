@@ -743,10 +743,7 @@
 
                 // Backend API Configuration
         const API_CONFIG = {
-            // Change this URL to your actual backend URL
-            baseUrl: 'https://your-backend-api.com',
-            // Or use environment-specific URLs
-            // baseUrl: window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://your-production-api.com',
+            baseUrl: window.location.origin,
             endpoints: {
                 login: '/api/auth/login',
                 health: '/health',
@@ -1181,7 +1178,7 @@ is staying human, staying.`
             submitBtn.disabled = true;
 
             try {
-                // Make API call to backend
+                 // Make API call to backend
                 const response = await fetch(API_CONFIG.baseUrl + API_CONFIG.endpoints.login, {
                     method: 'POST',
                     headers: {

@@ -742,26 +742,16 @@
     <script>
 
                 // Backend API Configuration
-        const API_CONFIG = {
-            baseUrl: window.location.origin,
-            endpoints: {
-                login: '/api/auth/login',
-                health: '/health',
-                ready: '/ready'
-            }
+        // Static/demo auth configuration (works on GitHub Pages)
+        const MOCK_USERS = {
+            'editor@example.com': { password: 'password', role: 'editor' },
+            'writer@example.com': { password: 'password', role: 'writer' }
         };
 
         // Check backend health status
+        // No-op health check for static hosting; always returns true
         async function checkBackendHealth() {
-            try {
-                const response = await fetch(API_CONFIG.baseUrl + API_CONFIG.endpoints.health);
-                const data = await response.json();
-                console.log('Backend health:', data);
-                return data.status === 'ok';
-            } catch (error) {
-                console.warn('Backend health check failed:', error);
-                return false;
-            }
+            return true;
         }
 
         const poems = {
@@ -1166,63 +1156,39 @@ is staying human, staying.`
         }
 
 // Handle login form submission - connects to backend API
+        // Static/mock login for Pages: validates against MOCK_USERS and stores in localStorage
         async function handleLogin(event) {
             event.preventDefault();
-            const email = document.getElementById('email').value;
+            const email = document.getElementById('email').value.trim().toLowerCase();
             const password = document.getElementById('password').value;
             const submitBtn = event.target.querySelector('.submit-btn');
             const originalText = submitBtn.textContent;
 
-            // Update button state
             submitBtn.textContent = 'Signing in...';
             submitBtn.disabled = true;
 
             try {
-                 // Make API call to backend
-                const response = await fetch(API_CONFIG.baseUrl + API_CONFIG.endpoints.login, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ email, password })
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    // Login successful
-                    console.log('Login successful:', data);
-                    
-                    // Store token if provided
-                    if (data.token) {
-                        localStorage.setItem('authToken', data.token);
-                    }
-                    
-                    // Store user info
-                    if (data.user) {
-                        localStorage.setItem('user', JSON.stringify(data.user));
-                    }
-
-                    closeLoginModal();
-                    alert('Login successful! Welcome back.');
-                    
-                    // Optionally redirect to dashboard
-                    // window.location.href = data.user.role === 'editor' ? '/editor-dashboard' : '/writer-dashboard';
-                } else {
-                    // Login failed
-                    throw new Error(data.message || 'Login failed. Please check your credentials.');
+                const user = MOCK_USERS[email];
+                if (!user || user.password !== password) {
+                    throw new Error('Invalid credentials. Try editor@example.com or writer@example.com with password "password".');
                 }
+
+                const token = btoa(`${email}:${Date.now()}`);
+                const userInfo = { email, role: user.role, loggedInAt: new Date().toISOString() };
+
+                localStorage.setItem('authToken', token);
+                localStorage.setItem('user', JSON.stringify(userInfo));
+
+                closeLoginModal();
+                alert(`Welcome back, ${userInfo.role}!`);
             } catch (error) {
                 console.error('Login error:', error);
-                alert(error.message || 'Unable to connect to server. Please try again later.');
+                alert(error.message);
             } finally {
-                // Reset button state
                 submitBtn.textContent = originalText;
                 submitBtn.disabled = false;
+                event.target.reset();
             }
-
-            // Reset form
-            event.target.reset();
         }
         // Close login modal when clicking outside
         document.getElementById('loginModal').addEventListener('click', (e) => {

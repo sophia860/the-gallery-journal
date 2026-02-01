@@ -1701,6 +1701,21 @@ is staying human, staying.`
         let activeIndex = 0;
         let currentCollection = 'nature';
 
+        // load published poems from localStorage into poems map
+        function hydratePublishedPoems() {
+            try {
+                const stored = JSON.parse(localStorage.getItem('publishedPoems') || '[]');
+                stored.forEach(p => {
+                    poems[p.id] = {
+                        title: p.title,
+                        author: p.author,
+                        collection: p.collection || 'memory',
+                        text: p.text
+                    };
+                });
+            } catch {}
+        }
+
         function renderCollection(collectionKey) {
             currentCollection = collectionKey;
             poemGrid.innerHTML = '';
@@ -2131,12 +2146,7 @@ is staying human, staying.`
 
             document.getElementById('edLabelFilter').innerHTML = '<option value="">Label filter</option>' + labels.map(l=>`<option value="${l.name}">${l.name}</option>`).join('');
             const feedEl = document.getElementById('activityFeed');
-            feedEl.innerHTML = loadActivity().map(a => `<div>• ${a.text} — ${new Date(a.ts).toLocaleTimeString()}</div>`).join('') || '<div>No recent activity.</div>';
-            // Auto-refresh feed on actions via a small timeout to avoid flicker
-            clearTimeout(feedEl._refreshTimer);
-            feedEl._refreshTimer = setTimeout(() => {
-                feedEl.innerHTML = loadActivity().map(a => `<div>• ${a.text} — ${new Date(a.ts).toLocaleTimeString()}</div>`).join('') || '<div>No recent activity.</div>';
-            }, 150);
+            updateActivityFeed();
             document.getElementById('bulkApprove').onclick = () => bulkAction('approve', filter);
             document.getElementById('bulkReject').onclick = () => bulkAction('reject', filter);
             document.getElementById('bulkAddLabel').onclick = () => bulkLabel(true, filter);
@@ -2559,6 +2569,7 @@ is staying human, staying.`
                 (sub.timeline = sub.timeline || []).push({ action: 'approved', ts: new Date().toISOString() });
                 saveSubmissions(subs);
                 logActivity(`Approved "${sub.title}"`);
+                renderTimeline(sub.timeline);
                 renderEditorStudio(getCurrentUser());
                 openDetail(id);
             };
@@ -2567,6 +2578,7 @@ is staying human, staying.`
                 (sub.timeline = sub.timeline || []).push({ action: 'rejected', ts: new Date().toISOString() });
                 saveSubmissions(subs);
                 logActivity(`Rejected "${sub.title}"`);
+                renderTimeline(sub.timeline);
                 renderEditorStudio(getCurrentUser());
                 openDetail(id);
             };
@@ -2582,6 +2594,8 @@ is staying human, staying.`
                 sub.internalNotes = detailNotes.value;
                 saveSubmissions(subs);
                 logActivity(`Saved notes for "${sub.title}"`);
+                renderTimeline(sub.timeline);
+                updateActivityFeed();
             };
         }
 
@@ -2592,6 +2606,11 @@ is staying human, staying.`
         function renderTimeline(timeline = []) {
             const tl = document.getElementById('detailTimeline');
             tl.innerHTML = timeline.map(t => `<div>• ${t.action} — ${new Date(t.ts).toLocaleString()}</div>`).join('') || '<div>No timeline yet.</div>';
+        }
+
+        function updateActivityFeed() {
+            const feedEl = document.getElementById('activityFeed');
+            feedEl.innerHTML = loadActivity().map(a => `<div>• ${a.text} — ${new Date(a.ts).toLocaleTimeString()}</div>`).join('') || '<div>No recent activity.</div>';
         }
     </script>
 </body>

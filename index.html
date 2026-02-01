@@ -459,6 +459,103 @@
             color: var(--color-dark);
         }
 
+        /* Typewriter / focus mode */
+        .typewriter-overlay {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 20% 20%, #f7f1e6, #efe4d2 45%, #e6d7c0 100%);
+            z-index: 5000;
+            display: none;
+            flex-direction: column;
+            padding: 2.5rem clamp(1.5rem, 3vw, 3rem);
+            font-family: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+        }
+
+        .typewriter-overlay.active {
+            display: flex;
+        }
+
+        .typewriter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+        }
+
+        .typewriter-title {
+            width: 100%;
+            border: none;
+            border-bottom: 1px solid rgba(0,0,0,0.12);
+            background: transparent;
+            font-size: 1.2rem;
+            padding: 0.35rem 0;
+            outline: none;
+        }
+
+        .typewriter-meta {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+            color: #6a5c4c;
+            font-size: 0.9rem;
+        }
+
+        .typewriter-body {
+            flex: 1;
+            border: 1px solid rgba(0,0,0,0.08);
+            background: #fdf9f1;
+            padding: 1.5rem;
+            font-size: 1rem;
+            line-height: 1.7;
+            outline: none;
+            resize: none;
+            box-shadow: inset 0 12px 30px rgba(0,0,0,0.04);
+        }
+
+        .typewriter-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .count-bar {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.9rem;
+            color: #6a5c4c;
+        }
+
+        .drafts-panel {
+            margin-top: 1rem;
+            border-top: 1px solid rgba(0,0,0,0.08);
+            padding-top: 1rem;
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        .draft-item {
+            padding: 0.75rem;
+            border: 1px dashed rgba(0,0,0,0.15);
+            background: #fff;
+            display: flex;
+            justify-content: space-between;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .tag-input, .notes-input {
+            width: 100%;
+            border: 1px solid rgba(0,0,0,0.12);
+            background: #fffdf8;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.95rem;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -829,6 +926,26 @@
             </div>
         </div>
         <div id="studioPanel" class="studio-panel" style="display:none;"></div>
+        <div id="typewriterOverlay" class="typewriter-overlay">
+            <div class="typewriter-header">
+                <input id="twTitle" class="typewriter-title" placeholder="Title this poem..." />
+                <div class="typewriter-meta">
+                    <input id="twTags" class="tag-input" placeholder="Tags (comma-separated)" style="max-width:220px;">
+                    <span id="twCounts" class="count-bar"></span>
+                </div>
+            </div>
+            <textarea id="twBody" class="typewriter-body" placeholder="Begin freewriting. Breathe."></textarea>
+            <textarea id="twNotes" class="notes-input" placeholder="Notes for yourself or editors (optional)" rows="2" style="margin-top:0.75rem;"></textarea>
+            <div class="typewriter-footer">
+                <div class="count-bar" id="twCountBar"></div>
+                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+                    <button class="studio-btn" id="twSaveDraft">Save Draft</button>
+                    <button class="studio-btn secondary" id="twSubmit">Submit to Editors</button>
+                    <button class="studio-btn secondary" id="twClose">Close</button>
+                </div>
+            </div>
+            <div class="drafts-panel" id="twDrafts"></div>
+        </div>
     </div>
 
     <div class="modal" id="poemModal">
@@ -884,6 +1001,19 @@
 
         function saveSubmissions(list) {
             localStorage.setItem('submissions', JSON.stringify(list));
+        }
+
+        // Typewriter draft helpers
+        function loadDrafts() {
+            try {
+                return JSON.parse(localStorage.getItem('drafts') || '[]');
+            } catch {
+                return [];
+            }
+        }
+
+        function saveDrafts(list) {
+            localStorage.setItem('drafts', JSON.stringify(list));
         }
 
         // Check backend health status
@@ -1404,13 +1534,9 @@ is staying human, staying.`
             const submissions = loadSubmissions().filter(s => s.author === user.email);
             panel.innerHTML = `
                 <h4>Writer's Studio — ${user.email}</h4>
-                <form id="submitForm" style="margin-bottom:1rem;">
-                    <div style="display:grid;gap:0.5rem;">
-                        <input required id="submissionTitle" placeholder="Poem title" />
-                        <textarea required id="submissionBody" placeholder="Your poem..." rows="4"></textarea>
-                        <button type="submit" class="studio-btn" style="width:fit-content;">Submit Poem</button>
-                    </div>
-                </form>
+                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.75rem;">
+                    <button class="studio-btn" onclick="openTypewriter()">Open Focus Mode</button>
+                </div>
                 <div class="studio-list" id="writerSubmissions">
                     ${submissions.length === 0 ? '<p>No submissions yet.</p>' : ''}
                 </div>
@@ -1423,26 +1549,10 @@ is staying human, staying.`
                     <strong>${sub.title}</strong>
                     <div class="badge ${sub.status}">${sub.status}</div>
                     <div style="font-size:0.9rem;color:#555;">${sub.body.slice(0,140)}${sub.body.length>140?'...':''}</div>
+                    ${sub.tags ? `<div style="font-size:0.8rem;color:#777;">Tags: ${sub.tags.join(', ')}</div>` : ''}
+                    ${sub.notes ? `<div style="font-size:0.8rem;color:#777;">Notes: ${sub.notes}</div>` : ''}
                 `;
                 listEl.appendChild(card);
-            });
-
-            panel.querySelector('#submitForm').addEventListener('submit', (e) => {
-                e.preventDefault();
-                const title = panel.querySelector('#submissionTitle').value.trim();
-                const body = panel.querySelector('#submissionBody').value.trim();
-                if (!title || !body) return;
-                const list = loadSubmissions();
-                list.push({
-                    id: Date.now().toString(),
-                    title,
-                    body,
-                    author: user.email,
-                    status: 'pending',
-                    submittedAt: new Date().toISOString()
-                });
-                saveSubmissions(list);
-                renderWriterStudio(user);
             });
         }
 
@@ -1467,6 +1577,8 @@ is staying human, staying.`
                     </div>
                     <div style="font-size:0.9rem;color:#555;">${sub.body.slice(0,160)}${sub.body.length>160?'...':''}</div>
                     <div style="font-size:0.85rem;color:#777;">By ${sub.author}</div>
+                    ${sub.tags ? `<div style="font-size:0.8rem;color:#777;">Tags: ${sub.tags.join(', ')}</div>` : ''}
+                    ${sub.notes ? `<div style="font-size:0.8rem;color:#777;">Notes: ${sub.notes}</div>` : ''}
                     <div class="submission-actions">
                         <button data-action="approve" data-id="${sub.id}">Approve</button>
                         <button data-action="reject" data-id="${sub.id}" class="secondary">Reject</button>
@@ -1500,6 +1612,151 @@ is staying human, staying.`
             }
             document.getElementById('studioPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
+
+        /* Typewriter overlay logic */
+        const overlay = document.getElementById('typewriterOverlay');
+        const twTitle = document.getElementById('twTitle');
+        const twBody = document.getElementById('twBody');
+        const twNotes = document.getElementById('twNotes');
+        const twTags = document.getElementById('twTags');
+        const twCountBar = document.getElementById('twCountBar');
+        const twDrafts = document.getElementById('twDrafts');
+        let currentDraftId = null;
+
+        function openTypewriter() {
+            const user = requireRole('writer');
+            if (!user) return;
+            overlay.classList.add('active');
+            loadDraftList();
+            twBody.focus();
+            updateCounts();
+        }
+
+        function closeTypewriter() {
+            overlay.classList.remove('active');
+            currentDraftId = null;
+        }
+
+        function updateCounts() {
+            const text = twBody.value;
+            const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+            const chars = text.length;
+            twCountBar.textContent = `${words} words • ${chars} chars`;
+        }
+
+        function loadDraftList() {
+            const drafts = loadDrafts();
+            twDrafts.innerHTML = drafts.length === 0 ? '<div style="color:#6a5c4c;">No drafts yet.</div>' : '';
+            drafts.forEach(d => {
+                const item = document.createElement('div');
+                item.className = 'draft-item';
+                item.innerHTML = `
+                    <div>
+                        <strong>${d.title || 'Untitled draft'}</strong>
+                        <div style="font-size:0.85rem;color:#6a5c4c;">Updated ${new Date(d.updatedAt).toLocaleString()}</div>
+                    </div>
+                    <div style="display:flex;gap:0.35rem;flex-wrap:wrap;">
+                        <button class="studio-btn secondary" data-load="${d.id}">Open</button>
+                        <button class="studio-btn secondary" data-delete="${d.id}">Delete</button>
+                    </div>
+                `;
+                twDrafts.appendChild(item);
+            });
+            twDrafts.querySelectorAll('button[data-load]').forEach(btn => {
+                btn.addEventListener('click', () => loadDraft(btn.getAttribute('data-load')));
+            });
+            twDrafts.querySelectorAll('button[data-delete]').forEach(btn => {
+                btn.addEventListener('click', () => deleteDraft(btn.getAttribute('data-delete')));
+            });
+        }
+
+        function saveCurrentDraft(status = 'draft') {
+            const user = getCurrentUser();
+            if (!user || user.role !== 'writer') {
+                alert('Please log in as writer.');
+                return;
+            }
+            const drafts = loadDrafts();
+            const payload = {
+                id: currentDraftId || Date.now().toString(),
+                title: twTitle.value.trim(),
+                body: twBody.value,
+                notes: twNotes.value.trim(),
+                tags: twTags.value.split(',').map(t => t.trim()).filter(Boolean),
+                status,
+                updatedAt: new Date().toISOString()
+            };
+            const existingIdx = drafts.findIndex(d => d.id === payload.id);
+            if (existingIdx >= 0) drafts[existingIdx] = payload; else drafts.push(payload);
+            saveDrafts(drafts);
+            currentDraftId = payload.id;
+            loadDraftList();
+        }
+
+        function loadDraft(id) {
+            const drafts = loadDrafts();
+            const d = drafts.find(dr => dr.id === id);
+            if (!d) return;
+            currentDraftId = d.id;
+            twTitle.value = d.title || '';
+            twBody.value = d.body || '';
+            twNotes.value = d.notes || '';
+            twTags.value = (d.tags || []).join(', ');
+            overlay.classList.add('active');
+            updateCounts();
+            twBody.focus();
+        }
+
+        function deleteDraft(id) {
+            const drafts = loadDrafts().filter(d => d.id !== id);
+            saveDrafts(drafts);
+            loadDraftList();
+        }
+
+        function submitFromTypewriter() {
+            const user = getCurrentUser();
+            if (!user || user.role !== 'writer') {
+                alert('Please log in as writer.');
+                return;
+            }
+            const title = twTitle.value.trim() || 'Untitled';
+            const body = twBody.value.trim();
+            if (!body) {
+                alert('Please write something before submitting.');
+                return;
+            }
+            const submissions = loadSubmissions();
+            submissions.push({
+                id: Date.now().toString(),
+                title,
+                body,
+                author: user.email,
+                status: 'pending',
+                submittedAt: new Date().toISOString(),
+                tags: twTags.value.split(',').map(t => t.trim()).filter(Boolean),
+                notes: twNotes.value.trim()
+            });
+            saveSubmissions(submissions);
+            // Also store as draft with status
+            saveCurrentDraft('submitted');
+            renderWriterStudio(user);
+            alert('Submitted to editors.');
+        }
+
+        twBody.addEventListener('input', () => {
+            updateCounts();
+            saveCurrentDraft('draft');
+        });
+        twTitle.addEventListener('input', () => saveCurrentDraft('draft'));
+        twNotes.addEventListener('input', () => saveCurrentDraft('draft'));
+        twTags.addEventListener('input', () => saveCurrentDraft('draft'));
+
+        document.getElementById('twSaveDraft').addEventListener('click', () => {
+            saveCurrentDraft('draft');
+            alert('Draft saved locally.');
+        });
+        document.getElementById('twSubmit').addEventListener('click', submitFromTypewriter);
+        document.getElementById('twClose').addEventListener('click', closeTypewriter);
     </script>
 </body>
 </html>

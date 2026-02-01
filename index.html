@@ -349,6 +349,116 @@
             max-width: 720px;
         }
 
+        /* Studios */
+        .studios-bar {
+            display: flex;
+            gap: 0.75rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .studio-card {
+            flex: 1 1 280px;
+            background: linear-gradient(145deg, #fdfaf6, #f3e8d7);
+            border: 1px solid rgba(139,115,85,0.2);
+            padding: 1.5rem;
+            box-shadow: 0 10px 26px rgba(0,0,0,0.08);
+        }
+
+        .studio-card h3 {
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.05em;
+        }
+
+        .studio-card p {
+            margin-bottom: 1rem;
+            color: #4a4a4a;
+        }
+
+        .studio-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.65rem 1rem;
+            border: 1px solid var(--color-dark);
+            background: var(--color-dark);
+            color: var(--color-cream);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .studio-btn.secondary {
+            background: transparent;
+            color: var(--color-dark);
+        }
+
+        .studio-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.12);
+        }
+
+        .studio-panel {
+            margin-top: 1.5rem;
+            background: #fdfaf6;
+            border: 1px solid rgba(139,115,85,0.2);
+            padding: 1.25rem;
+            box-shadow: inset 0 0 0 1px rgba(139,115,85,0.08);
+        }
+
+        .studio-panel h4 {
+            margin-bottom: 0.75rem;
+        }
+
+        .studio-list {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .submission-card {
+            border: 1px solid rgba(139,115,85,0.2);
+            padding: 0.9rem 1rem;
+            background: #fff;
+            display: grid;
+            gap: 0.35rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.6rem;
+            font-size: 0.75rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            border-radius: 999px;
+            border: 1px solid rgba(0,0,0,0.1);
+            background: #f7f1e6;
+        }
+
+        .badge.approved { border-color: #2e8b57; color: #2e8b57; }
+        .badge.rejected { border-color: #b22222; color: #b22222; }
+        .badge.pending { border-color: #8b7355; color: #8b7355; }
+
+        .submission-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .submission-actions button {
+            padding: 0.35rem 0.75rem;
+            border: 1px solid var(--color-dark);
+            background: var(--color-dark);
+            color: var(--color-cream);
+            cursor: pointer;
+        }
+
+        .submission-actions button.secondary {
+            background: transparent;
+            color: var(--color-dark);
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -704,6 +814,21 @@
             <div class="poem-grid" id="poemGrid">
             </div>
         </div>
+
+        <div class="section-header">Studios</div>
+        <div class="studios-bar">
+            <div class="studio-card">
+                <h3>Writer's Studio</h3>
+                <p>Submit new poems, view your submissions, and track status.</p>
+                <button class="studio-btn" onclick="openWriterStudio()">Open Writer Studio →</button>
+            </div>
+            <div class="studio-card">
+                <h3>Editor's Studio</h3>
+                <p>Review, approve, or reject submissions from writers.</p>
+                <button class="studio-btn secondary" onclick="openEditorStudio()">Open Editor Studio →</button>
+            </div>
+        </div>
+        <div id="studioPanel" class="studio-panel" style="display:none;"></div>
     </div>
 
     <div class="modal" id="poemModal">
@@ -747,6 +872,19 @@
             'editor@example.com': { password: 'password', role: 'editor' },
             'writer@example.com': { password: 'password', role: 'writer' }
         };
+
+        // Local submissions store
+        function loadSubmissions() {
+            try {
+                return JSON.parse(localStorage.getItem('submissions') || '[]');
+            } catch {
+                return [];
+            }
+        }
+
+        function saveSubmissions(list) {
+            localStorage.setItem('submissions', JSON.stringify(list));
+        }
 
         // Check backend health status
         // No-op health check for static hosting; always returns true
@@ -1179,6 +1317,13 @@ is staying human, staying.`
                 localStorage.setItem('authToken', token);
                 localStorage.setItem('user', JSON.stringify(userInfo));
 
+                // Redirect to appropriate studio
+                if (userInfo.role === 'editor') {
+                    openEditorStudio(true);
+                } else {
+                    openWriterStudio(true);
+                }
+
                 closeLoginModal();
                 alert(`Welcome back, ${userInfo.role}!`);
             } catch (error) {
@@ -1219,6 +1364,145 @@ is staying human, staying.`
 
         // Initialize with default collection
         renderCollection('nature');
+
+        /* Studios logic (client-side) */
+        function getCurrentUser() {
+            try {
+                return JSON.parse(localStorage.getItem('user') || 'null');
+            } catch {
+                return null;
+            }
+        }
+
+        function requireRole(role) {
+            const user = getCurrentUser();
+            if (!user || user.role !== role) {
+                alert(`Please log in as a ${role} to access this studio.`);
+                openLoginModal(role === 'editor' ? 'editor' : 'writer');
+                return null;
+            }
+            return user;
+        }
+
+        function openWriterStudio(fromLogin = false) {
+            const user = requireRole('writer');
+            if (!user) return;
+            renderWriterStudio(user);
+            if (!fromLogin) {
+                document.getElementById('studioPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        function openEditorStudio(fromLogin = false) {
+            const user = requireRole('editor');
+            if (!user) return;
+            renderEditorStudio(user);
+            if (!fromLogin) {
+                document.getElementById('studioPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        function renderWriterStudio(user) {
+            const panel = document.getElementById('studioPanel');
+            panel.style.display = 'block';
+            const submissions = loadSubmissions().filter(s => s.author === user.email);
+            panel.innerHTML = `
+                <h4>Writer's Studio — ${user.email}</h4>
+                <form id="submitForm" style="margin-bottom:1rem;">
+                    <div style="display:grid;gap:0.5rem;">
+                        <input required id="submissionTitle" placeholder="Poem title" />
+                        <textarea required id="submissionBody" placeholder="Your poem..." rows="4"></textarea>
+                        <button type="submit" class="studio-btn" style="width:fit-content;">Submit Poem</button>
+                    </div>
+                </form>
+                <div class="studio-list" id="writerSubmissions">
+                    ${submissions.length === 0 ? '<p>No submissions yet.</p>' : ''}
+                </div>
+            `;
+            const listEl = panel.querySelector('#writerSubmissions');
+            submissions.forEach(sub => {
+                const card = document.createElement('div');
+                card.className = 'submission-card';
+                card.innerHTML = `
+                    <strong>${sub.title}</strong>
+                    <div class="badge ${sub.status}">${sub.status}</div>
+                    <div style="font-size:0.9rem;color:#555;">${sub.body.slice(0,140)}${sub.body.length>140?'...':''}</div>
+                `;
+                listEl.appendChild(card);
+            });
+
+            panel.querySelector('#submitForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const title = panel.querySelector('#submissionTitle').value.trim();
+                const body = panel.querySelector('#submissionBody').value.trim();
+                if (!title || !body) return;
+                const list = loadSubmissions();
+                list.push({
+                    id: Date.now().toString(),
+                    title,
+                    body,
+                    author: user.email,
+                    status: 'pending',
+                    submittedAt: new Date().toISOString()
+                });
+                saveSubmissions(list);
+                renderWriterStudio(user);
+            });
+        }
+
+        function renderEditorStudio(user) {
+            const panel = document.getElementById('studioPanel');
+            panel.style.display = 'block';
+            const submissions = loadSubmissions();
+            panel.innerHTML = `
+                <h4>Editor's Studio — ${user.email}</h4>
+                <div class="studio-list" id="editorSubmissions">
+                    ${submissions.length === 0 ? '<p>No submissions yet.</p>' : ''}
+                </div>
+            `;
+            const listEl = panel.querySelector('#editorSubmissions');
+            submissions.forEach(sub => {
+                const card = document.createElement('div');
+                card.className = 'submission-card';
+                card.innerHTML = `
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;">
+                        <strong>${sub.title}</strong>
+                        <span class="badge ${sub.status}">${sub.status}</span>
+                    </div>
+                    <div style="font-size:0.9rem;color:#555;">${sub.body.slice(0,160)}${sub.body.length>160?'...':''}</div>
+                    <div style="font-size:0.85rem;color:#777;">By ${sub.author}</div>
+                    <div class="submission-actions">
+                        <button data-action="approve" data-id="${sub.id}">Approve</button>
+                        <button data-action="reject" data-id="${sub.id}" class="secondary">Reject</button>
+                    </div>
+                `;
+                listEl.appendChild(card);
+            });
+
+            listEl.querySelectorAll('button[data-action]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-id');
+                    const action = btn.getAttribute('data-action');
+                    const list = loadSubmissions();
+                    const idx = list.findIndex(s => s.id === id);
+                    if (idx >= 0) {
+                        list[idx].status = action === 'approve' ? 'approved' : 'rejected';
+                        saveSubmissions(list);
+                        renderEditorStudio(user);
+                    }
+                });
+            });
+        }
+
+        // Auto-open studio if already logged in
+        const existingUser = getCurrentUser();
+        if (existingUser) {
+            if (existingUser.role === 'editor') {
+                renderEditorStudio(existingUser);
+            } else {
+                renderWriterStudio(existingUser);
+            }
+        }
     </script>
 </body>
 </html>

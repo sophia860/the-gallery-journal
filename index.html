@@ -1707,7 +1707,8 @@ finally.`
                         title: p.title,
                         author: p.author,
                         collection: p.collection || 'love',
-                        text: p.text
+                        text: p.text,
+                        wallNumber: p.wallNumber
                     };
                 });
             } catch {}
@@ -1721,6 +1722,8 @@ finally.`
                 const card = document.createElement('div');
                 card.className = 'poem-card';
                 card.setAttribute('data-poem-id', id);
+                // Use stored wallNumber if available, otherwise fall back to index
+                const wallNum = poem.wallNumber || (idx + 1);
                 card.innerHTML = `
                     <div class="poem-frame">
                         <div class="poem-main">
@@ -1729,7 +1732,7 @@ finally.`
                             <div class="poem-preview">${poem.text.split('\\n').slice(0,3).join('<br>')}...</div>
                             <div class="read-more">Enter the piece →</div>
                         </div>
-                        <div class="poem-meta">Wall ${String(idx + 1).padStart(2, '0')}</div>
+                        <div class="poem-meta">Wall ${String(wallNum).padStart(2, '0')}</div>
                     </div>
                 `;
                 poemGrid.appendChild(card);
@@ -2221,6 +2224,9 @@ finally.`
             });
         });
 
+        // Load published poems from localStorage before rendering
+        hydratePublishedPoems();
+        
         // Initialize with default collection
         renderCollection('love');
 

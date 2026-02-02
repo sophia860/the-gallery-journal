@@ -1856,12 +1856,14 @@ finally.`
                 
                 // Split poem into lines for margin notes
                 const poemLines = poem.text.split('\n');
-                const poemLinesHtml = poemLines.map((line, lineIdx) => 
-                    `<div class="poem-line" data-poem-id="${id}" data-line="${lineIdx}" style="position: relative; padding: 0.2rem 0; cursor: pointer; transition: background 0.2s;" onmouseenter="this.style.background='rgba(196,30,58,0.05)'" onmouseleave="this.style.background='transparent'" onclick="openMarginNote('${id}', ${lineIdx}, '${line.replace(/'/g, "\\'")}')">
+                const poemLinesHtml = poemLines.map((line, lineIdx) => {
+                    const escapedLine = escapeHtml(line);
+                    const dataLine = line.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                    return `<div class="poem-line" data-poem-id="${id}" data-line="${lineIdx}" style="position: relative; padding: 0.2rem 0; cursor: pointer; transition: background 0.2s;" onmouseenter="this.style.background='rgba(196,30,58,0.05)'" onmouseleave="this.style.background='transparent'" onclick="openMarginNote('${id}', ${lineIdx}, \`${line.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)">
                         ${line || '<br>'}
                         <span class="margin-note-indicator" style="position: absolute; right: -20px; top: 50%; transform: translateY(-50%); opacity: 0; transition: opacity 0.2s; font-size: 0.7rem; color: var(--color-accent);">✎</span>
-                    </div>`
-                ).join('');
+                    </div>`;
+                }).join('');
                 
                 card.innerHTML = `
                     <div class="poem-frame">
@@ -2497,10 +2499,19 @@ finally.`
             const archived = submissions.filter(s => s.status === 'rejected');
             const profile = getProfile(user.email);
             
-            // Calculate mock resonance metrics
-            const totalReads = published.reduce((sum, p) => sum + (p.reads || Math.floor(Math.random() * 500)), 0);
-            const totalShares = published.reduce((sum, p) => sum + (p.shares || Math.floor(Math.random() * 50)), 0);
-            const totalHighlights = published.reduce((sum, p) => sum + (p.highlights || Math.floor(Math.random() * 100)), 0);
+            // Generate consistent mock resonance metrics (deterministic based on poem ID)
+            function getMetrics(poemId) {
+                const seed = parseInt(poemId) || 1;
+                return {
+                    reads: (seed * 37) % 500 + 100,
+                    shares: (seed * 13) % 50 + 10,
+                    highlights: (seed * 23) % 100 + 20
+                };
+            }
+            
+            const totalReads = published.reduce((sum, p) => sum + getMetrics(p.id).reads, 0);
+            const totalShares = published.reduce((sum, p) => sum + getMetrics(p.id).shares, 0);
+            const totalHighlights = published.reduce((sum, p) => sum + getMetrics(p.id).highlights, 0);
             
             panel.innerHTML = `
                 <div style="max-width: 1200px; margin: 0 auto; padding: 2rem;">
@@ -2618,9 +2629,7 @@ finally.`
             // Populate published
             const publishedListEl = panel.querySelector('#published-list');
             published.forEach(pub => {
-                const reads = pub.reads || Math.floor(Math.random() * 500);
-                const shares = pub.shares || Math.floor(Math.random() * 50);
-                const highlights = pub.highlights || Math.floor(Math.random() * 100);
+                const metrics = getMetrics(pub.id);
                 const card = document.createElement('div');
                 card.className = 'writer-card';
                 card.innerHTML = `
@@ -2630,13 +2639,12 @@ finally.`
                             Published in: ${pub.publishedCategory || 'Gallery'} • Wall ${pub.wallNumber || '01'}
                         </div>
                         <div style="display: flex; gap: 1.5rem; font-size: 0.85rem; color: var(--color-grey); margin-top: 0.5rem;">
-                            <span>${reads} reads</span>
-                            <span>${shares} shares</span>
-                            <span>${highlights} highlights</span>
+                            <span>${metrics.reads} reads</span>
+                            <span>${metrics.shares} shares</span>
+                            <span>${metrics.highlights} highlights</span>
                         </div>
                         <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem;">
                             <button class="studio-btn secondary" onclick="viewInGallery('${pub.publishedCategory}')">View in Gallery Room</button>
-                            <button class="studio-btn secondary" onclick="viewInArchive(${pub.id})">View in Archive</button>
                         </div>
                     </div>
                 `;
@@ -2661,9 +2669,7 @@ finally.`
             // Populate resonance details
             const resonanceDetailsEl = panel.querySelector('#resonance-details');
             published.forEach(pub => {
-                const reads = pub.reads || Math.floor(Math.random() * 500);
-                const shares = pub.shares || Math.floor(Math.random() * 50);
-                const highlights = pub.highlights || Math.floor(Math.random() * 100);
+                const metrics = getMetrics(pub.id);
                 const card = document.createElement('div');
                 card.className = 'writer-card';
                 card.innerHTML = `
@@ -2671,15 +2677,15 @@ finally.`
                         <h4 style="margin-bottom: 0.5rem;">${pub.title}</h4>
                         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 0.75rem;">
                             <div>
-                                <div style="font-size: 1.5rem; font-weight: 600; color: var(--color-accent);">${reads}</div>
+                                <div style="font-size: 1.5rem; font-weight: 600; color: var(--color-accent);">${metrics.reads}</div>
                                 <div style="font-size: 0.8rem; color: var(--color-grey);">Reads</div>
                             </div>
                             <div>
-                                <div style="font-size: 1.5rem; font-weight: 600; color: var(--color-accent);">${shares}</div>
+                                <div style="font-size: 1.5rem; font-weight: 600; color: var(--color-accent);">${metrics.shares}</div>
                                 <div style="font-size: 0.8rem; color: var(--color-grey);">Shares</div>
                             </div>
                             <div>
-                                <div style="font-size: 1.5rem; font-weight: 600; color: var(--color-accent);">${highlights}</div>
+                                <div style="font-size: 1.5rem; font-weight: 600; color: var(--color-accent);">${metrics.highlights}</div>
                                 <div style="font-size: 0.8rem; color: var(--color-grey);">Highlights</div>
                             </div>
                         </div>
@@ -2828,7 +2834,12 @@ Line breaks will be preserved exactly as you type them." style="width: 100%; pad
         }
         
         function editDraft(draftId) {
-            alert('Edit functionality coming soon! Draft ID: ' + draftId);
+            // Not yet implemented - would open poem editor with draft content
+            const drafts = loadDrafts();
+            const draft = drafts.find(d => d.id === draftId);
+            if (draft) {
+                alert(`Edit functionality coming soon!\n\nDraft: ${draft.title}\n\nFor now, you can submit this draft or create a new poem.`);
+            }
         }
         
         function submitDraft(draftId) {
@@ -2894,7 +2905,14 @@ Line breaks will be preserved exactly as you type them." style="width: 100%; pad
         }
         
         // Community Features Functions
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
         function openMarginNote(poemId, lineNumber, lineText) {
+            const escapedLineText = escapeHtml(lineText);
             const modal = document.createElement('div');
             modal.className = 'modal active';
             modal.innerHTML = `
@@ -2902,12 +2920,12 @@ Line breaks will be preserved exactly as you type them." style="width: 100%; pad
                     <button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
                     <h3 style="margin-bottom: 1rem; font-family: var(--font-slab); font-weight: 300;">Add Margin Note</h3>
                     <div style="padding: 1rem; background: var(--color-cream); border-radius: 4px; margin-bottom: 1rem; font-style: italic; color: var(--color-grey);">
-                        Line ${lineNumber + 1}: "${lineText}"
+                        Line ${lineNumber + 1}: "${escapedLineText}"
                     </div>
                     <textarea id="margin-note-text" rows="4" placeholder="Share your thoughts on this line..." style="width: 100%; padding: 0.75rem; border: 1px solid rgba(0,0,0,0.12); border-radius: 4px; font-family: var(--font-serif); font-size: 1rem; margin-bottom: 1rem;"></textarea>
                     <div style="display: flex; gap: 1rem; justify-content: flex-end;">
                         <button class="studio-btn secondary" onclick="this.closest('.modal').remove()">Cancel</button>
-                        <button class="studio-btn" onclick="saveMarginNote('${poemId}', ${lineNumber}, '${lineText.replace(/'/g, "\\'")}')">Add Note</button>
+                        <button class="studio-btn" onclick="saveMarginNote('${poemId}', ${lineNumber}, \`${lineText.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)">Add Note</button>
                     </div>
                 </div>
             `;
@@ -3023,7 +3041,7 @@ Line breaks will be preserved exactly as you type them." style="width: 100%; pad
         }
         
         function downloadQuoteCard() {
-            alert('Quote card download functionality would use html2canvas or similar library to generate an image. For now, use screenshot tools.');
+            alert('Quote card download requires additional library (html2canvas).\n\nFor now, please use your device\'s screenshot feature to save this beautiful quote card!');
         }
         
         function copyQuoteText() {

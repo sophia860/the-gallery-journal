@@ -2002,8 +2002,34 @@ finally.`
         }
 
         function getNextWallNumber(category) {
-            const existingPoems = Object.values(poems).filter(p => p.collection === category);
-            return existingPoems.length + 1;
+            // Count existing poems in memory
+            const existingInMemory = Object.values(poems).filter(p => p.collection === category);
+            
+            // Also check localStorage for published poems
+            try {
+                const stored = JSON.parse(localStorage.getItem('publishedPoems') || '[]');
+                const existingInStorage = stored.filter(p => p.collection === category);
+                const maxStored = Math.max(0, ...existingInStorage.map(p => p.wallNumber || 0));
+                const maxMemory = existingInMemory.length;
+                return Math.max(maxStored, maxMemory) + 1;
+            } catch {
+                return existingInMemory.length + 1;
+            }
+        }
+
+        function isWallNumberAvailable(category, wallNumber) {
+            // Check in-memory poems
+            const inMemory = Object.values(poems).some(p => p.collection === category && p.wallNumber === wallNumber);
+            if (inMemory) return false;
+            
+            // Check localStorage
+            try {
+                const stored = JSON.parse(localStorage.getItem('publishedPoems') || '[]');
+                const inStorage = stored.some(p => p.collection === category && p.wallNumber === wallNumber);
+                return !inStorage;
+            } catch {
+                return true;
+            }
         }
 
         document.getElementById('confirmPublishBtn').addEventListener('click', () => {
@@ -2012,6 +2038,12 @@ finally.`
             const category = document.getElementById('publishCategory').value;
             const wallNumberInput = document.getElementById('publishWallNumber').value;
             const wallNumber = wallNumberInput ? parseInt(wallNumberInput) : getNextWallNumber(category);
+            
+            // Validate WALL number availability
+            if (wallNumberInput && !isWallNumberAvailable(category, wallNumber)) {
+                alert(`WALL ${String(wallNumber).padStart(2, '0')} is already in use for this category. Please choose a different number.`);
+                return;
+            }
             
             if (confirm(`Publish this poem to ${category} collection as WALL ${String(wallNumber).padStart(2, '0')}?`)) {
                 publishToGallery(currentPublishSubmissionId, category, wallNumber);

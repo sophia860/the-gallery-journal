@@ -1230,7 +1230,9 @@
                         <button class="ed-filter active" data-filter="all">All</button>
                         <button class="ed-filter" data-filter="pending">Pending</button>
                         <button class="ed-filter" data-filter="approved">Approved</button>
+                        <button class="ed-filter" data-filter="revisions_requested">Revisions Requested</button>
                         <button class="ed-filter" data-filter="rejected">Rejected</button>
+                        <button class="ed-filter" data-filter="published">Published</button>
                     </div>
                     <div class="ed-toolbar">
                         <button class="ed-btn" id="bulkApprove">Approve All</button>
@@ -1287,8 +1289,76 @@
             <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
                 <button class="ed-btn" id="detailApprove">Approve</button>
                 <button class="ed-btn secondary" id="detailReject">Reject</button>
-                <button class="ed-btn secondary" id="detailPublish">Publish to Gallery</button>
+                <button class="ed-btn secondary" id="detailRequestRevisions">Request Revisions</button>
+                <button class="ed-btn secondary" id="detailPublish">Accept & Publish to Gallery</button>
                 <button class="ed-btn secondary" id="detailSaveNotes">Save Notes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Publish Modal for category and WALL selection -->
+    <div id="publishModal" class="ed-modal">
+        <div class="content" style="max-width: 500px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+                <h4>Accept & Publish to Gallery</h4>
+                <button class="ed-btn secondary" onclick="closePublishModal()">Cancel</button>
+            </div>
+            <div id="publishPoemInfo" style="margin-bottom:1rem;padding:0.75rem;background:rgba(139,115,85,0.05);border-radius:4px;"></div>
+            <div style="margin-bottom:1rem;">
+                <label style="display:block;font-weight:500;margin-bottom:0.5rem;">Select Category:</label>
+                <select id="publishCategory" style="width:100%;padding:0.5rem;border:1px solid rgba(0,0,0,0.12);border-radius:4px;">
+                    <option value="love">Love & Relationships</option>
+                    <option value="nature">Nature & The Natural World</option>
+                    <option value="grief">Grief, Loss & Memory</option>
+                    <option value="family">Family & Identity</option>
+                </select>
+            </div>
+            <div style="margin-bottom:1rem;">
+                <label style="display:block;font-weight:500;margin-bottom:0.5rem;">Assign WALL Number (optional):</label>
+                <input id="publishWallNumber" type="number" min="1" placeholder="e.g., 1 for WALL 01" style="width:100%;padding:0.5rem;border:1px solid rgba(0,0,0,0.12);border-radius:4px;">
+                <small style="color:#666;display:block;margin-top:0.25rem;">Leave empty to auto-assign next available number</small>
+            </div>
+            <div style="display:flex;gap:0.5rem;justify-content:flex-end;margin-top:1.5rem;">
+                <button class="ed-btn secondary" onclick="closePublishModal()">Cancel</button>
+                <button class="ed-btn" id="confirmPublishBtn">Publish to Gallery</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reject Modal for feedback -->
+    <div id="rejectModal" class="ed-modal">
+        <div class="content" style="max-width: 500px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+                <h4>Reject Submission</h4>
+                <button class="ed-btn secondary" onclick="closeRejectModal()">Cancel</button>
+            </div>
+            <div id="rejectPoemInfo" style="margin-bottom:1rem;padding:0.75rem;background:rgba(139,115,85,0.05);border-radius:4px;"></div>
+            <div style="margin-bottom:1rem;">
+                <label style="display:block;font-weight:500;margin-bottom:0.5rem;">Feedback to Writer (optional):</label>
+                <textarea id="rejectFeedback" rows="4" placeholder="Provide constructive feedback to help the writer..." style="width:100%;padding:0.6rem;border:1px solid rgba(0,0,0,0.12);border-radius:4px;"></textarea>
+            </div>
+            <div style="display:flex;gap:0.5rem;justify-content:flex-end;margin-top:1.5rem;">
+                <button class="ed-btn secondary" onclick="closeRejectModal()">Cancel</button>
+                <button class="ed-btn" id="confirmRejectBtn">Reject Submission</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Request Revisions Modal -->
+    <div id="revisionsModal" class="ed-modal">
+        <div class="content" style="max-width: 500px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+                <h4>Request Revisions</h4>
+                <button class="ed-btn secondary" onclick="closeRevisionsModal()">Cancel</button>
+            </div>
+            <div id="revisionsPoemInfo" style="margin-bottom:1rem;padding:0.75rem;background:rgba(139,115,85,0.05);border-radius:4px;"></div>
+            <div style="margin-bottom:1rem;">
+                <label style="display:block;font-weight:500;margin-bottom:0.5rem;">Feedback for Revisions:</label>
+                <textarea id="revisionsFeedback" rows="5" placeholder="Describe the changes you'd like the writer to make..." style="width:100%;padding:0.6rem;border:1px solid rgba(0,0,0,0.12);border-radius:4px;"></textarea>
+            </div>
+            <div style="display:flex;gap:0.5rem;justify-content:flex-end;margin-top:1.5rem;">
+                <button class="ed-btn secondary" onclick="closeRevisionsModal()">Cancel</button>
+                <button class="ed-btn" id="confirmRevisionsBtn">Send Revision Request</button>
             </div>
         </div>
     </div>
@@ -1637,7 +1707,8 @@ finally.`
                         title: p.title,
                         author: p.author,
                         collection: p.collection || 'love',
-                        text: p.text
+                        text: p.text,
+                        wallNumber: p.wallNumber
                     };
                 });
             } catch {}
@@ -1651,6 +1722,8 @@ finally.`
                 const card = document.createElement('div');
                 card.className = 'poem-card';
                 card.setAttribute('data-poem-id', id);
+                // Use stored wallNumber if available, otherwise fall back to index
+                const wallNum = poem.wallNumber || (idx + 1);
                 card.innerHTML = `
                     <div class="poem-frame">
                         <div class="poem-main">
@@ -1659,7 +1732,7 @@ finally.`
                             <div class="poem-preview">${poem.text.split('\\n').slice(0,3).join('<br>')}...</div>
                             <div class="read-more">Enter the piece →</div>
                         </div>
-                        <div class="poem-meta">Wall ${String(idx + 1).padStart(2, '0')}</div>
+                        <div class="poem-meta">Wall ${String(wallNum).padStart(2, '0')}</div>
                     </div>
                 `;
                 poemGrid.appendChild(card);
@@ -1826,10 +1899,26 @@ finally.`
         }
 
         // Publish submission into gallery as a new poem card and persist to localStorage
-        function publishToGallery(id) {
+        function publishToGallery(id, category, wallNumber) {
             const list = loadSubmissions();
             const sub = list.find(s => s.id === id);
             if (!sub) return;
+            
+            // Update submission status
+            const idx = list.findIndex(s => s.id === id);
+            if (idx >= 0) {
+                list[idx].status = 'published';
+                list[idx].publishedCategory = category;
+                list[idx].wallNumber = wallNumber;
+                (list[idx].timeline = list[idx].timeline || []).push({ 
+                    action: 'published', 
+                    ts: new Date().toISOString(),
+                    category: category,
+                    wallNumber: wallNumber
+                });
+                saveSubmissions(list);
+            }
+            
             const newId = `pub-${id}`;
             const stored = JSON.parse(localStorage.getItem('publishedPoems') || '[]');
             if (!stored.find(p => p.id === newId)) {
@@ -1837,20 +1926,280 @@ finally.`
                     id: newId,
                     title: sub.title,
                     author: sub.displayName || sub.author,
-                    collection: sub.collection || currentCollection || 'memory',
-                    text: sub.body
+                    collection: category,
+                    text: sub.body,
+                    wallNumber: wallNumber
                 });
                 localStorage.setItem('publishedPoems', JSON.stringify(stored));
             }
             poems[newId] = {
                 title: sub.title,
                 author: sub.displayName || sub.author,
-                collection: sub.collection || currentCollection || 'love',
-                text: sub.body
+                collection: category,
+                text: sub.body,
+                wallNumber: wallNumber
             };
-            renderCollection(currentCollection || 'love');
-            logActivity(`Published "${sub.title}" to gallery`);
+            
+            // Notify writer
+            notifyWriter(sub.author, {
+                type: 'accepted',
+                title: sub.title,
+                category: category,
+                wallNumber: wallNumber
+            });
+            
+            renderCollection(category);
+            logActivity(`Published "${sub.title}" to ${category} gallery`);
         }
+
+        /* Writer notification system */
+        function notifyWriter(writerEmail, notification) {
+            const notifications = JSON.parse(localStorage.getItem('writerNotifications') || '{}');
+            if (!notifications[writerEmail]) {
+                notifications[writerEmail] = [];
+            }
+            notifications[writerEmail].unshift({
+                ...notification,
+                timestamp: new Date().toISOString(),
+                read: false
+            });
+            localStorage.setItem('writerNotifications', JSON.stringify(notifications));
+        }
+
+        /* Publish Modal Functions */
+        let currentPublishSubmissionId = null;
+
+        function openPublishModal(id) {
+            const subs = loadSubmissions();
+            const sub = subs.find(s => s.id === id);
+            if (!sub) return;
+            
+            currentPublishSubmissionId = id;
+            const modal = document.getElementById('publishModal');
+            const info = document.getElementById('publishPoemInfo');
+            
+            info.innerHTML = `
+                <div style="font-weight:500;margin-bottom:0.25rem;">"${sub.title}"</div>
+                <div style="color:#666;">by ${sub.displayName || sub.author}</div>
+            `;
+            
+            // Pre-select category if available
+            const categorySelect = document.getElementById('publishCategory');
+            if (sub.collection) {
+                categorySelect.value = sub.collection;
+            }
+            
+            // Auto-assign next wall number
+            const category = categorySelect.value;
+            const nextWallNumber = getNextWallNumber(category);
+            document.getElementById('publishWallNumber').value = nextWallNumber;
+            
+            modal.classList.add('active');
+        }
+
+        function closePublishModal() {
+            const modal = document.getElementById('publishModal');
+            modal.classList.remove('active');
+            currentPublishSubmissionId = null;
+            document.getElementById('publishWallNumber').value = '';
+        }
+
+        function getNextWallNumber(category) {
+            // Count existing poems in memory
+            const existingInMemory = Object.values(poems).filter(p => p.collection === category);
+            
+            // Also check localStorage for published poems
+            try {
+                const stored = JSON.parse(localStorage.getItem('publishedPoems') || '[]');
+                const existingInStorage = stored.filter(p => p.collection === category);
+                const maxStored = Math.max(0, ...existingInStorage.map(p => p.wallNumber || 0));
+                const maxMemory = existingInMemory.length;
+                return Math.max(maxStored, maxMemory) + 1;
+            } catch {
+                return existingInMemory.length + 1;
+            }
+        }
+
+        function isWallNumberAvailable(category, wallNumber) {
+            // Check in-memory poems
+            const inMemory = Object.values(poems).some(p => p.collection === category && p.wallNumber === wallNumber);
+            if (inMemory) return false;
+            
+            // Check localStorage
+            try {
+                const stored = JSON.parse(localStorage.getItem('publishedPoems') || '[]');
+                const inStorage = stored.some(p => p.collection === category && p.wallNumber === wallNumber);
+                return !inStorage;
+            } catch {
+                return true;
+            }
+        }
+
+        document.getElementById('confirmPublishBtn').addEventListener('click', () => {
+            if (!currentPublishSubmissionId) return;
+            
+            const category = document.getElementById('publishCategory').value;
+            const wallNumberInput = document.getElementById('publishWallNumber').value;
+            const wallNumber = wallNumberInput ? parseInt(wallNumberInput) : getNextWallNumber(category);
+            
+            // Validate WALL number availability
+            if (wallNumberInput && !isWallNumberAvailable(category, wallNumber)) {
+                alert(`WALL ${String(wallNumber).padStart(2, '0')} is already in use for this category. Please choose a different number.`);
+                return;
+            }
+            
+            if (confirm(`Publish this poem to ${category} collection as WALL ${String(wallNumber).padStart(2, '0')}?`)) {
+                publishToGallery(currentPublishSubmissionId, category, wallNumber);
+                closePublishModal();
+                
+                // Refresh the editor view
+                const user = getCurrentUser();
+                if (user) {
+                    renderEditorStudio(user, 'all');
+                }
+                
+                alert('Poem successfully published to the gallery!');
+            }
+        });
+
+        /* Reject Modal Functions */
+        let currentRejectSubmissionId = null;
+
+        function openRejectModal(id) {
+            const subs = loadSubmissions();
+            const sub = subs.find(s => s.id === id);
+            if (!sub) return;
+            
+            currentRejectSubmissionId = id;
+            const modal = document.getElementById('rejectModal');
+            const info = document.getElementById('rejectPoemInfo');
+            
+            info.innerHTML = `
+                <div style="font-weight:500;margin-bottom:0.25rem;">"${sub.title}"</div>
+                <div style="color:#666;">by ${sub.displayName || sub.author}</div>
+            `;
+            
+            document.getElementById('rejectFeedback').value = '';
+            modal.classList.add('active');
+        }
+
+        function closeRejectModal() {
+            const modal = document.getElementById('rejectModal');
+            modal.classList.remove('active');
+            currentRejectSubmissionId = null;
+        }
+
+        document.getElementById('confirmRejectBtn').addEventListener('click', () => {
+            if (!currentRejectSubmissionId) return;
+            
+            const feedback = document.getElementById('rejectFeedback').value.trim();
+            
+            if (confirm('Are you sure you want to reject this submission?')) {
+                const list = loadSubmissions();
+                const idx = list.findIndex(s => s.id === currentRejectSubmissionId);
+                
+                if (idx >= 0) {
+                    list[idx].status = 'rejected';
+                    list[idx].rejectionFeedback = feedback;
+                    (list[idx].timeline = list[idx].timeline || []).push({ 
+                        action: 'rejected', 
+                        ts: new Date().toISOString(),
+                        feedback: feedback
+                    });
+                    saveSubmissions(list);
+                    
+                    // Notify writer
+                    notifyWriter(list[idx].author, {
+                        type: 'rejected',
+                        title: list[idx].title,
+                        feedback: feedback
+                    });
+                    
+                    logActivity(`Rejected "${list[idx].title}"`);
+                }
+                
+                closeRejectModal();
+                
+                // Refresh the editor view
+                const user = getCurrentUser();
+                if (user) {
+                    renderEditorStudio(user, 'all');
+                }
+            }
+        });
+
+        /* Request Revisions Modal Functions */
+        let currentRevisionsSubmissionId = null;
+
+        function openRevisionsModal(id) {
+            const subs = loadSubmissions();
+            const sub = subs.find(s => s.id === id);
+            if (!sub) return;
+            
+            currentRevisionsSubmissionId = id;
+            const modal = document.getElementById('revisionsModal');
+            const info = document.getElementById('revisionsPoemInfo');
+            
+            info.innerHTML = `
+                <div style="font-weight:500;margin-bottom:0.25rem;">"${sub.title}"</div>
+                <div style="color:#666;">by ${sub.displayName || sub.author}</div>
+            `;
+            
+            document.getElementById('revisionsFeedback').value = '';
+            modal.classList.add('active');
+        }
+
+        function closeRevisionsModal() {
+            const modal = document.getElementById('revisionsModal');
+            modal.classList.remove('active');
+            currentRevisionsSubmissionId = null;
+        }
+
+        document.getElementById('confirmRevisionsBtn').addEventListener('click', () => {
+            if (!currentRevisionsSubmissionId) return;
+            
+            const feedback = document.getElementById('revisionsFeedback').value.trim();
+            
+            if (!feedback) {
+                alert('Please provide feedback for the writer.');
+                return;
+            }
+            
+            if (confirm('Send revision request to the writer?')) {
+                const list = loadSubmissions();
+                const idx = list.findIndex(s => s.id === currentRevisionsSubmissionId);
+                
+                if (idx >= 0) {
+                    list[idx].status = 'revisions_requested';
+                    list[idx].revisionFeedback = feedback;
+                    (list[idx].timeline = list[idx].timeline || []).push({ 
+                        action: 'revisions_requested', 
+                        ts: new Date().toISOString(),
+                        feedback: feedback
+                    });
+                    saveSubmissions(list);
+                    
+                    // Notify writer
+                    notifyWriter(list[idx].author, {
+                        type: 'revisions_requested',
+                        title: list[idx].title,
+                        feedback: feedback
+                    });
+                    
+                    logActivity(`Requested revisions for "${list[idx].title}"`);
+                }
+                
+                closeRevisionsModal();
+                
+                // Refresh the editor view
+                const user = getCurrentUser();
+                if (user) {
+                    renderEditorStudio(user, 'all');
+                }
+                
+                alert('Revision request sent to the writer.');
+            }
+        });
 
         function backToGallery() {
             document.querySelector('.hero').style.display = '';
@@ -1875,6 +2224,9 @@ finally.`
             });
         });
 
+        // Load published poems from localStorage before rendering
+        hydratePublishedPoems();
+        
         // Initialize with default collection
         renderCollection('love');
 
@@ -1971,13 +2323,17 @@ finally.`
                 total: submissions.length,
                 pending: submissions.filter(s => s.status === 'pending').length,
                 approved: submissions.filter(s => s.status === 'approved').length,
-                rejected: submissions.filter(s => s.status === 'rejected').length
+                revisions: submissions.filter(s => s.status === 'revisions_requested').length,
+                rejected: submissions.filter(s => s.status === 'rejected').length,
+                published: submissions.filter(s => s.status === 'published').length
             };
             const edStats = document.getElementById('edStats');
             edStats.innerHTML = `
                 <div class="ed-stat"><div>Total</div><strong>${stats.total}</strong></div>
                 <div class="ed-stat"><div>Pending</div><strong>${stats.pending}</strong></div>
+                <div class="ed-stat"><div>Revisions</div><strong>${stats.revisions}</strong></div>
                 <div class="ed-stat"><div>Approved</div><strong>${stats.approved}</strong></div>
+                <div class="ed-stat"><div>Published</div><strong>${stats.published}</strong></div>
                 <div class="ed-stat"><div>Rejected</div><strong>${stats.rejected}</strong></div>
             `;
 
@@ -2033,9 +2389,9 @@ finally.`
                     <div class="ed-meta">Submitted: ${new Date(sub.submittedAt || Date.now()).toLocaleString()}</div>
                     <div class="ed-preview" data-id="${sub.id}">${bodyPreview}</div>
                     <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem;">
-                        <button class="ed-btn" data-action="approve" data-id="${sub.id}">Approve</button>
+                        <button class="ed-btn" data-action="acceptpublish" data-id="${sub.id}">Accept & Publish</button>
                         <button class="ed-btn secondary" data-action="reject" data-id="${sub.id}">Reject</button>
-                        ${sub.status === 'approved' ? `<button class="ed-btn secondary" data-publish="${sub.id}">Publish to Gallery</button>` : ''}
+                        <button class="ed-btn secondary" data-action="revisions" data-id="${sub.id}">Request Revisions</button>
                         <button class="ed-btn secondary" data-toggle="${sub.id}">Toggle Preview</button>
                         <button class="ed-btn secondary" data-detail="${sub.id}">Open Details</button>
                     </div>
@@ -2047,14 +2403,13 @@ finally.`
                 btn.addEventListener('click', () => {
                     const id = btn.getAttribute('data-id');
                     const action = btn.getAttribute('data-action');
-                    const list = loadSubmissions();
-                    const idx = list.findIndex(s => s.id === id);
-                    if (idx >= 0) {
-                        list[idx].status = action === 'approve' ? 'approved' : 'rejected';
-                        (list[idx].timeline = list[idx].timeline || []).push({ action: action === 'approve' ? 'approved' : 'rejected', ts: new Date().toISOString() });
-                        saveSubmissions(list);
-                        logActivity(`${action === 'approve' ? 'Approved' : 'Rejected'} "${list[idx].title}"`);
-                        renderEditorStudio(user, filter);
+                    
+                    if (action === 'acceptpublish') {
+                        openPublishModal(id);
+                    } else if (action === 'reject') {
+                        openRejectModal(id);
+                    } else if (action === 'revisions') {
+                        openRevisionsModal(id);
                     }
                 });
             });
@@ -2064,14 +2419,6 @@ finally.`
                     const id = btn.getAttribute('data-toggle');
                     const prev = listEl.querySelector(`.ed-preview[data-id="${id}"]`);
                     if (prev) prev.classList.toggle('expanded');
-                });
-            });
-
-            listEl.querySelectorAll('button[data-publish]').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const id = btn.getAttribute('data-publish');
-                    publishToGallery(id);
-                    logActivity(`Published submission ${id}`);
                 });
             });
 
@@ -2484,31 +2831,27 @@ finally.`
             };
             setView();
             document.getElementById('detailApprove').onclick = () => {
-                sub.status = 'approved';
-                (sub.timeline = sub.timeline || []).push({ action: 'approved', ts: new Date().toISOString() });
-                saveSubmissions(subs);
-                logActivity(`Approved "${sub.title}"`);
-                updateActivityFeed();
-                renderEditorStudio(getCurrentUser());
-                setView();
+                if (confirm('Mark this submission as approved?')) {
+                    sub.status = 'approved';
+                    (sub.timeline = sub.timeline || []).push({ action: 'approved', ts: new Date().toISOString() });
+                    saveSubmissions(subs);
+                    logActivity(`Approved "${sub.title}"`);
+                    updateActivityFeed();
+                    renderEditorStudio(getCurrentUser());
+                    setView();
+                }
             };
             document.getElementById('detailReject').onclick = () => {
-                sub.status = 'rejected';
-                (sub.timeline = sub.timeline || []).push({ action: 'rejected', ts: new Date().toISOString() });
-                saveSubmissions(subs);
-                logActivity(`Rejected "${sub.title}"`);
-                updateActivityFeed();
-                renderEditorStudio(getCurrentUser());
-                setView();
+                closeDetail();
+                openRejectModal(sub.id);
+            };
+            document.getElementById('detailRequestRevisions').onclick = () => {
+                closeDetail();
+                openRevisionsModal(sub.id);
             };
             document.getElementById('detailPublish').onclick = () => {
-                publishToGallery(sub.id);
-                (sub.timeline = sub.timeline || []).push({ action: 'published', ts: new Date().toISOString() });
-                saveSubmissions(subs);
-                logActivity(`Published "${sub.title}"`);
-                updateActivityFeed();
-                renderEditorStudio(getCurrentUser());
-                setView();
+                closeDetail();
+                openPublishModal(sub.id);
             };
             document.getElementById('detailSaveNotes').onclick = () => {
                 sub.internalNotes = detailNotes.value;

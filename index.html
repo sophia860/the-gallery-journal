@@ -5,13 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Gallery - Winter 2026</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@500;600&family=Lora:wght@400;500&family=Playfair+Display:wght@600;700&display=swap');
         :root {
-            --color-cream: #f5f1e8;
-            --color-dark: #2a2a2a;
-            --color-accent: #8b7355;
-            --color-light-accent: #c9b8a3;
-            --font-serif: 'Georgia', 'Times New Roman', serif;
-            --font-sans: 'Helvetica Neue', Arial, sans-serif;
+            --color-paper: #FAF8F5;
+            --color-ink: #0D0D0D;
+            --color-accent: #C41E3A;
+            --color-grey: #6B6B6B;
+            --color-cream: #F5F1EB;
+            --font-serif: 'Lora', 'Source Serif Pro', serif;
+            --font-display: 'Playfair Display', 'Georgia', serif;
+            --font-sans: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+            --max-width: 680px;
+            --transition-soft: all 240ms ease;
         }
 
         * {
@@ -22,40 +27,51 @@
 
         body {
             font-family: var(--font-serif);
-            background-color: var(--color-cream);
-            color: var(--color-dark);
-            line-height: 1.7;
+            font-size: 18px;
+            background: var(--color-paper);
+            color: var(--color-ink);
+            line-height: 1.65;
             overflow-x: hidden;
+            scroll-behavior: smooth;
         }
 
         .hero {
             min-height: 70vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             align-items: center;
-            text-align: center;
-            padding: 4rem 2rem;
-            background: linear-gradient(to bottom, #e8e4da 0%, var(--color-cream) 100%);
+            gap: 3rem;
+            text-align: left;
+            padding: 8rem clamp(12vw, 18vw, 22vw) 5rem;
+            background: var(--color-paper);
             position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 3rem 6vw 2rem 6vw;
+            border: 1px solid rgba(13, 13, 13, 0.08);
+            pointer-events: none;
         }
 
         .issue-label {
             font-family: var(--font-sans);
-            font-size: 0.75rem;
-            letter-spacing: 0.3em;
+            font-size: 0.78rem;
+            letter-spacing: 0.32em;
             text-transform: uppercase;
-            color: var(--color-accent);
-            margin-bottom: 2rem;
-            font-weight: 400;
+            color: var(--color-grey);
+            margin-bottom: 1rem;
+            font-weight: 600;
         }
 
         .hero h1 {
-            font-size: clamp(3rem, 8vw, 5.5rem);
-            font-weight: 400;
-            letter-spacing: -0.02em;
-            margin-bottom: 1.5rem;
-            color: var(--color-dark);
+            font-family: var(--font-display);
+            font-size: clamp(3.2rem, 7vw, 5.6rem);
+            font-weight: 600;
+            letter-spacing: -0.025em;
+            margin-bottom: 1.2rem;
+            color: var(--color-ink);
         }
 
         .hero h1 em {
@@ -63,20 +79,114 @@
         }
 
         .tagline {
-            font-size: 1rem;
+            font-family: var(--font-serif);
+            font-size: 1.1rem;
             font-style: italic;
+            color: var(--color-grey);
+            max-width: var(--max-width);
+            margin-bottom: 1.8rem;
+            line-height: 1.7;
+        }
+
+        .hero-copy {
+            position: relative;
+            padding-left: 0.5rem;
+        }
+
+        .cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+            padding: 0.95rem 1.6rem;
+            font-family: var(--font-sans);
+            font-size: 0.86rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            background: var(--color-ink);
+            color: var(--color-paper);
+            border: none;
+            cursor: pointer;
+            transition: var(--transition-soft);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.16);
+            background: #161616;
+        }
+
+        .magazine-cta {
+            position: relative;
+            background: var(--color-paper);
+            padding: 2.2rem;
+            border: 1px solid rgba(13, 13, 13, 0.06);
+            box-shadow: 0 16px 38px rgba(0,0,0,0.08);
+            max-width: 400px;
+            justify-self: center;
+            transition: var(--transition-soft);
+        }
+
+        .magazine-cta:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 46px rgba(0,0,0,0.1);
+        }
+
+        .magazine-spine {
+            font-family: var(--font-sans);
+            font-size: 0.72rem;
+            letter-spacing: 0.28em;
+            text-transform: uppercase;
+            color: var(--color-grey);
+            margin-bottom: 1rem;
+        }
+
+        .magazine-cover {
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        .magazine-cover .cover-title {
+            font-family: var(--font-display);
+            font-size: 2.2rem;
+            letter-spacing: -0.02em;
+            color: var(--color-ink);
+        }
+
+        .magazine-cover .cover-subtitle {
+            font-family: var(--font-sans);
+            font-size: 0.86rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--color-grey);
+        }
+
+        .magazine-cover .cover-meta {
+            font-size: 0.98rem;
+            color: var(--color-grey);
+            font-style: italic;
+        }
+
+        .magazine-foot {
+            margin-top: 1.2rem;
+            font-family: var(--font-sans);
+            font-size: 0.75rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
             color: var(--color-accent);
-            max-width: 600px;
-            margin: 0 auto;
         }
 
         .container {
-            max-width: 900px;
+            max-width: 1100px;
             margin: 0 auto;
             padding: 0 2rem;
         }
 
         .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
             font-family: var(--font-sans);
             font-size: 0.7rem;
             letter-spacing: 0.25em;
@@ -87,28 +197,108 @@
             border-bottom: 1px solid var(--color-light-accent);
         }
 
+        .section-header::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(139, 115, 85, 0.25), transparent);
+        }
+
+        .gallery-wall {
+            position: relative;
+            background: var(--color-paper);
+            border: 1px solid rgba(13, 13, 13, 0.08);
+            padding: 3rem 2rem;
+            margin-bottom: 5rem;
+            box-shadow: 0 24px 70px rgba(0,0,0,0.05);
+            transition: var(--transition-soft);
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .gallery-wall::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(139,115,85,0.1), rgba(139,115,85,0));
+            transform: translateX(-50%);
+            pointer-events: none;
+        }
+
         .poem-grid {
             display: grid;
-            gap: 2rem;
-            margin-bottom: 5rem;
+            grid-template-columns: 1fr;
+            gap: 2.5rem;
         }
 
         .poem-card {
-            padding: 2.5rem 0;
-            border-bottom: 1px solid rgba(139, 115, 85, 0.15);
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: var(--transition-soft);
+            position: relative;
+            max-width: 680px;
+            margin: 0 auto;
         }
 
         .poem-card:hover {
-            padding-left: 1rem;
+            transform: translateY(-6px);
+            filter: drop-shadow(0 18px 28px rgba(0,0,0,0.12));
+        }
+
+        .poem-frame {
+            background: var(--color-paper);
+            border: 12px solid var(--color-cream);
+            box-shadow:
+                0 10px 25px rgba(0,0,0,0.12),
+                inset 0 0 0 1px rgba(13,13,13,0.08);
+            padding: 1.8rem 1.6rem;
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 1rem;
+            min-height: 220px;
+            transition: var(--transition-soft);
+        }
+
+        .poem-frame::after {
+            content: '';
+            position: absolute;
+            top: -12px;
+            left: 40px;
+            width: 48px;
+            height: 6px;
+            background: radial-gradient(circle at 30% 50%, rgba(0,0,0,0.08), transparent 55%);
+            filter: blur(2px);
+            transform: rotate(-2deg);
+        }
+
+        .poem-main {
+            display: grid;
+            gap: 0.55rem;
+            max-width: var(--max-width);
+            margin: 0 auto;
+        }
+
+        .poem-meta {
+            justify-self: end;
+            align-self: start;
+            text-align: right;
+            font-family: var(--font-sans);
+            font-size: 0.72rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--color-grey);
+            opacity: 0.82;
         }
 
         .poem-title {
             font-size: 1.5rem;
             font-weight: 400;
             margin-bottom: 0.5rem;
-            color: var(--color-dark);
+            color: var(--color-ink);
         }
 
         .poem-author {
@@ -119,20 +309,542 @@
         }
 
         .poem-preview {
-            font-size: 0.95rem;
-            line-height: 1.8;
-            color: #5a5a5a;
+            font-size: 1.03rem;
+            line-height: 1.9;
+            color: var(--color-grey);
             font-style: italic;
+            max-width: var(--max-width);
         }
 
         .read-more {
             font-family: var(--font-sans);
-            font-size: 0.75rem;
-            letter-spacing: 0.15em;
+            font-size: 0.78rem;
+            letter-spacing: 0.18em;
             text-transform: uppercase;
-            color: var(--color-accent);
+            color: var(--color-ink);
             margin-top: 1rem;
             display: inline-block;
+            opacity: 0.85;
+            position: relative;
+            padding-bottom: 2px;
+            transition: var(--transition-soft);
+        }
+
+        .read-more::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 1px;
+            background: var(--color-ink);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: var(--transition-soft);
+        }
+
+        .read-more:hover::after {
+            transform: scaleX(1);
+        }
+
+        .collections-nav {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .collection-tab {
+            border: 1px solid rgba(13, 13, 13, 0.15);
+            background: transparent;
+            color: var(--color-ink);
+            padding: 0.75rem 1.1rem;
+            font-family: var(--font-sans);
+            font-size: 0.85rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: var(--transition-soft);
+        }
+
+        .collection-tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 18px rgba(0,0,0,0.08);
+            border-color: rgba(13,13,13,0.35);
+        }
+
+        .collection-tab.active {
+            background: var(--color-ink);
+            color: var(--color-paper);
+            border-color: var(--color-ink);
+        }
+
+        .collection-title {
+            font-size: 1.25rem;
+            letter-spacing: 0.04em;
+            margin-bottom: 0.35rem;
+        }
+
+        .collection-desc {
+            color: var(--color-grey);
+            margin-bottom: 2rem;
+            max-width: var(--max-width);
+            line-height: 1.7;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Studios */
+        .studios-bar {
+            display: flex;
+            gap: 0.75rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .studio-card {
+            display: none; /* hidden on public homepage per brief */
+        }
+
+        .studio-card h3 {
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.05em;
+        }
+
+        .studio-card p {
+            margin-bottom: 1rem;
+            color: #4a4a4a;
+        }
+
+        .studio-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.65rem 1rem;
+            border: 1px solid var(--color-dark);
+            background: var(--color-dark);
+            color: var(--color-cream);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .studio-btn.secondary {
+            background: transparent;
+            color: var(--color-dark);
+        }
+
+        .studio-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.12);
+        }
+
+        .studio-panel {
+            margin-top: 1.5rem;
+            background: #fdfaf6;
+            border: 1px solid rgba(139,115,85,0.2);
+            padding: 1.25rem;
+            box-shadow: inset 0 0 0 1px rgba(139,115,85,0.08);
+        }
+
+        .studio-panel h4 {
+            margin-bottom: 0.75rem;
+        }
+
+        .studio-list {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .submission-card {
+            border: 1px solid rgba(139,115,85,0.2);
+            padding: 0.9rem 1rem;
+            background: #fff;
+            display: grid;
+            gap: 0.35rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.6rem;
+            font-size: 0.75rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            border-radius: 999px;
+            border: 1px solid rgba(0,0,0,0.1);
+            background: #f7f1e6;
+        }
+
+        .badge.approved { border-color: #2e8b57; color: #2e8b57; }
+        .badge.rejected { border-color: #b22222; color: #b22222; }
+        .badge.pending { border-color: #8b7355; color: #8b7355; }
+
+        .submission-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .submission-actions button {
+            padding: 0.35rem 0.75rem;
+            border: 1px solid var(--color-dark);
+            background: var(--color-dark);
+            color: var(--color-cream);
+            cursor: pointer;
+        }
+
+        .submission-actions button.secondary {
+            background: transparent;
+            color: var(--color-dark);
+        }
+
+        /* Typewriter / focus mode */
+        .typewriter-overlay {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 20% 20%, #f7f1e6, #efe4d2 45%, #e6d7c0 100%);
+            z-index: 5000;
+            display: none;
+            flex-direction: column;
+            padding: 2.5rem clamp(1.5rem, 3vw, 3rem);
+            font-family: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+        }
+
+        .typewriter-overlay.active {
+            display: flex;
+        }
+
+        .typewriter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+        }
+
+        .typewriter-title {
+            width: 100%;
+            border: none;
+            border-bottom: 1px solid rgba(0,0,0,0.12);
+            background: transparent;
+            font-size: 1.2rem;
+            padding: 0.35rem 0;
+            outline: none;
+        }
+
+        .typewriter-meta {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+            color: #6a5c4c;
+            font-size: 0.9rem;
+        }
+
+        .typewriter-body {
+            flex: 1;
+            border: 1px solid rgba(0,0,0,0.08);
+            background: #fdf9f1;
+            padding: 1.5rem;
+            font-size: 1rem;
+            line-height: 1.7;
+            outline: none;
+            resize: none;
+            box-shadow: inset 0 12px 30px rgba(0,0,0,0.04);
+        }
+
+        .typewriter-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .count-bar {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.9rem;
+            color: #6a5c4c;
+        }
+
+        .drafts-panel {
+            margin-top: 1rem;
+            border-top: 1px solid rgba(0,0,0,0.08);
+            padding-top: 1rem;
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        .draft-item {
+            padding: 0.75rem;
+            border: 1px dashed rgba(0,0,0,0.15);
+            background: #fff;
+            display: flex;
+            justify-content: space-between;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .tag-input, .notes-input {
+            width: 100%;
+            border: 1px solid rgba(0,0,0,0.12);
+            background: #fffdf8;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        /* Profile */
+        .profile-card {
+            border: 1px solid rgba(139,115,85,0.2);
+            background: #fdfaf6;
+            padding: 1rem;
+            display: grid;
+            gap: 0.35rem;
+            align-items: center;
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .profile-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 6000;
+        }
+
+        .profile-modal.active { display: flex; }
+
+        .profile-modal .content {
+            background: #fffdf8;
+            padding: 1.5rem;
+            width: min(520px, 90vw);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            border: 1px solid rgba(0,0,0,0.1);
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .profile-modal label {
+            font-size: 0.9rem;
+            color: #4a4a4a;
+        }
+
+        .profile-modal input, .profile-modal textarea {
+            width: 100%;
+            padding: 0.6rem 0.75rem;
+            border: 1px solid rgba(0,0,0,0.12);
+            background: #fff;
+        }
+
+        /* Editor dashboard */
+        #editorDashboard {
+            display: none;
+            min-height: 100vh;
+            background: #f7f3ea;
+            padding: 2rem clamp(1.25rem, 3vw, 3rem);
+            font-family: var(--font-sans);
+        }
+
+        .ed-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .ed-title {
+            font-size: 2rem;
+            letter-spacing: -0.01em;
+        }
+
+        .ed-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .ed-btn {
+            padding: 0.6rem 0.9rem;
+            border: 1px solid var(--color-dark);
+            background: var(--color-dark);
+            color: var(--color-cream);
+            letter-spacing: 0.05em;
+            cursor: pointer;
+        }
+
+        .ed-btn.secondary {
+            background: transparent;
+            color: var(--color-dark);
+        }
+
+        .ed-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .ed-stat {
+            background: #fffdf8;
+            border: 1px solid rgba(0,0,0,0.08);
+            padding: 0.9rem;
+            box-shadow: 0 10px 24px rgba(0,0,0,0.06);
+        }
+
+        .ed-filters {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .ed-filter {
+            padding: 0.45rem 0.8rem;
+            border: 1px solid rgba(0,0,0,0.15);
+            background: #fff;
+            cursor: pointer;
+        }
+
+        .ed-filter.active {
+            background: var(--color-dark);
+            color: var(--color-cream);
+            border-color: var(--color-dark);
+        }
+
+        .ed-list {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .ed-card {
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.08);
+            padding: 1rem;
+            box-shadow: 0 12px 26px rgba(0,0,0,0.08);
+        }
+
+        .ed-meta {
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .ed-preview {
+            margin: 0.5rem 0;
+            background: #fdfaf6;
+            padding: 0.75rem;
+            border: 1px solid rgba(0,0,0,0.05);
+            max-height: 140px;
+            overflow: hidden;
+        }
+
+        .ed-preview.expanded {
+            max-height: none;
+        }
+
+        .ed-layout {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 1rem;
+        }
+
+        .ed-side {
+            background: #fffdf8;
+            border: 1px solid rgba(0,0,0,0.08);
+            padding: 1rem;
+            box-shadow: 0 10px 24px rgba(0,0,0,0.06);
+            display: grid;
+            gap: 1rem;
+        }
+
+        .ed-nav button {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 0.6rem 0.8rem;
+            border: 1px solid rgba(0,0,0,0.08);
+            background: #fff;
+            margin-bottom: 0.4rem;
+            cursor: pointer;
+        }
+
+        .ed-nav button.active {
+            background: var(--color-dark);
+            color: var(--color-cream);
+        }
+
+        .ed-main {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .ed-toolbar {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .label-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.2rem 0.55rem;
+            border-radius: 999px;
+            border: 1px solid rgba(0,0,0,0.12);
+            font-size: 0.8rem;
+            cursor: default;
+        }
+
+        .ed-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 7000;
+        }
+
+        .ed-modal.active { display: flex; }
+
+        .ed-modal .content {
+            background: #fff;
+            width: min(900px, 94vw);
+            max-height: 90vh;
+            overflow: auto;
+            padding: 1.25rem;
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .activity-feed {
+            display: grid;
+            gap: 0.4rem;
+            font-size: 0.9rem;
+            color: #444;
+        }
+
+        .ed-tags-row {
+            display: flex;
+            gap: 0.35rem;
+            flex-wrap: wrap;
+        }
+
+        .ed-checkbox {
+            width: 16px;
+            height: 16px;
         }
 
         .modal {
@@ -163,7 +875,7 @@
         .modal-content {
             background-color: var(--color-cream);
             padding: 4rem;
-            max-width: 700px;
+            max-width: 760px;
             width: 100%;
             position: relative;
             animation: slideUp 0.4s ease;
@@ -203,7 +915,7 @@
             font-family: var(--font-sans);
             font-size: 0.9rem;
             color: var(--color-accent);
-            margin-bottom: 3rem;
+            margin-bottom: 1.5rem;
         }
 
         .modal-poem-text {
@@ -219,7 +931,7 @@
             font-size: 0.75rem;
             letter-spacing: 0.15em;
             text-transform: uppercase;
-            color: var(--color-accent);
+            color: var(--color-grey);
         }
 
         /* Top Navigation Bar */
@@ -394,6 +1106,21 @@
             background: #3a3a3a;
         }
 
+        @media (max-width: 900px) {
+            .hero {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-copy {
+                text-align: center;
+            }
+
+            .magazine-cta {
+                margin: 0 auto;
+            }
+        }
+
         @media (max-width: 768px) {
             .top-nav {
                 padding: 1rem 1.5rem;
@@ -442,70 +1169,170 @@
     </nav>
 
     <div class="hero">
-        <div class="issue-label">Winter 2026</div>
-        <h1>The <em>Gallery</em></h1>
-        <p class="tagline">Where poetry passes through like light through glass</p>
+        <div class="hero-copy">
+            <div class="issue-label">Winter 2026</div>
+            <h1>The <em>Gallery</em></h1>
+            <p class="tagline">Where poetry passes through like light through glass</p>
+            <button class="cta-btn" onclick="openMagazine()">Read the live issue →</button>
+        </div>
+        <div class="magazine-cta">
+            <div class="magazine-spine">Live Gallery</div>
+            <div class="magazine-cover">
+                <div class="cover-title">The Gallery</div>
+                <div class="cover-subtitle">Winter 2026 — Issue 01</div>
+                <div class="cover-meta">An ongoing, living magazine inspired by the shoreline.</div>
+            </div>
+            <div class="magazine-foot">Swipe / arrow keys to turn pages</div>
+        </div>
+    </div>
+
+    <div id="editorDashboard">
+        <div class="ed-header">
+            <div>
+                <div class="ed-title">Editor's Studio</div>
+                <div id="edUser" class="ed-meta"></div>
+            </div>
+            <div class="ed-actions">
+                <button class="ed-btn secondary" onclick="backToGallery()">Back to Gallery</button>
+                <button class="ed-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+        <div class="ed-layout">
+            <aside class="ed-side">
+                <div class="ed-nav">
+                    <button class="active" data-edview="dashboard">Dashboard</button>
+                    <button data-edview="submissions">All Submissions</button>
+                    <button data-edview="labels">Labels / Categories</button>
+                    <button data-edview="settings">Settings</button>
+                </div>
+                <div>
+                    <strong>Activity</strong>
+                    <div class="activity-feed" id="activityFeed"></div>
+                </div>
+            </aside>
+            <main class="ed-main">
+                <div id="edSubmissionsView">
+                    <div class="ed-stats" id="edStats"></div>
+                    <div class="ed-toolbar">
+                        <input id="edSearch" placeholder="Search title/author/content" style="padding:0.5rem;border:1px solid rgba(0,0,0,0.12);flex:1 1 220px;">
+                        <input id="edDateFrom" type="date" style="padding:0.45rem;border:1px solid rgba(0,0,0,0.12);">
+                        <input id="edDateTo" type="date" style="padding:0.45rem;border:1px solid rgba(0,0,0,0.12);">
+                        <select id="edLabelFilter" style="padding:0.45rem;border:1px solid rgba(0,0,0,0.12);">
+                            <option value="">Label filter</option>
+                        </select>
+                        <select id="edSort" style="padding:0.45rem;border:1px solid rgba(0,0,0,0.12);">
+                            <option value="date">Sort by date</option>
+                            <option value="title">Sort by title</option>
+                            <option value="rating">Sort by rating</option>
+                        </select>
+                    </div>
+                    <div class="ed-filters">
+                        <button class="ed-filter active" data-filter="all">All</button>
+                        <button class="ed-filter" data-filter="pending">Pending</button>
+                        <button class="ed-filter" data-filter="approved">Approved</button>
+                        <button class="ed-filter" data-filter="rejected">Rejected</button>
+                    </div>
+                    <div class="ed-toolbar">
+                        <button class="ed-btn" id="bulkApprove">Approve All</button>
+                        <button class="ed-btn secondary" id="bulkReject">Reject All</button>
+                        <button class="ed-btn secondary" id="bulkAddLabel">Add Label</button>
+                        <button class="ed-btn secondary" id="bulkRemoveLabel">Remove Label</button>
+                        <button class="ed-btn secondary" id="bulkExport">Export Selected</button>
+                    </div>
+                    <div class="ed-list" id="edList"></div>
+                </div>
+                <div id="edLabelsView" style="display:none;">
+                    <h4>Labels / Categories</h4>
+                    <div id="labelListInline"></div>
+                    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem;">
+                        <input id="newLabelNameInline" placeholder="Label name" style="flex:1;min-width:140px;padding:0.5rem;border:1px solid rgba(0,0,0,0.12);">
+                        <input id="newLabelColorInline" type="color" value="#8b7355" style="width:60px;height:42px;border:1px solid rgba(0,0,0,0.12);">
+                        <button class="ed-btn" id="addLabelBtnInline">Add Label</button>
+                    </div>
+                </div>
+                <div id="edSettingsView" style="display:none;">
+                    <h4>Response Templates</h4>
+                    <div id="tmplListInline"></div>
+                    <div style="display:grid;gap:0.35rem;margin-top:0.5rem;">
+                        <input id="tmplTitleInline" placeholder="Template title" style="padding:0.5rem;border:1px solid rgba(0,0,0,0.12);">
+                        <textarea id="tmplBodyInline" rows="4" placeholder="Template body" style="padding:0.6rem;border:1px solid rgba(0,0,0,0.12);"></textarea>
+                        <button class="ed-btn" id="tmplSaveInline">Save Template</button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div id="edDetailModal" class="ed-modal">
+        <div class="content">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <h4 id="detailTitle"></h4>
+                <button class="ed-btn secondary" onclick="closeDetail()">Close</button>
+            </div>
+            <div id="detailMeta" class="ed-meta"></div>
+            <div id="detailBody" class="ed-preview expanded"></div>
+            <div id="detailProfile" class="ed-meta"></div>
+            <div>
+                <strong>Timeline</strong>
+                <div id="detailTimeline" class="activity-feed"></div>
+            </div>
+            <div>
+                <strong>Internal Notes</strong>
+                <textarea id="detailNotes" rows="3" style="width:100%;padding:0.6rem;border:1px solid rgba(0,0,0,0.12);"></textarea>
+            </div>
+            <div>
+                <strong>Rating</strong>
+                <div id="detailRating" style="display:flex;gap:0.35rem;"></div>
+            </div>
+            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+                <button class="ed-btn" id="detailApprove">Approve</button>
+                <button class="ed-btn secondary" id="detailReject">Reject</button>
+                <button class="ed-btn secondary" id="detailPublish">Publish to Gallery</button>
+                <button class="ed-btn secondary" id="detailSaveNotes">Save Notes</button>
+            </div>
+        </div>
     </div>
 
     <div class="container">
-        <div class="section-header">Featured</div>
-        
-        <div class="poem-grid" id="poemGrid">
-            <div class="poem-card" data-poem-id="1">
-                <div class="poem-title">Liminal Spaces</div>
-                <div class="poem-author">by Sarah Chen</div>
-                <div class="poem-preview">Between the wanting and the wound,<br>I found a door that opened inward...</div>
-                <div class="read-more">Read Full Poem →</div>
-            </div>
+        <div class="section-header">Collections</div>
 
-            <div class="poem-card" data-poem-id="2">
-                <div class="poem-title">The Light Collector</div>
-                <div class="poem-author">by Marcus Webb</div>
-                <div class="poem-preview">She kept jars of morning light,<br>arranged them on the windowsill...</div>
-                <div class="read-more">Read Full Poem →</div>
-            </div>
+        <div class="collections-nav" id="collectionsNav">
+            <button class="collection-tab active" data-collection="nature">Nature &amp; Light</button>
+            <button class="collection-tab" data-collection="memory">Memory &amp; Identity</button>
+            <button class="collection-tab" data-collection="urban">Urban Landscapes</button>
+        </div>
 
-            <div class="poem-card" data-poem-id="3">
-                <div class="poem-title">Inheritance</div>
-                <div class="poem-author">by Priya Sharma</div>
-                <div class="poem-preview">My grandmother's hands speak<br>a language I'm still learning...</div>
-                <div class="read-more">Read Full Poem →</div>
-            </div>
+        <div class="collection-title" id="collectionTitle">Nature &amp; Light — Gallery Room</div>
+        <p class="collection-desc" id="collectionDesc">A quiet wing where light, water, and the natural world bend through language.</p>
 
-            <div class="poem-card" data-poem-id="4">
-                <div class="poem-title">Urban Pastoral</div>
-                <div class="poem-author">by James Liu</div>
-                <div class="poem-preview">The subway busker's violin<br>carves a chapel from concrete...</div>
-                <div class="read-more">Read Full Poem →</div>
+        <div class="gallery-wall">
+            <div class="poem-grid" id="poemGrid">
             </div>
+        </div>
 
-            <div class="poem-card" data-poem-id="5">
-                <div class="poem-title">What the Ocean Said</div>
-                <div class="poem-author">by Elena Vasquez</div>
-                <div class="poem-preview">Come back when you're ready<br>to remember what you've forgotten...</div>
-                <div class="read-more">Read Full Poem →</div>
+        <!-- Studios are hidden on the public homepage to keep the focus on reading -->
+        <div class="section-header" style="display:none;">Studios</div>
+        <div class="studios-bar" style="display:none;"></div>
+        <div id="studioPanel" class="studio-panel" style="display:none;"></div>
+        <div id="typewriterOverlay" class="typewriter-overlay">
+            <div class="typewriter-header">
+                <input id="twTitle" class="typewriter-title" placeholder="Title this poem..." />
+                <div class="typewriter-meta">
+                    <input id="twTags" class="tag-input" placeholder="Tags (comma-separated)" style="max-width:220px;">
+                    <span id="twCounts" class="count-bar"></span>
+                </div>
             </div>
-
-            <div class="poem-card" data-poem-id="6">
-                <div class="poem-title">Anatomy of Silence</div>
-                <div class="poem-author">by David Okonkwo</div>
-                <div class="poem-preview">There are silences that sing<br>and silences that suffocate...</div>
-                <div class="read-more">Read Full Poem →</div>
+            <textarea id="twBody" class="typewriter-body" placeholder="Begin freewriting. Breathe."></textarea>
+            <textarea id="twNotes" class="notes-input" placeholder="Notes for yourself or editors (optional)" rows="2" style="margin-top:0.75rem;"></textarea>
+            <div class="typewriter-footer">
+                <div class="count-bar" id="twCountBar"></div>
+                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+                    <button class="studio-btn" id="twSaveDraft">Save Draft</button>
+                    <button class="studio-btn secondary" id="twSubmit">Submit to Editors</button>
+                    <button class="studio-btn secondary" id="twClose">Close</button>
+                </div>
             </div>
-
-            <div class="poem-card" data-poem-id="7">
-                <div class="poem-title">The Cartographer's Daughter</div>
-                <div class="poem-author">by Lily Morrison</div>
-                <div class="poem-preview">She drew maps of places<br>that existed only in translation...</div>
-                <div class="read-more">Read Full Poem →</div>
-            </div>
-
-            <div class="poem-card" data-poem-id="8">
-                <div class="poem-title">Midnight Economy</div>
-                <div class="poem-author">by Rafael Torres</div>
-                <div class="poem-preview">The diner at 3am trades in confessions,<br>currency of the sleepless...</div>
-                <div class="read-more">Read Full Poem →</div>
-            </div>
+            <div class="drafts-panel" id="twDrafts"></div>
         </div>
     </div>
 
@@ -545,35 +1372,109 @@
     <script>
 
                 // Backend API Configuration
-        const API_CONFIG = {
-            // Change this URL to your actual backend URL
-            baseUrl: 'https://your-backend-api.com',
-            // Or use environment-specific URLs
-            // baseUrl: window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://your-production-api.com',
-            endpoints: {
-                login: '/api/auth/login',
-                health: '/health',
-                ready: '/ready'
-            }
+        // Static/demo auth configuration (works on GitHub Pages)
+        const MOCK_USERS = {
+            'editor@example.com': { password: 'password', role: 'editor' },
+            'writer@example.com': { password: 'password', role: 'writer' }
         };
 
-        // Check backend health status
-        async function checkBackendHealth() {
+        // Local submissions store
+        function loadSubmissions() {
             try {
-                const response = await fetch(API_CONFIG.baseUrl + API_CONFIG.endpoints.health);
-                const data = await response.json();
-                console.log('Backend health:', data);
-                return data.status === 'ok';
-            } catch (error) {
-                console.warn('Backend health check failed:', error);
-                return false;
+                return JSON.parse(localStorage.getItem('submissions') || '[]');
+            } catch {
+                return [];
             }
+        }
+
+        function saveSubmissions(list) {
+            localStorage.setItem('submissions', JSON.stringify(list));
+        }
+
+        // Typewriter draft helpers
+        function loadDrafts() {
+            try {
+                return JSON.parse(localStorage.getItem('drafts') || '[]');
+            } catch {
+                return [];
+            }
+        }
+
+        function saveDrafts(list) {
+            localStorage.setItem('drafts', JSON.stringify(list));
+        }
+
+        // Profiles
+        function loadProfiles() {
+            try {
+                return JSON.parse(localStorage.getItem('profiles') || '{}');
+            } catch {
+                return {};
+            }
+        }
+
+        function saveProfiles(obj) {
+            localStorage.setItem('profiles', JSON.stringify(obj));
+        }
+
+        // Labels
+        function loadLabels() {
+            try {
+                return JSON.parse(localStorage.getItem('labels') || '[]');
+            } catch {
+                return [];
+            }
+        }
+
+        function saveLabels(list) {
+            localStorage.setItem('labels', JSON.stringify(list));
+        }
+
+        // Activity feed
+        function logActivity(text) {
+            const feed = JSON.parse(localStorage.getItem('activityFeed') || '[]');
+            feed.unshift({ text, ts: new Date().toISOString() });
+            localStorage.setItem('activityFeed', JSON.stringify(feed.slice(0, 30)));
+        }
+
+        function loadActivity() {
+            try {
+                return JSON.parse(localStorage.getItem('activityFeed') || '[]');
+            } catch {
+                return [];
+            }
+        }
+
+        // Response templates
+        function loadTemplates() {
+            try {
+                return JSON.parse(localStorage.getItem('templates') || '[]');
+            } catch {
+                return [];
+            }
+        }
+
+        function saveTemplates(list) {
+            localStorage.setItem('templates', JSON.stringify(list));
+        }
+
+        function renderLabelPill(name, labels) {
+            const meta = labels.find(l => l.name === name);
+            const color = meta?.color || '#8b7355';
+            return `<span class="label-pill" style="border-color:${color};color:${color};">${name}</span>`;
+        }
+
+        // Check backend health status
+        // No-op health check for static hosting; always returns true
+        async function checkBackendHealth() {
+            return true;
         }
 
         const poems = {
             1: {
                 title: "Liminal Spaces",
                 author: "Sarah Chen",
+                collection: "memory",
                 text: `Between the wanting and the wound,
 I found a door that opened inward—
 not to darkness, but to a room
@@ -600,6 +1501,7 @@ where the future hasn't chosen me yet.`
             2: {
                 title: "The Light Collector",
                 author: "Marcus Webb",
+                collection: "nature",
                 text: `She kept jars of morning light,
 arranged them on the windowsill
 like a lexicon of brightness—
@@ -627,6 +1529,7 @@ until even the shadows glowed.`
             3: {
                 title: "Inheritance",
                 author: "Priya Sharma",
+                collection: "memory",
                 text: `My grandmother's hands speak
 a language I'm still learning—
 the grammar of ghee and turmeric,
@@ -660,6 +1563,7 @@ kneading history into sustenance.`
             4: {
                 title: "Urban Pastoral",
                 author: "James Liu",
+                collection: "urban",
                 text: `The subway busker's violin
 carves a chapel from concrete,
 makes the morning commute
@@ -688,6 +1592,7 @@ alone together, going home.`
             5: {
                 title: "What the Ocean Said",
                 author: "Elena Vasquez",
+                collection: "nature",
                 text: `Come back when you're ready
 to remember what you've forgotten—
 that you are mostly water,
@@ -716,6 +1621,7 @@ is just water, returning.`
             6: {
                 title: "Anatomy of Silence",
                 author: "David Okonkwo",
+                collection: "memory",
                 text: `There are silences that sing
 and silences that suffocate—
 I learned to tell the difference
@@ -749,6 +1655,7 @@ hear your own name.`
             7: {
                 title: "The Cartographer's Daughter",
                 author: "Lily Morrison",
+                collection: "memory",
                 text: `She drew maps of places
 that existed only in translation—
 the country between two languages,
@@ -782,6 +1689,7 @@ where you actually are.`
             8: {
                 title: "Midnight Economy",
                 author: "Rafael Torres",
+                collection: "urban",
                 text: `The diner at 3am trades in confessions,
 currency of the sleepless,
 where the coffee's always fresh
@@ -814,26 +1722,110 @@ is staying human, staying.`
             }
         };
 
-        const poemCards = document.querySelectorAll('.poem-card');
+        const poemGrid = document.getElementById('poemGrid');
+        const collectionTitle = document.getElementById('collectionTitle');
+        const collectionDesc = document.getElementById('collectionDesc');
+        const collectionTabs = document.querySelectorAll('.collection-tab');
+
         const modal = document.getElementById('poemModal');
         const closeBtn = document.getElementById('closeModal');
         const modalTitle = document.getElementById('modalTitle');
         const modalAuthor = document.getElementById('modalAuthor');
         const modalText = document.getElementById('modalText');
 
-        poemCards.forEach(card => {
-            card.addEventListener('click', () => {
-                const poemId = card.getAttribute('data-poem-id');
-                const poem = poems[poemId];
-                
-                modalTitle.textContent = poem.title;
-                modalAuthor.textContent = `by ${poem.author}`;
-                modalText.textContent = poem.text;
-                
-                modal.classList.add('active');
-                document.body.style.overflow = 'hidden';
+        const collectionCopy = {
+            nature: {
+                title: "Nature & Light — Gallery Room",
+                desc: "A quiet wing where light, water, and the natural world bend through language."
+            },
+            memory: {
+                title: "Memory & Identity — Gallery Room",
+                desc: "Echoes, lineage, and the self unfolding across time and inheritance."
+            },
+            urban: {
+                title: "Urban Landscapes — Gallery Room",
+                desc: "City soundscapes, midnight diners, and the sacred in concrete corridors."
+            }
+        };
+
+        let poemCards = [];
+        let activeIndex = 0;
+        let currentCollection = 'nature';
+
+        // load published poems from localStorage into poems map
+        function hydratePublishedPoems() {
+            try {
+                const stored = JSON.parse(localStorage.getItem('publishedPoems') || '[]');
+                stored.forEach(p => {
+                    poems[p.id] = {
+                        title: p.title,
+                        author: p.author,
+                        collection: p.collection || 'memory',
+                        text: p.text
+                    };
+                });
+            } catch {}
+        }
+
+        function renderCollection(collectionKey) {
+            currentCollection = collectionKey;
+            poemGrid.innerHTML = '';
+            const entries = Object.entries(poems).filter(([, poem]) => poem.collection === collectionKey);
+            entries.forEach(([id, poem], idx) => {
+                const card = document.createElement('div');
+                card.className = 'poem-card';
+                card.setAttribute('data-poem-id', id);
+                card.innerHTML = `
+                    <div class="poem-frame">
+                        <div class="poem-main">
+                            <div class="poem-title">${poem.title}</div>
+                            <div class="poem-author">by ${poem.author}</div>
+                            <div class="poem-preview">${poem.text.split('\\n').slice(0,3).join('<br>')}...</div>
+                            <div class="read-more">Enter the piece →</div>
+                        </div>
+                        <div class="poem-meta">Wall ${String(idx + 1).padStart(2, '0')}</div>
+                    </div>
+                `;
+                poemGrid.appendChild(card);
             });
-        });
+            poemCards = Array.from(document.querySelectorAll('.poem-card'));
+            activeIndex = 0;
+            bindCardEvents();
+            highlightCard(activeIndex);
+        }
+
+        function bindCardEvents() {
+            poemCards.forEach((card, idx) => {
+                card.addEventListener('click', () => {
+                    const poemId = card.getAttribute('data-poem-id');
+                    const poem = poems[poemId];
+                    activeIndex = idx;
+                    highlightCard(activeIndex);
+                    
+                    modalTitle.textContent = poem.title;
+                    modalAuthor.textContent = `by ${poem.author}`;
+                    modalText.textContent = poem.text;
+                    
+                    modal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                });
+            });
+        }
+
+        // Allow keyboard navigation like a magazine (arrow keys to move selection)
+        function highlightCard(index) {
+            poemCards.forEach((card, i) => {
+                card.style.opacity = i === index ? '1' : '0.6';
+                card.style.transform = i === index ? 'translateX(6px)' : 'translateX(0)';
+            });
+            if (poemCards[index]) {
+                poemCards[index].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        function openActiveCard() {
+            poemCards[activeIndex].click();
+        }
 
         closeBtn.addEventListener('click', () => {
             modal.classList.remove('active');
@@ -854,6 +1846,20 @@ is staying human, staying.`
                     document.body.style.overflow = 'auto';
                 }
                 closeLoginModal();
+            } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+                if (poemCards.length > 0) {
+                    activeIndex = (activeIndex + 1) % poemCards.length;
+                    highlightCard(activeIndex);
+                }
+            } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                if (poemCards.length > 0) {
+                    activeIndex = (activeIndex - 1 + poemCards.length) % poemCards.length;
+                    highlightCard(activeIndex);
+                }
+            } else if (e.key === 'Enter') {
+                if (poemCards.length > 0) {
+                    openActiveCard();
+                }
             }
         });
 
@@ -883,63 +1889,46 @@ is staying human, staying.`
         }
 
 // Handle login form submission - connects to backend API
+        // Static/mock login for Pages: validates against MOCK_USERS and stores in localStorage
         async function handleLogin(event) {
             event.preventDefault();
-            const email = document.getElementById('email').value;
+            const email = document.getElementById('email').value.trim().toLowerCase();
             const password = document.getElementById('password').value;
             const submitBtn = event.target.querySelector('.submit-btn');
             const originalText = submitBtn.textContent;
 
-            // Update button state
             submitBtn.textContent = 'Signing in...';
             submitBtn.disabled = true;
 
             try {
-                // Make API call to backend
-                const response = await fetch(API_CONFIG.baseUrl + API_CONFIG.endpoints.login, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ email, password })
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    // Login successful
-                    console.log('Login successful:', data);
-                    
-                    // Store token if provided
-                    if (data.token) {
-                        localStorage.setItem('authToken', data.token);
-                    }
-                    
-                    // Store user info
-                    if (data.user) {
-                        localStorage.setItem('user', JSON.stringify(data.user));
-                    }
-
-                    closeLoginModal();
-                    alert('Login successful! Welcome back.');
-                    
-                    // Optionally redirect to dashboard
-                    // window.location.href = data.user.role === 'editor' ? '/editor-dashboard' : '/writer-dashboard';
-                } else {
-                    // Login failed
-                    throw new Error(data.message || 'Login failed. Please check your credentials.');
+                const user = MOCK_USERS[email];
+                if (!user || user.password !== password) {
+                    throw new Error('Invalid credentials. Try editor@example.com or writer@example.com with password "password".');
                 }
+
+                const token = btoa(`${email}:${Date.now()}`);
+                const userInfo = { email, role: user.role, loggedInAt: new Date().toISOString() };
+
+                localStorage.setItem('authToken', token);
+                localStorage.setItem('user', JSON.stringify(userInfo));
+
+                // Redirect to appropriate studio
+                if (userInfo.role === 'editor') {
+                    openEditorStudio(true);
+                } else {
+                    openWriterStudio(true);
+                }
+
+                closeLoginModal();
+                alert(`Welcome back, ${userInfo.role}!`);
             } catch (error) {
                 console.error('Login error:', error);
-                alert(error.message || 'Unable to connect to server. Please try again later.');
+                alert(error.message);
             } finally {
-                // Reset button state
                 submitBtn.textContent = originalText;
                 submitBtn.disabled = false;
+                event.target.reset();
             }
-
-            // Reset form
-            event.target.reset();
         }
         // Close login modal when clicking outside
         document.getElementById('loginModal').addEventListener('click', (e) => {
@@ -947,6 +1936,755 @@ is staying human, staying.`
                 closeLoginModal();
             }
         });
+
+        // Quick access CTA
+        function openMagazine() {
+            if (poemGrid) {
+                poemGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                highlightCard(activeIndex);
+            }
+        }
+
+        // Publish submission into gallery as a new poem card and persist to localStorage
+        function publishToGallery(id) {
+            const list = loadSubmissions();
+            const sub = list.find(s => s.id === id);
+            if (!sub) return;
+            const newId = `pub-${id}`;
+            const stored = JSON.parse(localStorage.getItem('publishedPoems') || '[]');
+            if (!stored.find(p => p.id === newId)) {
+                stored.push({
+                    id: newId,
+                    title: sub.title,
+                    author: sub.displayName || sub.author,
+                    collection: sub.collection || currentCollection || 'memory',
+                    text: sub.body
+                });
+                localStorage.setItem('publishedPoems', JSON.stringify(stored));
+            }
+            poems[newId] = {
+                title: sub.title,
+                author: sub.displayName || sub.author,
+                collection: sub.collection || currentCollection || 'memory',
+                text: sub.body
+            };
+            renderCollection(currentCollection || 'memory');
+            logActivity(`Published "${sub.title}" to gallery`);
+        }
+
+        function backToGallery() {
+            document.querySelector('.hero').style.display = '';
+            document.querySelector('.container').style.display = '';
+            document.getElementById('editorDashboard').style.display = 'none';
+            const user = getCurrentUser();
+            if (user && user.role === 'editor') {
+                // hide writer panel by default to keep homepage focused on reading
+                document.getElementById('studioPanel').style.display = 'none';
+            }
+        }
+
+        // Collections navigation
+        collectionTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                collectionTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                const key = tab.getAttribute('data-collection');
+                collectionTitle.textContent = collectionCopy[key].title;
+                collectionDesc.textContent = collectionCopy[key].desc;
+                renderCollection(key);
+            });
+        });
+
+        // Initialize with default collection
+        renderCollection('nature');
+
+        /* Studios logic (client-side) */
+        function getCurrentUser() {
+            try {
+                return JSON.parse(localStorage.getItem('user') || 'null');
+            } catch {
+                return null;
+            }
+        }
+
+        function requireRole(role) {
+            const user = getCurrentUser();
+            if (!user || user.role !== role) {
+                // hide any stale studio panel content
+                document.getElementById('studioPanel').style.display = 'none';
+                alert(`Please log in as a ${role} to access this studio.`);
+                openLoginModal(role === 'editor' ? 'editor' : 'writer');
+                return null;
+            }
+            return user;
+        }
+
+        function openWriterStudio(fromLogin = false) {
+            const user = requireRole('writer');
+            if (!user) return;
+            renderWriterStudio(user);
+            const panel = document.getElementById('studioPanel');
+            panel.style.display = 'block';
+            panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function openEditorStudio(fromLogin = false) {
+            const user = requireRole('editor');
+            if (!user) return;
+            renderEditorStudio(user);
+            document.getElementById('studioPanel').style.display = 'none'; // hide writer panel area
+            document.getElementById('editorDashboard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function renderWriterStudio(user) {
+            const panel = document.getElementById('studioPanel');
+            // only render content when explicitly opened; panel visibility is controlled by caller
+            const submissions = loadSubmissions().filter(s => s.author === user.email);
+            const profile = getProfile(user.email);
+            panel.innerHTML = `
+                <h4>Writer's Studio — ${user.email}</h4>
+                <div class="profile-card" id="writerProfileCard">
+                    <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap;">
+                        ${profile.photo ? `<img src="${profile.photo}" alt="Profile" style="width:60px;height:60px;object-fit:cover;border-radius:50%;border:1px solid rgba(0,0,0,0.1);">` : ''}
+                        <div>
+                            <div><strong>${profile.displayName || 'Set your display name'}</strong></div>
+                            ${profile.bio ? `<div style="font-size:0.9rem;color:#555;max-width:520px;">${profile.bio}</div>` : '<div style="font-size:0.9rem;color:#777;">Add a short bio (max 300 chars).</div>'}
+                            <div style="font-size:0.85rem;color:#777;">${profile.location || ''} ${profile.website ? '• ' + profile.website : ''}</div>
+                        </div>
+                    </div>
+                    <div class="profile-actions">
+                        <button class="studio-btn secondary" onclick="openProfileModal()">Profile Settings</button>
+                        <button class="studio-btn" onclick="openTypewriter()">Open Focus Mode</button>
+                    </div>
+                </div>
+                <div class="studio-list" id="writerSubmissions" style="margin-top:1rem;">
+                    ${submissions.length === 0 ? '<p>No submissions yet.</p>' : ''}
+                </div>
+            `;
+            const listEl = panel.querySelector('#writerSubmissions');
+            submissions.forEach(sub => {
+                const card = document.createElement('div');
+                card.className = 'submission-card';
+                card.innerHTML = `
+                    <strong>${sub.title}</strong>
+                    <div class="badge ${sub.status}">${sub.status}</div>
+                    <div style="font-size:0.9rem;color:#555;">${sub.body.slice(0,140)}${sub.body.length>140?'...':''}</div>
+                    ${sub.tags ? `<div style="font-size:0.8rem;color:#777;">Tags: ${sub.tags.join(', ')}</div>` : ''}
+                    ${sub.notes ? `<div style="font-size:0.8rem;color:#777;">Notes: ${sub.notes}</div>` : ''}
+                    <div style="font-size:0.8rem;color:#777;">Display name: ${sub.displayName || profile.displayName || 'N/A'}</div>
+                    ${sub.bio ? `<div style="font-size:0.8rem;color:#777;">Bio: ${sub.bio}</div>` : ''}
+                `;
+                listEl.appendChild(card);
+            });
+        }
+
+        function renderEditorStudio(user, filter = 'all') {
+            // Hide main gallery
+            document.querySelector('.hero').style.display = 'none';
+            document.querySelector('.container').style.display = 'none';
+            document.getElementById('editorDashboard').style.display = 'block';
+            document.getElementById('edUser').textContent = user.email;
+
+            const submissions = loadSubmissions();
+            const labels = loadLabels();
+            const stats = {
+                total: submissions.length,
+                pending: submissions.filter(s => s.status === 'pending').length,
+                approved: submissions.filter(s => s.status === 'approved').length,
+                rejected: submissions.filter(s => s.status === 'rejected').length
+            };
+            const edStats = document.getElementById('edStats');
+            edStats.innerHTML = `
+                <div class="ed-stat"><div>Total</div><strong>${stats.total}</strong></div>
+                <div class="ed-stat"><div>Pending</div><strong>${stats.pending}</strong></div>
+                <div class="ed-stat"><div>Approved</div><strong>${stats.approved}</strong></div>
+                <div class="ed-stat"><div>Rejected</div><strong>${stats.rejected}</strong></div>
+            `;
+
+            document.querySelectorAll('.ed-filter').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-filter') === filter);
+                btn.onclick = () => renderEditorStudio(user, btn.getAttribute('data-filter'));
+            });
+
+            const listEl = document.getElementById('edList');
+            listEl.innerHTML = '';
+            const search = document.getElementById('edSearch').value.toLowerCase();
+            const lf = document.getElementById('edLabelFilter').value;
+            const sortVal = document.getElementById('edSort').value;
+            const df = document.getElementById('edDateFrom').value ? new Date(document.getElementById('edDateFrom').value) : null;
+            const dt = document.getElementById('edDateTo').value ? new Date(document.getElementById('edDateTo').value) : null;
+
+            let filtered = submissions.filter(sub => filter === 'all' ? true : sub.status === filter);
+            filtered = filtered.filter(sub => {
+                const hay = `${sub.title} ${sub.body} ${sub.author} ${(sub.displayName||'')}`.toLowerCase();
+                if (search && !hay.includes(search)) return false;
+                if (lf && !(sub.labels || []).includes(lf)) return false;
+                const d = sub.submittedAt ? new Date(sub.submittedAt) : null;
+                if (df && d && d < df) return false;
+                if (dt && d && d > dt) return false;
+                return true;
+            });
+
+            if (sortVal === 'title') filtered.sort((a,b)=>a.title.localeCompare(b.title));
+            if (sortVal === 'rating') filtered.sort((a,b)=>(b.rating||0)-(a.rating||0));
+            if (sortVal === 'date') filtered.sort((a,b)=>new Date(b.submittedAt||0)-new Date(a.submittedAt||0));
+
+            if (filtered.length === 0) {
+                listEl.innerHTML = '<div style="color:#555;">No submissions in this view.</div>';
+                return;
+            }
+
+            filtered.forEach(sub => {
+                const card = document.createElement('div');
+                card.className = 'ed-card';
+                const bodyPreview = sub.body.replace(/\n/g, '<br>');
+                card.innerHTML = `
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;">
+                        <div style="display:flex;align-items:center;gap:0.5rem;">
+                            <input type="checkbox" class="ed-check" data-id="${sub.id}">
+                            <strong>${sub.title}</strong>
+                        </div>
+                        <span class="badge ${sub.status}">${sub.status}</span>
+                    </div>
+                    <div class="ed-meta">By ${sub.author}${sub.displayName ? ` • ${sub.displayName}` : ''}</div>
+                    ${sub.bio ? `<div class="ed-meta">${sub.bio}</div>` : ''}
+                    ${(sub.tags && sub.tags.length) ? `<div class="ed-meta">Tags: ${sub.tags.join(', ')}</div>` : ''}
+                    ${(sub.labels && sub.labels.length) ? `<div class="ed-meta">Labels: ${sub.labels.map(l=>renderLabelPill(l, labels)).join(' ')}</div>` : ''}
+                    <div class="ed-meta">Submitted: ${new Date(sub.submittedAt || Date.now()).toLocaleString()}</div>
+                    <div class="ed-preview" data-id="${sub.id}">${bodyPreview}</div>
+                    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem;">
+                        <button class="ed-btn" data-action="approve" data-id="${sub.id}">Approve</button>
+                        <button class="ed-btn secondary" data-action="reject" data-id="${sub.id}">Reject</button>
+                        ${sub.status === 'approved' ? `<button class="ed-btn secondary" data-publish="${sub.id}">Publish to Gallery</button>` : ''}
+                        <button class="ed-btn secondary" data-toggle="${sub.id}">Toggle Preview</button>
+                        <button class="ed-btn secondary" data-detail="${sub.id}">Open Details</button>
+                    </div>
+                `;
+                listEl.appendChild(card);
+            });
+
+            listEl.querySelectorAll('button[data-action]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-id');
+                    const action = btn.getAttribute('data-action');
+                    const list = loadSubmissions();
+                    const idx = list.findIndex(s => s.id === id);
+                    if (idx >= 0) {
+                        list[idx].status = action === 'approve' ? 'approved' : 'rejected';
+                        (list[idx].timeline = list[idx].timeline || []).push({ action: action === 'approve' ? 'approved' : 'rejected', ts: new Date().toISOString() });
+                        saveSubmissions(list);
+                        logActivity(`${action === 'approve' ? 'Approved' : 'Rejected'} "${list[idx].title}"`);
+                        renderEditorStudio(user, filter);
+                    }
+                });
+            });
+
+            listEl.querySelectorAll('button[data-toggle]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-toggle');
+                    const prev = listEl.querySelector(`.ed-preview[data-id="${id}"]`);
+                    if (prev) prev.classList.toggle('expanded');
+                });
+            });
+
+            listEl.querySelectorAll('button[data-publish]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-publish');
+                    publishToGallery(id);
+                    logActivity(`Published submission ${id}`);
+                });
+            });
+
+            listEl.querySelectorAll('button[data-detail]').forEach(btn => {
+                btn.addEventListener('click', () => openDetail(btn.getAttribute('data-detail')));
+            });
+
+            document.getElementById('edLabelFilter').innerHTML = '<option value="">Label filter</option>' + labels.map(l=>`<option value="${l.name}">${l.name}</option>`).join('');
+            const feedEl = document.getElementById('activityFeed');
+            updateActivityFeed();
+            document.getElementById('bulkApprove').onclick = () => bulkAction('approve', filter);
+            document.getElementById('bulkReject').onclick = () => bulkAction('reject', filter);
+            document.getElementById('bulkAddLabel').onclick = () => bulkLabel(true, filter);
+            document.getElementById('bulkRemoveLabel').onclick = () => bulkLabel(false, filter);
+            document.getElementById('bulkExport').onclick = () => bulkExport();
+            ['edSearch','edDateFrom','edDateTo','edLabelFilter','edSort'].forEach(id=>{
+                const el = document.getElementById(id);
+                el.onchange = () => renderEditorStudio(user, filter);
+                if (id==='edSearch') el.oninput = () => renderEditorStudio(user, filter);
+            });
+        }
+
+        // Public homepage should start clean: clear any persisted login/session to avoid auto-showing studios
+        localStorage.removeItem('user');
+        localStorage.removeItem('authToken');
+        // Do not auto-open studios; keep homepage focused on reading.
+
+        /* Typewriter overlay logic */
+        const overlay = document.getElementById('typewriterOverlay');
+        const twTitle = document.getElementById('twTitle');
+        const twBody = document.getElementById('twBody');
+        const twNotes = document.getElementById('twNotes');
+        const twTags = document.getElementById('twTags');
+        const twCountBar = document.getElementById('twCountBar');
+        const twDrafts = document.getElementById('twDrafts');
+        let currentDraftId = null;
+
+        function openTypewriter() {
+            const user = requireRole('writer');
+            if (!user) return;
+            overlay.classList.add('active');
+            loadDraftList();
+            twBody.focus();
+            updateCounts();
+        }
+
+        function closeTypewriter() {
+            overlay.classList.remove('active');
+            currentDraftId = null;
+        }
+
+        function updateCounts() {
+            const text = twBody.value;
+            const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+            const chars = text.length;
+            twCountBar.textContent = `${words} words • ${chars} chars`;
+        }
+
+        function loadDraftList() {
+            const drafts = loadDrafts();
+            twDrafts.innerHTML = drafts.length === 0 ? '<div style="color:#6a5c4c;">No drafts yet.</div>' : '';
+            drafts.forEach(d => {
+                const item = document.createElement('div');
+                item.className = 'draft-item';
+                item.innerHTML = `
+                    <div>
+                        <strong>${d.title || 'Untitled draft'}</strong>
+                        <div style="font-size:0.85rem;color:#6a5c4c;">Updated ${new Date(d.updatedAt).toLocaleString()}</div>
+                    </div>
+                    <div style="display:flex;gap:0.35rem;flex-wrap:wrap;">
+                        <button class="studio-btn secondary" data-load="${d.id}">Open</button>
+                        <button class="studio-btn secondary" data-delete="${d.id}">Delete</button>
+                    </div>
+                `;
+                twDrafts.appendChild(item);
+            });
+            twDrafts.querySelectorAll('button[data-load]').forEach(btn => {
+                btn.addEventListener('click', () => loadDraft(btn.getAttribute('data-load')));
+            });
+            twDrafts.querySelectorAll('button[data-delete]').forEach(btn => {
+                btn.addEventListener('click', () => deleteDraft(btn.getAttribute('data-delete')));
+            });
+        }
+
+        function saveCurrentDraft(status = 'draft') {
+            const user = getCurrentUser();
+            if (!user || user.role !== 'writer') {
+                alert('Please log in as writer.');
+                return;
+            }
+            const drafts = loadDrafts();
+            const payload = {
+                id: currentDraftId || Date.now().toString(),
+                title: twTitle.value.trim(),
+                body: twBody.value,
+                notes: twNotes.value.trim(),
+                tags: twTags.value.split(',').map(t => t.trim()).filter(Boolean),
+                status,
+                updatedAt: new Date().toISOString()
+            };
+            const existingIdx = drafts.findIndex(d => d.id === payload.id);
+            if (existingIdx >= 0) drafts[existingIdx] = payload; else drafts.push(payload);
+            saveDrafts(drafts);
+            currentDraftId = payload.id;
+            loadDraftList();
+        }
+
+        function loadDraft(id) {
+            const drafts = loadDrafts();
+            const d = drafts.find(dr => dr.id === id);
+            if (!d) return;
+            currentDraftId = d.id;
+            twTitle.value = d.title || '';
+            twBody.value = d.body || '';
+            twNotes.value = d.notes || '';
+            twTags.value = (d.tags || []).join(', ');
+            overlay.classList.add('active');
+            updateCounts();
+            twBody.focus();
+        }
+
+        function deleteDraft(id) {
+            const drafts = loadDrafts().filter(d => d.id !== id);
+            saveDrafts(drafts);
+            loadDraftList();
+        }
+
+        function submitFromTypewriter() {
+            const user = getCurrentUser();
+            if (!user || user.role !== 'writer') {
+                alert('Please log in as writer.');
+                return;
+            }
+            const title = twTitle.value.trim() || 'Untitled';
+            const body = twBody.value.trim();
+            if (!body) {
+                alert('Please write something before submitting.');
+                return;
+            }
+            const profile = getProfile(user.email);
+            const submissions = loadSubmissions();
+            submissions.push({
+                id: Date.now().toString(),
+                title,
+                body,
+                author: user.email,
+                status: 'pending',
+                submittedAt: new Date().toISOString(),
+                tags: twTags.value.split(',').map(t => t.trim()).filter(Boolean),
+                notes: twNotes.value.trim(),
+                displayName: profile.displayName,
+                bio: profile.bio,
+                labels: [],
+                rating: 0,
+                timeline: [{ action: 'submitted', ts: new Date().toISOString() }],
+                internalNotes: ''
+            });
+            saveSubmissions(submissions);
+            // Also store as draft with status
+            saveCurrentDraft('submitted');
+            renderWriterStudio(user);
+            alert('Submitted to editors.');
+        }
+
+        twBody.addEventListener('input', () => {
+            updateCounts();
+            saveCurrentDraft('draft');
+        });
+        twTitle.addEventListener('input', () => saveCurrentDraft('draft'));
+        twNotes.addEventListener('input', () => saveCurrentDraft('draft'));
+        twTags.addEventListener('input', () => saveCurrentDraft('draft'));
+
+        document.getElementById('twSaveDraft').addEventListener('click', () => {
+            saveCurrentDraft('draft');
+            alert('Draft saved locally.');
+        });
+        document.getElementById('twSubmit').addEventListener('click', submitFromTypewriter);
+        document.getElementById('twClose').addEventListener('click', closeTypewriter);
+
+        /* Profile modal */
+        const profileModal = document.createElement('div');
+        profileModal.id = 'profileModal';
+        profileModal.className = 'profile-modal';
+        profileModal.innerHTML = `
+            <div class="content">
+                <h4>Writer Profile</h4>
+                <label>Display Name</label>
+                <input id="pfDisplay" maxlength="80" placeholder="How your name appears on published poems" />
+                <label>Bio (max 300 chars)</label>
+                <textarea id="pfBio" maxlength="300" rows="3" placeholder="A short bio about you"></textarea>
+                <label>Location (optional)</label>
+                <input id="pfLocation" placeholder="City, Country" />
+                <label>Website / Social link (optional)</label>
+                <input id="pfWebsite" placeholder="https://..." />
+                <label>Profile photo URL (optional)</label>
+                <input id="pfPhoto" placeholder="https://example.com/photo.jpg" />
+                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;justify-content:flex-end;">
+                    <button class="studio-btn secondary" id="pfCancel">Cancel</button>
+                    <button class="studio-btn" id="pfSave">Save Profile</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(profileModal);
+
+        function getProfile(email) {
+            const profiles = loadProfiles();
+            return profiles[email] || {};
+        }
+
+        function openProfileModal() {
+            const user = requireRole('writer');
+            if (!user) return;
+            const p = getProfile(user.email);
+            document.getElementById('pfDisplay').value = p.displayName || '';
+            document.getElementById('pfBio').value = p.bio || '';
+            document.getElementById('pfLocation').value = p.location || '';
+            document.getElementById('pfWebsite').value = p.website || '';
+            document.getElementById('pfPhoto').value = p.photo || '';
+            profileModal.classList.add('active');
+        }
+
+        function closeProfileModal() {
+            profileModal.classList.remove('active');
+        }
+
+        document.getElementById('pfCancel').addEventListener('click', closeProfileModal);
+        document.getElementById('pfSave').addEventListener('click', () => {
+            const user = getCurrentUser();
+            if (!user || user.role !== 'writer') return closeProfileModal();
+            const profiles = loadProfiles();
+            profiles[user.email] = {
+                displayName: document.getElementById('pfDisplay').value.trim(),
+                bio: document.getElementById('pfBio').value.trim(),
+                location: document.getElementById('pfLocation').value.trim(),
+                website: document.getElementById('pfWebsite').value.trim(),
+                photo: document.getElementById('pfPhoto').value.trim()
+            };
+            saveProfiles(profiles);
+            closeProfileModal();
+            renderWriterStudio(user);
+        });
+
+        /* Labels management */
+        function ensureDefaultLabels() {
+            const labels = loadLabels();
+            if (labels.length === 0) {
+                const seed = [
+                    { name: 'Staff Pick', color: '#c76f51' },
+                    { name: 'Shortlisted', color: '#5a8f7b' },
+                    { name: 'Needs Second Review', color: '#b28c23' },
+                    { name: 'Hold for Next Issue', color: '#7a6fa0' }
+                ];
+                saveLabels(seed);
+            }
+        }
+
+        ensureDefaultLabels();
+
+        function renderLabelsInline() {
+            const listContainer = document.getElementById('labelListInline');
+            const labels = loadLabels();
+            listContainer.innerHTML = labels.map(l => `
+                <div style="display:flex;align-items:center;gap:0.5rem;margin:0.3rem 0;">
+                    ${renderLabelPill(l.name, labels)}
+                    <button class="ed-btn secondary" data-del="${l.name}">Delete</button>
+                </div>
+            `).join('') || '<div>No labels yet.</div>';
+            listContainer.querySelectorAll('button[data-del]').forEach(btn => {
+                btn.onclick = () => {
+                    const updated = loadLabels().filter(x => x.name !== btn.getAttribute('data-del'));
+                    saveLabels(updated);
+                    renderLabelsInline();
+                };
+            });
+            document.getElementById('addLabelBtnInline').onclick = () => {
+                const name = document.getElementById('newLabelNameInline').value.trim();
+                const color = document.getElementById('newLabelColorInline').value;
+                if (!name) return;
+                const lbls = loadLabels();
+                if (lbls.some(l => l.name.toLowerCase() === name.toLowerCase())) return;
+                lbls.push({ name, color });
+                saveLabels(lbls);
+                document.getElementById('newLabelNameInline').value = '';
+                renderLabelsInline();
+            };
+        }
+
+            const subView = document.getElementById('edSubmissionsView');
+            const labelsView = document.getElementById('edLabelsView');
+            const settingsView = document.getElementById('edSettingsView');
+            function showView(key) {
+                subView.style.display = key === 'submissions' || key === 'dashboard' ? 'block' : 'none';
+                labelsView.style.display = key === 'labels' ? 'block' : 'none';
+                settingsView.style.display = key === 'settings' ? 'block' : 'none';
+            }
+            document.querySelectorAll('.ed-nav button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.ed-nav button').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const view = btn.getAttribute('data-edview');
+                    showView(view);
+                    if (view === 'labels') {
+                        renderLabelsInline();
+                    } else if (view === 'settings') {
+                        renderTemplatesInline();
+                    } else {
+                        renderEditorStudio(getCurrentUser(), 'all');
+                    }
+                });
+            });
+
+        /* Bulk actions */
+        function getSelectedIds() {
+            return Array.from(document.querySelectorAll('.ed-check:checked')).map(cb => cb.getAttribute('data-id'));
+        }
+
+        function bulkAction(action, filter) {
+            const ids = getSelectedIds();
+            if (ids.length === 0) return alert('Select submissions first.');
+            const list = loadSubmissions();
+            ids.forEach(id => {
+                const idx = list.findIndex(s => s.id === id);
+                if (idx >= 0) {
+                    list[idx].status = action === 'approve' ? 'approved' : 'rejected';
+                    (list[idx].timeline = list[idx].timeline || []).push({ action: action === 'approve' ? 'approved' : 'rejected', ts: new Date().toISOString() });
+                }
+            });
+            saveSubmissions(list);
+            logActivity(`${action === 'approve' ? 'Approved' : 'Rejected'} ${ids.length} submissions`);
+            renderEditorStudio(getCurrentUser(), filter);
+        }
+
+        function bulkLabel(add, filter) {
+            const ids = getSelectedIds();
+            if (ids.length === 0) return alert('Select submissions first.');
+            const labels = loadLabels();
+            if (labels.length === 0) { alert('No labels defined. Add labels first.'); return; }
+            const label = prompt(`${add ? 'Add' : 'Remove'} which label?\n` + labels.map(l=>`- ${l.name}`).join('\n'));
+            if (!label) return;
+            const list = loadSubmissions();
+            ids.forEach(id => {
+                const idx = list.findIndex(s => s.id === id);
+                if (idx >= 0) {
+                    list[idx].labels = list[idx].labels || [];
+                    if (add) {
+                        if (!list[idx].labels.includes(label)) list[idx].labels.push(label);
+                    } else {
+                        list[idx].labels = list[idx].labels.filter(l => l !== label);
+                    }
+                }
+            });
+            saveSubmissions(list);
+            logActivity(`${add ? 'Added' : 'Removed'} label "${label}" on ${ids.length} submissions`);
+            renderEditorStudio(getCurrentUser(), filter);
+        }
+
+        function bulkExport() {
+            const ids = getSelectedIds();
+            if (ids.length === 0) return alert('Select submissions first.');
+            const list = loadSubmissions().filter(s => ids.includes(s.id));
+            const blob = new Blob([JSON.stringify(list, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'submissions.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        /* Detail modal */
+        const detailModal = document.getElementById('edDetailModal');
+        const detailNotes = document.getElementById('detailNotes');
+
+        function openDetail(id) {
+            const subs = loadSubmissions();
+            const sub = subs.find(s => s.id === id);
+            if (!sub) return;
+            detailModal.classList.add('active');
+            const setView = () => {
+                document.getElementById('detailTitle').textContent = sub.title;
+                document.getElementById('detailMeta').innerHTML = `
+                    <div>Author: ${sub.author}${sub.displayName ? ` • ${sub.displayName}` : ''}</div>
+                    ${sub.bio ? `<div>${sub.bio}</div>` : ''}
+                    ${(sub.tags && sub.tags.length) ? `<div>Tags: ${sub.tags.join(', ')}</div>` : ''}
+                    ${(sub.labels && sub.labels.length) ? `<div>Labels: ${sub.labels.join(', ')}</div>` : ''}
+                    <div>Submitted: ${new Date(sub.submittedAt || Date.now()).toLocaleString()}</div>
+                `;
+                document.getElementById('detailBody').innerHTML = sub.body.replace(/\n/g, '<br>');
+                document.getElementById('detailProfile').innerHTML = `
+                    <div><strong>${sub.displayName || sub.author}</strong></div>
+                    ${sub.bio || ''}
+                `;
+                renderTimeline(sub.timeline);
+                detailNotes.value = sub.internalNotes || '';
+                const ratingEl = document.getElementById('detailRating');
+                ratingEl.innerHTML = '';
+                for (let i=1;i<=5;i++) {
+                    const b = document.createElement('button');
+                    b.className = 'ed-btn secondary';
+                    b.textContent = i <= (sub.rating||0) ? '★' : '☆';
+                    b.onclick = () => {
+                        sub.rating = i;
+                        saveSubmissions(subs);
+                        renderTimeline(sub.timeline);
+                        renderEditorStudio(getCurrentUser());
+                        setView();
+                    };
+                    ratingEl.appendChild(b);
+                }
+            };
+            setView();
+            document.getElementById('detailApprove').onclick = () => {
+                sub.status = 'approved';
+                (sub.timeline = sub.timeline || []).push({ action: 'approved', ts: new Date().toISOString() });
+                saveSubmissions(subs);
+                logActivity(`Approved "${sub.title}"`);
+                updateActivityFeed();
+                renderEditorStudio(getCurrentUser());
+                setView();
+            };
+            document.getElementById('detailReject').onclick = () => {
+                sub.status = 'rejected';
+                (sub.timeline = sub.timeline || []).push({ action: 'rejected', ts: new Date().toISOString() });
+                saveSubmissions(subs);
+                logActivity(`Rejected "${sub.title}"`);
+                updateActivityFeed();
+                renderEditorStudio(getCurrentUser());
+                setView();
+            };
+            document.getElementById('detailPublish').onclick = () => {
+                publishToGallery(sub.id);
+                (sub.timeline = sub.timeline || []).push({ action: 'published', ts: new Date().toISOString() });
+                saveSubmissions(subs);
+                logActivity(`Published "${sub.title}"`);
+                updateActivityFeed();
+                renderEditorStudio(getCurrentUser());
+                setView();
+            };
+            document.getElementById('detailSaveNotes').onclick = () => {
+                sub.internalNotes = detailNotes.value;
+                saveSubmissions(subs);
+                logActivity(`Saved notes for "${sub.title}"`);
+                renderTimeline(sub.timeline);
+                updateActivityFeed();
+            };
+        }
+
+        function closeDetail() {
+            detailModal.classList.remove('active');
+        }
+
+        function renderTimeline(timeline = []) {
+            const tl = document.getElementById('detailTimeline');
+            tl.innerHTML = timeline.map(t => `<div>• ${t.action} — ${new Date(t.ts).toLocaleString()}</div>`).join('') || '<div>No timeline yet.</div>';
+        }
+
+        function updateActivityFeed() {
+            const feedEl = document.getElementById('activityFeed');
+            feedEl.innerHTML = loadActivity().map(a => `<div>• ${a.text} — ${new Date(a.ts).toLocaleTimeString()}</div>`).join('') || '<div>No recent activity.</div>';
+        }
     </script>
 </body>
 </html>
+        /* Templates manager */
+        function renderTemplatesInline() {
+            const list = document.getElementById('tmplListInline');
+            const tpls = loadTemplates();
+            list.innerHTML = tpls.map((t,i)=>`
+                <div style="border:1px solid rgba(0,0,0,0.1);padding:0.5rem;margin-bottom:0.4rem;">
+                    <div><strong>${t.title}</strong></div>
+                    <div style="font-size:0.9rem;color:#555;white-space:pre-line;">${t.body}</div>
+                    <div style="display:flex;gap:0.4rem;margin-top:0.35rem;">
+                        <button class="ed-btn secondary" data-del="${i}">Delete</button>
+                    </div>
+                </div>
+            `).join('') || '<div>No templates yet.</div>';
+            list.querySelectorAll('button[data-del]').forEach(btn => {
+                btn.onclick = () => {
+                    const t = loadTemplates();
+                    t.splice(Number(btn.getAttribute('data-del')),1);
+                    saveTemplates(t);
+                    renderTemplatesInline();
+                };
+            });
+            document.getElementById('tmplSaveInline').onclick = () => {
+                const title = document.getElementById('tmplTitleInline').value.trim();
+                const body = document.getElementById('tmplBodyInline').value.trim();
+                if (!title || !body) return;
+                const t = loadTemplates();
+                t.push({ title, body });
+                saveTemplates(t);
+                document.getElementById('tmplTitleInline').value = '';
+                document.getElementById('tmplBodyInline').value = '';
+                renderTemplatesInline();
+            };
+        }

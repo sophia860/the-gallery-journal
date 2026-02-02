@@ -1,0 +1,19 @@
+{
+  "name": "the-gallery-journal",
+  "version": "1.0.0",
+  "description": "**Winter 2026 Edition**",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "monitor:agent": "node src/monitoring/agent.js",
+    "monitor:ai": "node src/monitoring/ai-agent.js",
+    "test": "echo \"No automated tests configured\" && exit 0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1"
+  }
+}

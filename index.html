@@ -1297,13 +1297,14 @@
         <div class="section-header">Collections</div>
 
         <div class="collections-nav" id="collectionsNav">
-            <button class="collection-tab active" data-collection="nature">Nature &amp; Light</button>
-            <button class="collection-tab" data-collection="memory">Memory &amp; Identity</button>
-            <button class="collection-tab" data-collection="urban">Urban Landscapes</button>
+            <button class="collection-tab active" data-collection="love">Love &amp; Relationships</button>
+            <button class="collection-tab" data-collection="nature">Nature &amp; The Natural World</button>
+            <button class="collection-tab" data-collection="grief">Grief, Loss &amp; Memory</button>
+            <button class="collection-tab" data-collection="family">Family &amp; Identity</button>
         </div>
 
-        <div class="collection-title" id="collectionTitle">Nature &amp; Light — Gallery Room</div>
-        <p class="collection-desc" id="collectionDesc">A quiet wing where light, water, and the natural world bend through language.</p>
+        <div class="collection-title" id="collectionTitle">Love &amp; Relationships — Gallery Room</div>
+        <p class="collection-desc" id="collectionDesc">Intimate moments and connections between people, exploring the depth of human bonds.</p>
 
         <div class="gallery-wall">
             <div class="poem-grid" id="poemGrid">
@@ -1473,253 +1474,123 @@
 
         const poems = {
             1: {
-                title: "Liminal Spaces",
-                author: "Sarah Chen",
-                collection: "memory",
-                text: `Between the wanting and the wound,
-I found a door that opened inward—
-not to darkness, but to a room
-where time pools like water
-at the bottom of a well.
+                title: "Your Eyes",
+                author: "Pam Martin-Lawrence",
+                collection: "love",
+                text: `Your eyes. OMG yes your eyes. They're serotonin and I'm smiling. They're champagne and I'm fizzing. Just one glance and you've got me jonesing like a junkie.
 
-Here, the air tastes of almonds
-and forgotten names. Here,
-every surface reflects something
-other than what stands before it.
+My drug of choice - if you were my dealer I'd have you on speed dial. I want you on speed dial. With your eyes. You would always deliver.
 
-I am learning to live
-in the threshold, to make a home
-of the in-between, where nothing
-is certain except the quality
-of light on the edge of decision.
-
-My mother called this indecision.
-My lover called it fear.
-But I know it as the place
-where all things are still possible,
-where the future hasn't chosen me yet.`
+Still high I risk another glimpse. But your eyes! Laser-focused. Locked and loaded. And I'm in your sights, exactly where I want to be.`
             },
             2: {
-                title: "The Light Collector",
-                author: "Marcus Webb",
-                collection: "nature",
-                text: `She kept jars of morning light,
-arranged them on the windowsill
-like a lexicon of brightness—
-March light thick as honey,
-August light sharp as gin.
+                title: "Thoughts on love during a heatwave",
+                author: "Ella B Winters",
+                collection: "love",
+                text: `I sit in the dark every day,
+curtains drawn, face
+perilously close to the
+impotent fan nudging
+my exhaustion around
+the room. We may
+need to move, I say,
+to Greenland.
 
-The neighbors thought her strange,
-this woman who woke before dawn
-to trap gold in glass,
-who labeled each vessel
-with dates and weather patterns.
-
-But she knew what they didn't:
-that winter would come,
-that darkness is a hunger,
-that memory needs something
-to illuminate its corridors.
-
-On the year's shortest day,
-she unscrewed every lid,
-let six months of mornings
-fill her small apartment
-until even the shadows glowed.`
+You buy an aircon unit
+from Amazon,
+go up the stairs each
+night to turn it on
+three hours before I go
+to bed, cooling the air
+just for me, so I can rest.`
             },
             3: {
-                title: "Inheritance",
-                author: "Priya Sharma",
-                collection: "memory",
-                text: `My grandmother's hands speak
-a language I'm still learning—
-the grammar of ghee and turmeric,
-syntax of gold thread through silk.
+                title: "Ocean Pockets",
+                author: "Indee Sehrish Watson",
+                collection: "nature",
+                text: `We rummage through the
+Deep pockets of the ocean,
+Seeking a plaything, a shell,
+A fragment of driftwood,
+Of which to admire in fond recall,
+Taking our piece of her home,
+To forever remind us of her deep waters.
 
-She teaches me to make rotis
-perfect as full moons, tells me
-the secret is in the pressure,
-knowing when to push and when to yield.
-
-But there are other lessons
-in the way she folds her grief
-into the dough, works it smooth
-until it stops resisting.
-
-I inherit her recipes,
-her gold bangles, the way
-she says my name with all
-its English angles softened.
-
-What I can't inherit: her fluency
-in leaving, her doctorate in survival,
-the way she carried an entire country
-in the folds of her sari.
-
-Still, I'm learning. Still,
-my hands remember what
-my tongue has forgotten,
-kneading history into sustenance.`
+She gives us treasures,
+Seaglass mottled and smooth,
+Shells beaming peach beneath
+Ivory bone, as a curled tulip,
+An ocean of mystery,
+Smiling as it curves upon the sand
+And retreats back beneath her
+Coiling, blue waves.`
             },
             4: {
-                title: "Urban Pastoral",
-                author: "James Liu",
-                collection: "urban",
-                text: `The subway busker's violin
-carves a chapel from concrete,
-makes the morning commute
-a pilgrimage of sound.
-
-We are all converts here,
-clutching our coffee like prayer beads,
-seeking grace in the gap
-between stations, between breaths.
-
-Above us, the city grows
-its peculiar garden—
-fire escapes bloom with laundry,
-pigeons negotiate for bread.
-
-Someone's Bach, someone's baby
-crying, someone's argument
-in a language I almost understand—
-all of it sacred, all of it psalm.
-
-This is my church: the 6 train
-at rush hour, the democratic
-crush of bodies, each of us
-alone together, going home.`
+                title: "The Clear Sky",
+                author: "Bhavna Jain",
+                collection: "nature",
+                text: `On an evening
+With an orange sky
+I looked into the great wide open
+Thinking about what's to be
+And what's already been
+With nowhere to be
+Just my cats and me
+Thoughts on a fleeting spree`
             },
             5: {
-                title: "What the Ocean Said",
-                author: "Elena Vasquez",
-                collection: "nature",
-                text: `Come back when you're ready
-to remember what you've forgotten—
-that you are mostly water,
-that salt is your first language.
-
-Come back when the city
-has made you too solid,
-when you need reminding
-that boundaries are illusion.
-
-I will take your sharp edges,
-tumble them smooth,
-give you back to yourself
-grain by grain, wave by wave.
-
-You think you are separate,
-but I know you—
-every tear you've cried
-has found its way back to me.
-
-Come back. The tide
-is always turning.
-Every ending
-is just water, returning.`
+                title: "Blessings",
+                author: "Leonie Rowland",
+                collection: "grief",
+                text: `Almost thirty years of knowing where you are, but only now
+realising: incense burning on a windowsill next to black
+leaves untidied ashes red string in small piles that used to be
+worn around your wrist as blessings. It's raining properly
+and there are droplets on the glass and some of them come
+inside and oh you realise: you are in a clumsy severe imminent
+arrangement of a god that chose smoke over clarity.`
             },
             6: {
-                title: "Anatomy of Silence",
-                author: "David Okonkwo",
-                collection: "memory",
-                text: `There are silences that sing
-and silences that suffocate—
-I learned to tell the difference
-in my father's house.
-
-The silence before speech:
-a held breath, a loading gun,
-potential humming like power lines
-before the storm.
-
-The silence after: a aftermath,
-debris settling, trying to determine
-if it's safe yet to uncover
-your head, to stand upright.
-
-And then there are the silences
-that love speaks—
-my mother's hand on my father's shoulder,
-a whole conversation in the pressure.
-
-Now I practice a silence
-that is neither weapon nor wound,
-but a clearing in the forest,
-a space for something new to grow.
-
-I am learning that silence
-can be a gift you give yourself,
-a room where you finally
-hear your own name.`
+                title: "Dialogue in Times Square",
+                author: "Seth Trochtenberg",
+                collection: "grief",
+                text: `Do you live?
+I think I do.
+I'd scream in joy.
+I don't remember that.
+So you rest in memories, and find peace there?
+I still see much, within the memories that is.
+And find peace?
+I find little.`
             },
             7: {
-                title: "The Cartographer's Daughter",
-                author: "Lily Morrison",
-                collection: "memory",
-                text: `She drew maps of places
-that existed only in translation—
-the country between two languages,
-the border zone of almost-understanding.
+                title: "Tinkles",
+                author: "Sadiya Ali",
+                collection: "family",
+                text: `She punched her way into my world,
+Red raw and claiming her place.
+Not long after, she possessed me
+All I could do was stare, stunned and dope-eyed.
 
-Her father mapped the measurable world:
-coastlines, mountains, rivers.
-She mapped the territories
-no compass could find.
+Now she's all sibilant suppositions and
+Enthusiastic expressions.
+Earnest endeavours clinging to my leg.
+Fakey shakey tantrums ending in found-out giggles.
 
-Here is the island of First Kiss.
-Here is the desert of Father's Silence.
-Here is the ocean of Mother's Humming,
-vast and uncharted.
-
-She knew that all maps lie,
-that the territory always exceeds
-its representation, that grief
-is a country with no fixed borders.
-
-Still, she drew. Still, she tried
-to make sense of the senseless,
-to chart a course through the unmappable
-country of being alive.
-
-Her inheritance: understanding
-that to be lost is sometimes
-the only way to find
-where you actually are.`
+Her laughter is a tinkly bell, high and concise,
+Its vibrations reaching every single nook.`
             },
             8: {
-                title: "Midnight Economy",
-                author: "Rafael Torres",
-                collection: "urban",
-                text: `The diner at 3am trades in confessions,
-currency of the sleepless,
-where the coffee's always fresh
-and the waitress knows everyone's story.
+                title: "Her Graduation",
+                author: "Luna Bailey",
+                collection: "family",
+                text: `He says no,
+she says yes,
+we say probably.
 
-Here, the nurse from the night shift
-sits across from the insomniac poet,
-neither one asking the other
-why they're still awake.
-
-The divorced man studies his pie
-like it holds answers.
-The student, wired on deadline panic,
-types prayers to the gods of GPA.
-
-We are the after-hours people,
-the ones who don't fit
-into daylight's neat categories,
-who do our living in the margins.
-
-The fluorescent lights hum
-their tuneless song. The waitress
-refills our cups without asking,
-knows we're here for the warmth
-
-as much as the coffee,
-this church of the sleepless,
-where the only sacrament
-is staying human, staying.`
+Tomorrow we can go to the lake
+celebrate her graduation, and get some answers,
+finally.`
             }
         };
 
@@ -1735,23 +1606,27 @@ is staying human, staying.`
         const modalText = document.getElementById('modalText');
 
         const collectionCopy = {
+            love: {
+                title: "Love & Relationships — Gallery Room",
+                desc: "Intimate moments and connections between people, exploring the depth of human bonds."
+            },
             nature: {
-                title: "Nature & Light — Gallery Room",
+                title: "Nature & The Natural World — Gallery Room",
                 desc: "A quiet wing where light, water, and the natural world bend through language."
             },
-            memory: {
-                title: "Memory & Identity — Gallery Room",
-                desc: "Echoes, lineage, and the self unfolding across time and inheritance."
+            grief: {
+                title: "Grief, Loss & Memory — Gallery Room",
+                desc: "Echoes, lineage, and the self unfolding across time and remembrance."
             },
-            urban: {
-                title: "Urban Landscapes — Gallery Room",
-                desc: "City soundscapes, midnight diners, and the sacred in concrete corridors."
+            family: {
+                title: "Family & Identity — Gallery Room",
+                desc: "Stories of kinship, lineage, and the mirrors we find in those who share our blood and our lives."
             }
         };
 
         let poemCards = [];
         let activeIndex = 0;
-        let currentCollection = 'nature';
+        let currentCollection = 'love';
 
         // load published poems from localStorage into poems map
         function hydratePublishedPoems() {
@@ -1761,7 +1636,7 @@ is staying human, staying.`
                     poems[p.id] = {
                         title: p.title,
                         author: p.author,
-                        collection: p.collection || 'memory',
+                        collection: p.collection || 'love',
                         text: p.text
                     };
                 });
@@ -1970,10 +1845,10 @@ is staying human, staying.`
             poems[newId] = {
                 title: sub.title,
                 author: sub.displayName || sub.author,
-                collection: sub.collection || currentCollection || 'memory',
+                collection: sub.collection || currentCollection || 'love',
                 text: sub.body
             };
-            renderCollection(currentCollection || 'memory');
+            renderCollection(currentCollection || 'love');
             logActivity(`Published "${sub.title}" to gallery`);
         }
 
@@ -2001,7 +1876,7 @@ is staying human, staying.`
         });
 
         // Initialize with default collection
-        renderCollection('nature');
+        renderCollection('love');
 
         /* Studios logic (client-side) */
         function getCurrentUser() {

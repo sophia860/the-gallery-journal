@@ -1375,7 +1375,8 @@
         // Static/demo auth configuration (works on GitHub Pages)
         const MOCK_USERS = {
             'editor@example.com': { password: 'password', role: 'editor' },
-            'writer@example.com': { password: 'password', role: 'writer' }
+            'writer@example.com': { password: 'password', role: 'writer' },
+            'writer@thegallery.com': { password: 'writer123', role: 'writer' }
         };
 
         // Local submissions store
@@ -1900,10 +1901,11 @@ is staying human, staying.`
             submitBtn.textContent = 'Signing in...';
             submitBtn.disabled = true;
 
+            let success = false;
             try {
                 const user = MOCK_USERS[email];
                 if (!user || user.password !== password) {
-                    throw new Error('Invalid credentials. Try editor@example.com or writer@example.com with password "password".');
+                    throw new Error('Invalid credentials. Try editor@example.com or writer@example.com with password "password", or writer@thegallery.com with password "writer123".');
                 }
 
                 const token = btoa(`${email}:${Date.now()}`);
@@ -1911,6 +1913,7 @@ is staying human, staying.`
 
                 localStorage.setItem('authToken', token);
                 localStorage.setItem('user', JSON.stringify(userInfo));
+                success = true;
 
                 // Redirect to appropriate studio
                 if (userInfo.role === 'editor') {
@@ -1927,7 +1930,9 @@ is staying human, staying.`
             } finally {
                 submitBtn.textContent = originalText;
                 submitBtn.disabled = false;
-                event.target.reset();
+                if (success) {
+                    event.target.reset();
+                }
             }
         }
         // Close login modal when clicking outside

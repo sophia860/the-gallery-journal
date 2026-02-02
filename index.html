@@ -1594,6 +1594,43 @@
                     <input type="password" id="password" name="password" required>
                 </div>
                 <button type="submit" class="submit-btn">Enter</button>
+                <p style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem;">
+                    Don't have an account? <a href="#" onclick="event.preventDefault(); switchToRegister();" style="color: var(--color-accent); text-decoration: underline;">Register here</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Registration Modal -->
+    <div class="login-modal-overlay" id="registerModal">
+        <div class="login-modal">
+            <button class="login-modal-close" onclick="closeRegisterModal()">&times;</button>
+            <h2>Create Account</h2>
+            <p>Join The Gallery community</p>
+            <form onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label for="reg-username">Username</label>
+                    <input type="text" id="reg-username" name="username" required minlength="3">
+                </div>
+                <div class="form-group">
+                    <label for="reg-email">Email</label>
+                    <input type="email" id="reg-email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="reg-password">Password</label>
+                    <input type="password" id="reg-password" name="password" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label for="reg-role">I am a...</label>
+                    <select id="reg-role" name="role" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; font-family: var(--font-serif); font-size: 1rem;">
+                        <option value="poet">Poet / Writer</option>
+                        <option value="editor">Editor</option>
+                    </select>
+                </div>
+                <button type="submit" class="submit-btn">Create Account</button>
+                <p style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem;">
+                    Already have an account? <a href="#" onclick="event.preventDefault(); switchToLogin();" style="color: var(--color-accent); text-decoration: underline;">Login here</a>
+                </p>
             </form>
         </div>
     </div>
@@ -1601,6 +1638,9 @@
     <footer>
         The Gallery &copy; 2026 &nbsp;&middot;&nbsp; A Space for Poetry
     </footer>
+
+    <!-- Strapi API Client -->
+    <script src="src/strapi-client.js"></script>
 
     <script>
 
@@ -2050,8 +2090,7 @@ finally.`
             document.body.style.overflow = 'auto';
         }
 
-// Handle login form submission - connects to backend API
-        // Static/mock login for Pages: validates against MOCK_USERS and stores in localStorage
+// Handle login form submission - connects to Strapi backend API
         async function handleLogin(event) {
             event.preventDefault();
             const email = document.getElementById('email').value.trim().toLowerCase();
@@ -2064,6 +2103,58 @@ finally.`
 
             let success = false;
             try {
+                // Try Strapi authentication first
+                if (window.strapiClient) {
+                    try {
+                        const response = await window.strapiClient.login({
+                            identifier: email,
+                            password: password
+                        });
+
+                        // Get full user profile with extended fields
+                        const userProfile = await window.strapiClient.getMe();
+                        
+                        // Determine role (use custom role field or fall back to Strapi role)
+                        let role = userProfile.role || 'writer'; // Default to writer
+                        if (userProfile.role === 'editor') {
+                            role = 'editor';
+                        } else if (userProfile.role === 'poet') {
+                            role = 'writer'; // Map poet to writer for UI
+                        }
+
+                        const userInfo = { 
+                            id: userProfile.id,
+                            email: userProfile.email,
+                            username: userProfile.username,
+                            displayName: userProfile.displayName || userProfile.username,
+                            role: role,
+                            bio: userProfile.bio,
+                            profileImage: userProfile.profileImage,
+                            socialLinks: userProfile.socialLinks,
+                            loggedInAt: new Date().toISOString() 
+                        };
+
+                        localStorage.setItem('authToken', response.jwt);
+                        localStorage.setItem('user', JSON.stringify(userInfo));
+                        success = true;
+
+                        // Redirect to appropriate studio
+                        if (role === 'editor') {
+                            openEditorStudio(true);
+                        } else {
+                            openWriterStudio(true);
+                        }
+
+                        closeLoginModal();
+                        alert(`Welcome back, ${userInfo.displayName || userInfo.username}!`);
+                        return;
+                    } catch (strapiError) {
+                        console.warn('Strapi login failed, trying mock users:', strapiError.message);
+                        // Fall through to mock users
+                    }
+                }
+
+                // Fallback to mock users for development
                 const user = MOCK_USERS[email];
                 if (!user || user.password !== password) {
                     throw new Error('Invalid credentials. Try editor@example.com or writer@example.com with password "password", or writer@thegallery.com with password "writer123".');
@@ -2102,6 +2193,116 @@ finally.`
                 closeLoginModal();
             }
         });
+
+        // Registration Modal Functions
+        function openRegisterModal() {
+            const registerModal = document.getElementById('registerModal');
+            registerModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeRegisterModal() {
+            const registerModal = document.getElementById('registerModal');
+            registerModal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        function switchToRegister() {
+            closeLoginModal();
+            setTimeout(() => openRegisterModal(), 300);
+        }
+
+        function switchToLogin() {
+            closeRegisterModal();
+            setTimeout(() => openLoginModal('writer'), 300);
+        }
+
+        // Close register modal when clicking outside
+        document.getElementById('registerModal').addEventListener('click', (e) => {
+            if (e.target.id === 'registerModal') {
+                closeRegisterModal();
+            }
+        });
+
+        // Handle registration form submission
+        async function handleRegister(event) {
+            event.preventDefault();
+            const username = document.getElementById('reg-username').value.trim();
+            const email = document.getElementById('reg-email').value.trim().toLowerCase();
+            const password = document.getElementById('reg-password').value;
+            const role = document.getElementById('reg-role').value;
+            const submitBtn = event.target.querySelector('.submit-btn');
+            const originalText = submitBtn.textContent;
+
+            submitBtn.textContent = 'Creating account...';
+            submitBtn.disabled = true;
+
+            let success = false;
+            try {
+                // Try Strapi registration
+                if (window.strapiClient) {
+                    try {
+                        const response = await window.strapiClient.register({
+                            username: username,
+                            email: email,
+                            password: password,
+                            role: role
+                        });
+
+                        // Update profile with role
+                        if (response.user && response.user.id) {
+                            await window.strapiClient.updateProfile(response.user.id, {
+                                role: role
+                            });
+                        }
+
+                        // Get full user profile
+                        const userProfile = await window.strapiClient.getMe();
+
+                        const userInfo = { 
+                            id: userProfile.id,
+                            email: userProfile.email,
+                            username: userProfile.username,
+                            displayName: userProfile.displayName || userProfile.username,
+                            role: role === 'editor' ? 'editor' : 'writer',
+                            bio: userProfile.bio,
+                            profileImage: userProfile.profileImage,
+                            socialLinks: userProfile.socialLinks,
+                            loggedInAt: new Date().toISOString() 
+                        };
+
+                        localStorage.setItem('authToken', response.jwt);
+                        localStorage.setItem('user', JSON.stringify(userInfo));
+                        success = true;
+
+                        closeRegisterModal();
+                        alert(`Welcome to The Gallery, ${username}! Your account has been created.`);
+
+                        // Redirect to appropriate studio
+                        if (role === 'editor') {
+                            openEditorStudio(true);
+                        } else {
+                            openWriterStudio(true);
+                        }
+                        return;
+                    } catch (strapiError) {
+                        console.error('Strapi registration failed:', strapiError);
+                        throw strapiError;
+                    }
+                } else {
+                    throw new Error('Registration requires Strapi backend connection.');
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                alert(`Registration failed: ${error.message}\n\nPlease ensure the Strapi backend is properly configured.`);
+            } finally {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+                if (success) {
+                    event.target.reset();
+                }
+            }
+        }
 
         // Quick access CTA
         function openMagazine() {
@@ -2555,7 +2756,10 @@ finally.`
                 <div style="max-width: 1200px; margin: 0 auto; padding: 2rem;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                         <h2 style="font-family: var(--font-slab); font-weight: 300;">Writer's Studio</h2>
-                        <button class="studio-btn" onclick="openNewPoemEditor()">+ New Poem</button>
+                        <div style="display: flex; gap: 1rem;">
+                            <button class="studio-btn secondary" onclick="openProfileEditor()">Edit Profile</button>
+                            <button class="studio-btn" onclick="openNewPoemEditor()">+ New Poem</button>
+                        </div>
                     </div>
                     
                     <!-- Dashboard Tabs -->
@@ -2839,7 +3043,7 @@ Line breaks will be preserved exactly as you type them." style="width: 100%; pad
             openWriterStudio();
         }
         
-        function submitNewPoem() {
+        async function submitNewPoem() {
             const title = document.getElementById('new-poem-title').value;
             const room = document.getElementById('new-poem-room').value;
             const tags = document.getElementById('new-poem-tags').value.split(',').map(t => t.trim()).filter(t => t);
@@ -2851,7 +3055,6 @@ Line breaks will be preserved exactly as you type them." style="width: 100%; pad
                 return;
             }
             
-            const submissions = loadSubmissions();
             const newSubmission = {
                 id: Date.now(),
                 title: title,
@@ -2862,7 +3065,37 @@ Line breaks will be preserved exactly as you type them." style="width: 100%; pad
                 status: 'pending',
                 submittedAt: new Date().toISOString()
             };
+
+            // Try to submit to Strapi first
+            if (window.strapiClient && window.strapiClient.isAuthenticated()) {
+                try {
+                    const strapiSubmission = await window.strapiClient.createSubmission({
+                        title: title,
+                        body: body,
+                        category: room,
+                        tags: tags,
+                        status: 'submitted',
+                        submittedAt: new Date().toISOString()
+                    });
+                    
+                    // Also save locally for offline access
+                    const submissions = loadSubmissions();
+                    newSubmission.strapiId = strapiSubmission.id;
+                    submissions.push(newSubmission);
+                    saveSubmissions(submissions);
+                    
+                    alert('Poem submitted for review!');
+                    document.querySelector('.modal').remove();
+                    openWriterStudio();
+                    return;
+                } catch (error) {
+                    console.error('Failed to submit to Strapi, saving locally:', error);
+                    alert('Warning: Could not sync with server. Your submission has been saved locally.');
+                }
+            }
             
+            // Fallback to local storage
+            const submissions = loadSubmissions();
             submissions.push(newSubmission);
             saveSubmissions(submissions);
             
@@ -2880,12 +3113,11 @@ Line breaks will be preserved exactly as you type them." style="width: 100%; pad
             }
         }
         
-        function submitDraft(draftId) {
+        async function submitDraft(draftId) {
             const drafts = loadDrafts();
             const draft = drafts.find(d => d.id === draftId);
             if (!draft) return;
             
-            const submissions = loadSubmissions();
             const newSubmission = {
                 id: Date.now(),
                 title: draft.title,
@@ -2896,7 +3128,40 @@ Line breaks will be preserved exactly as you type them." style="width: 100%; pad
                 status: 'pending',
                 submittedAt: new Date().toISOString()
             };
+
+            // Try to submit to Strapi first
+            if (window.strapiClient && window.strapiClient.isAuthenticated()) {
+                try {
+                    const strapiSubmission = await window.strapiClient.createSubmission({
+                        title: draft.title,
+                        body: draft.body,
+                        category: draft.room,
+                        tags: draft.tags,
+                        status: 'submitted',
+                        submittedAt: new Date().toISOString()
+                    });
+                    
+                    // Also save locally
+                    const submissions = loadSubmissions();
+                    newSubmission.strapiId = strapiSubmission.id;
+                    submissions.push(newSubmission);
+                    saveSubmissions(submissions);
+                    
+                    // Remove from drafts
+                    const updatedDrafts = drafts.filter(d => d.id !== draftId);
+                    saveDrafts(updatedDrafts);
+                    
+                    alert('Draft submitted for review!');
+                    openWriterStudio();
+                    return;
+                } catch (error) {
+                    console.error('Failed to submit to Strapi, saving locally:', error);
+                    alert('Warning: Could not sync with server. Your submission has been saved locally.');
+                }
+            }
             
+            // Fallback to local storage
+            const submissions = loadSubmissions();
             submissions.push(newSubmission);
             saveSubmissions(submissions);
             
@@ -3284,7 +3549,10 @@ Line breaks will be preserved exactly as you type them." style="width: 100%; pad
             });
         }
 
-        function saveCurrentDraft(status = 'draft') {
+        // Auto-save debounce timer
+        let autoSaveTimer = null;
+
+        async function saveCurrentDraft(status = 'draft') {
             const user = getCurrentUser();
             if (!user || user.role !== 'writer') {
                 alert('Please log in as writer.');
@@ -3305,6 +3573,45 @@ Line breaks will be preserved exactly as you type them." style="width: 100%; pad
             saveDrafts(drafts);
             currentDraftId = payload.id;
             loadDraftList();
+
+            // Auto-save to Strapi (debounced)
+            if (window.strapiClient && window.strapiClient.isAuthenticated()) {
+                clearTimeout(autoSaveTimer);
+                autoSaveTimer = setTimeout(async () => {
+                    try {
+                        const strapiData = {
+                            title: payload.title || 'Untitled',
+                            body: payload.body,
+                            category: '', // Can be set later
+                            tags: payload.tags,
+                            status: 'draft',
+                            lastSaved: new Date().toISOString()
+                        };
+
+                        // Check if draft has strapiId stored
+                        const draftWithStrapiId = drafts.find(d => d.id === payload.id);
+                        
+                        if (draftWithStrapiId && draftWithStrapiId.strapiId) {
+                            // Update existing Strapi draft
+                            await window.strapiClient.updateSubmission(draftWithStrapiId.strapiId, strapiData);
+                        } else {
+                            // Create new Strapi draft
+                            const strapiSubmission = await window.strapiClient.createSubmission(strapiData);
+                            
+                            // Store strapiId in local draft
+                            const updatedDrafts = loadDrafts();
+                            const idx = updatedDrafts.findIndex(d => d.id === payload.id);
+                            if (idx >= 0) {
+                                updatedDrafts[idx].strapiId = strapiSubmission.id;
+                                saveDrafts(updatedDrafts);
+                            }
+                        }
+                        console.log('Draft auto-saved to Strapi');
+                    } catch (error) {
+                        console.error('Failed to auto-save to Strapi:', error);
+                    }
+                }, 2000); // Debounce for 2 seconds
+            }
         }
 
         function loadDraft(id) {
@@ -3327,7 +3634,7 @@ Line breaks will be preserved exactly as you type them." style="width: 100%; pad
             loadDraftList();
         }
 
-        function submitFromTypewriter() {
+        async function submitFromTypewriter() {
             const user = getCurrentUser();
             if (!user || user.role !== 'writer') {
                 alert('Please log in as writer.');
@@ -3340,8 +3647,7 @@ Line breaks will be preserved exactly as you type them." style="width: 100%; pad
                 return;
             }
             const profile = getProfile(user.email);
-            const submissions = loadSubmissions();
-            submissions.push({
+            const newSubmission = {
                 id: Date.now().toString(),
                 title,
                 body,
@@ -3356,8 +3662,46 @@ Line breaks will be preserved exactly as you type them." style="width: 100%; pad
                 rating: 0,
                 timeline: [{ action: 'submitted', ts: new Date().toISOString() }],
                 internalNotes: ''
-            });
+            };
+
+            // Try to submit to Strapi first
+            if (window.strapiClient && window.strapiClient.isAuthenticated()) {
+                try {
+                    // Check if this was a draft with strapiId
+                    const drafts = loadDrafts();
+                    const draft = drafts.find(d => d.id === currentDraftId);
+                    
+                    if (draft && draft.strapiId) {
+                        // Update existing Strapi draft to submitted status
+                        const strapiSubmission = await window.strapiClient.updateSubmission(draft.strapiId, {
+                            title: title,
+                            body: body,
+                            tags: newSubmission.tags,
+                            status: 'submitted',
+                            submittedAt: new Date().toISOString()
+                        });
+                        newSubmission.strapiId = draft.strapiId;
+                    } else {
+                        // Create new submission in Strapi
+                        const strapiSubmission = await window.strapiClient.createSubmission({
+                            title: title,
+                            body: body,
+                            tags: newSubmission.tags,
+                            status: 'submitted',
+                            submittedAt: new Date().toISOString()
+                        });
+                        newSubmission.strapiId = strapiSubmission.id;
+                    }
+                } catch (error) {
+                    console.error('Failed to submit to Strapi, saving locally:', error);
+                    alert('Warning: Could not sync with server. Your submission has been saved locally.');
+                }
+            }
+
+            const submissions = loadSubmissions();
+            submissions.push(newSubmission);
             saveSubmissions(submissions);
+            
             // Also store as draft with status
             saveCurrentDraft('submitted');
             renderWriterStudio(user);
@@ -3409,6 +3753,10 @@ Line breaks will be preserved exactly as you type them." style="width: 100%; pad
             return profiles[email] || {};
         }
 
+        function openProfileEditor() {
+            openProfileModal();
+        }
+
         function openProfileModal() {
             const user = requireRole('writer');
             if (!user) return;
@@ -3426,17 +3774,50 @@ Line breaks will be preserved exactly as you type them." style="width: 100%; pad
         }
 
         document.getElementById('pfCancel').addEventListener('click', closeProfileModal);
-        document.getElementById('pfSave').addEventListener('click', () => {
+        document.getElementById('pfSave').addEventListener('click', async () => {
             const user = getCurrentUser();
             if (!user || user.role !== 'writer') return closeProfileModal();
-            const profiles = loadProfiles();
-            profiles[user.email] = {
+            
+            const profileData = {
                 displayName: document.getElementById('pfDisplay').value.trim(),
                 bio: document.getElementById('pfBio').value.trim(),
                 location: document.getElementById('pfLocation').value.trim(),
                 website: document.getElementById('pfWebsite').value.trim(),
                 photo: document.getElementById('pfPhoto').value.trim()
             };
+
+            // Save to Strapi if authenticated
+            if (window.strapiClient && window.strapiClient.isAuthenticated() && user.id) {
+                try {
+                    await window.strapiClient.updateProfile(user.id, {
+                        displayName: profileData.displayName,
+                        bio: profileData.bio,
+                        socialLinks: {
+                            website: profileData.website,
+                            location: profileData.location
+                        },
+                        profileImage: profileData.photo
+                    });
+
+                    // Update local user object
+                    user.displayName = profileData.displayName;
+                    user.bio = profileData.bio;
+                    user.socialLinks = {
+                        website: profileData.website,
+                        location: profileData.location
+                    };
+                    localStorage.setItem('user', JSON.stringify(user));
+                    
+                    alert('Profile updated successfully!');
+                } catch (error) {
+                    console.error('Failed to update profile in Strapi:', error);
+                    alert('Warning: Could not sync profile with server. Changes saved locally.');
+                }
+            }
+
+            // Also save locally
+            const profiles = loadProfiles();
+            profiles[user.email] = profileData;
             saveProfiles(profiles);
             closeProfileModal();
             renderWriterStudio(user);
@@ -3690,6 +4071,71 @@ Line breaks will be preserved exactly as you type them." style="width: 100%; pad
                 renderTemplatesInline();
             };
         }
+
+        // Session Persistence - Validate JWT on page load
+        async function validateSession() {
+            const token = localStorage.getItem('strapi_jwt');
+            const userStr = localStorage.getItem('user');
+            
+            if (!token || !userStr) {
+                return false;
+            }
+
+            // If we have Strapi client, validate the token
+            if (window.strapiClient) {
+                try {
+                    const isValid = await window.strapiClient.validateToken();
+                    if (!isValid) {
+                        // Token is invalid, clear session
+                        localStorage.removeItem('strapi_jwt');
+                        localStorage.removeItem('user');
+                        localStorage.removeItem('authToken');
+                        return false;
+                    }
+                    
+                    // Sync user data from Strapi
+                    const userProfile = await window.strapiClient.getMe();
+                    const user = JSON.parse(userStr);
+                    
+                    // Update stored user info with latest from Strapi
+                    const updatedUser = {
+                        ...user,
+                        id: userProfile.id,
+                        email: userProfile.email,
+                        username: userProfile.username,
+                        displayName: userProfile.displayName || userProfile.username,
+                        bio: userProfile.bio,
+                        profileImage: userProfile.profileImage,
+                        socialLinks: userProfile.socialLinks,
+                    };
+                    
+                    localStorage.setItem('user', JSON.stringify(updatedUser));
+                    return true;
+                } catch (error) {
+                    console.error('Session validation failed:', error);
+                    return false;
+                }
+            }
+            
+            // Fallback for mock users
+            return !!userStr;
+        }
+
+        // Initialize session on page load
+        (async function initializeSession() {
+            const isValid = await validateSession();
+            if (isValid) {
+                console.log('Session restored successfully');
+                // Optionally auto-redirect to studio if on homepage
+                // Uncomment if you want auto-redirect:
+                // const user = JSON.parse(localStorage.getItem('user'));
+                // if (user && user.role === 'editor') {
+                //     openEditorStudio(false);
+                // } else if (user && user.role === 'writer') {
+                //     openWriterStudio(false);
+                // }
+            }
+        })();
     </script>
 </body>
 </html>

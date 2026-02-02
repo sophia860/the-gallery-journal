@@ -2652,9 +2652,7 @@ is staying human, staying.`
             const feedEl = document.getElementById('activityFeed');
             feedEl.innerHTML = loadActivity().map(a => `<div>• ${a.text} — ${new Date(a.ts).toLocaleTimeString()}</div>`).join('') || '<div>No recent activity.</div>';
         }
-    </script>
-</body>
-</html>
+
         /* Templates manager */
         function renderTemplatesInline() {
             const list = document.getElementById('tmplListInline');
@@ -2688,3 +2686,6 @@ is staying human, staying.`
                 renderTemplatesInline();
             };
         }
+    </script>
+</body>
+</html>

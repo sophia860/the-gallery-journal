@@ -27,9 +27,10 @@
 
         body {
             font-family: var(--font-serif);
+            font-size: 18px;
             background: var(--color-paper);
             color: var(--color-ink);
-            line-height: 1.68;
+            line-height: 1.65;
             overflow-x: hidden;
             scroll-behavior: smooth;
         }
@@ -211,6 +212,9 @@
             margin-bottom: 5rem;
             box-shadow: 0 24px 70px rgba(0,0,0,0.05);
             transition: var(--transition-soft);
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .gallery-wall::before {
@@ -227,7 +231,7 @@
 
         .poem-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            grid-template-columns: 1fr;
             gap: 2.5rem;
         }
 
@@ -235,6 +239,8 @@
             cursor: pointer;
             transition: var(--transition-soft);
             position: relative;
+            max-width: 680px;
+            margin: 0 auto;
         }
 
         .poem-card:hover {
@@ -273,6 +279,7 @@
             display: grid;
             gap: 0.55rem;
             max-width: var(--max-width);
+            margin: 0 auto;
         }
 
         .poem-meta {
@@ -383,6 +390,8 @@
             margin-bottom: 2rem;
             max-width: var(--max-width);
             line-height: 1.7;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         /* Studios */
@@ -1301,6 +1310,7 @@
             </div>
         </div>
 
+        <!-- Studios are hidden on the public homepage to keep the focus on reading -->
         <div class="section-header" style="display:none;">Studios</div>
         <div class="studios-bar" style="display:none;"></div>
         <div id="studioPanel" class="studio-panel" style="display:none;"></div>

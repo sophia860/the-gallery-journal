@@ -1594,6 +1594,43 @@
                     <input type="password" id="password" name="password" required>
                 </div>
                 <button type="submit" class="submit-btn">Enter</button>
+                <p style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem;">
+                    Don't have an account? <a href="#" onclick="event.preventDefault(); switchToRegister();" style="color: var(--color-accent); text-decoration: underline;">Register here</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Registration Modal -->
+    <div class="login-modal-overlay" id="registerModal">
+        <div class="login-modal">
+            <button class="login-modal-close" onclick="closeRegisterModal()">&times;</button>
+            <h2>Create Account</h2>
+            <p>Join The Gallery community</p>
+            <form onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label for="reg-username">Username</label>
+                    <input type="text" id="reg-username" name="username" required minlength="3">
+                </div>
+                <div class="form-group">
+                    <label for="reg-email">Email</label>
+                    <input type="email" id="reg-email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="reg-password">Password</label>
+                    <input type="password" id="reg-password" name="password" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label for="reg-role">I am a...</label>
+                    <select id="reg-role" name="role" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; font-family: var(--font-serif); font-size: 1rem;">
+                        <option value="poet">Poet / Writer</option>
+                        <option value="editor">Editor</option>
+                    </select>
+                </div>
+                <button type="submit" class="submit-btn">Create Account</button>
+                <p style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem;">
+                    Already have an account? <a href="#" onclick="event.preventDefault(); switchToLogin();" style="color: var(--color-accent); text-decoration: underline;">Login here</a>
+                </p>
             </form>
         </div>
     </div>
@@ -1601,6 +1638,9 @@
     <footer>
         The Gallery &copy; 2026 &nbsp;&middot;&nbsp; A Space for Poetry
     </footer>
+
+    <!-- Strapi API Client -->
+    <script src="src/strapi-client.js"></script>
 
     <script>
 
@@ -2050,8 +2090,7 @@ finally.`
             document.body.style.overflow = 'auto';
         }
 
-// Handle login form submission - connects to backend API
-        // Static/mock login for Pages: validates against MOCK_USERS and stores in localStorage
+// Handle login form submission - connects to Strapi backend API
         async function handleLogin(event) {
             event.preventDefault();
             const email = document.getElementById('email').value.trim().toLowerCase();
@@ -2064,6 +2103,58 @@ finally.`
 
             let success = false;
             try {
+                // Try Strapi authentication first
+                if (window.strapiClient) {
+                    try {
+                        const response = await window.strapiClient.login({
+                            identifier: email,
+                            password: password
+                        });
+
+                        // Get full user profile with extended fields
+                        const userProfile = await window.strapiClient.getMe();
+                        
+                        // Determine role (use custom role field or fall back to Strapi role)
+                        let role = userProfile.role || 'writer'; // Default to writer
+                        if (userProfile.role === 'editor') {
+                            role = 'editor';
+                        } else if (userProfile.role === 'poet') {
+                            role = 'writer'; // Map poet to writer for UI
+                        }
+
+                        const userInfo = { 
+                            id: userProfile.id,
+                            email: userProfile.email,
+                            username: userProfile.username,
+                            displayName: userProfile.displayName || userProfile.username,
+                            role: role,
+                            bio: userProfile.bio,
+                            profileImage: userProfile.profileImage,
+                            socialLinks: userProfile.socialLinks,
+                            loggedInAt: new Date().toISOString() 
+                        };
+
+                        localStorage.setItem('authToken', response.jwt);
+                        localStorage.setItem('user', JSON.stringify(userInfo));
+                        success = true;
+
+                        // Redirect to appropriate studio
+                        if (role === 'editor') {
+                            openEditorStudio(true);
+                        } else {
+                            openWriterStudio(true);
+                        }
+
+                        closeLoginModal();
+                        alert(`Welcome back, ${userInfo.displayName || userInfo.username}!`);
+                        return;
+                    } catch (strapiError) {
+                        console.warn('Strapi login failed, trying mock users:', strapiError.message);
+                        // Fall through to mock users
+                    }
+                }
+
+                // Fallback to mock users for development
                 const user = MOCK_USERS[email];
                 if (!user || user.password !== password) {
                     throw new Error('Invalid credentials. Try editor@example.com or writer@example.com with password "password", or writer@thegallery.com with password "writer123".');
@@ -2102,6 +2193,116 @@ finally.`
                 closeLoginModal();
             }
         });
+
+        // Registration Modal Functions
+        function openRegisterModal() {
+            const registerModal = document.getElementById('registerModal');
+            registerModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeRegisterModal() {
+            const registerModal = document.getElementById('registerModal');
+            registerModal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        function switchToRegister() {
+            closeLoginModal();
+            setTimeout(() => openRegisterModal(), 300);
+        }
+
+        function switchToLogin() {
+            closeRegisterModal();
+            setTimeout(() => openLoginModal('writer'), 300);
+        }
+
+        // Close register modal when clicking outside
+        document.getElementById('registerModal').addEventListener('click', (e) => {
+            if (e.target.id === 'registerModal') {
+                closeRegisterModal();
+            }
+        });
+
+        // Handle registration form submission
+        async function handleRegister(event) {
+            event.preventDefault();
+            const username = document.getElementById('reg-username').value.trim();
+            const email = document.getElementById('reg-email').value.trim().toLowerCase();
+            const password = document.getElementById('reg-password').value;
+            const role = document.getElementById('reg-role').value;
+            const submitBtn = event.target.querySelector('.submit-btn');
+            const originalText = submitBtn.textContent;
+
+            submitBtn.textContent = 'Creating account...';
+            submitBtn.disabled = true;
+
+            let success = false;
+            try {
+                // Try Strapi registration
+                if (window.strapiClient) {
+                    try {
+                        const response = await window.strapiClient.register({
+                            username: username,
+                            email: email,
+                            password: password,
+                            role: role
+                        });
+
+                        // Update profile with role
+                        if (response.user && response.user.id) {
+                            await window.strapiClient.updateProfile(response.user.id, {
+                                role: role
+                            });
+                        }
+
+                        // Get full user profile
+                        const userProfile = await window.strapiClient.getMe();
+
+                        const userInfo = { 
+                            id: userProfile.id,
+                            email: userProfile.email,
+                            username: userProfile.username,
+                            displayName: userProfile.displayName || userProfile.username,
+                            role: role === 'editor' ? 'editor' : 'writer',
+                            bio: userProfile.bio,
+                            profileImage: userProfile.profileImage,
+                            socialLinks: userProfile.socialLinks,
+                            loggedInAt: new Date().toISOString() 
+                        };
+
+                        localStorage.setItem('authToken', response.jwt);
+                        localStorage.setItem('user', JSON.stringify(userInfo));
+                        success = true;
+
+                        closeRegisterModal();
+                        alert(`Welcome to The Gallery, ${username}! Your account has been created.`);
+
+                        // Redirect to appropriate studio
+                        if (role === 'editor') {
+                            openEditorStudio(true);
+                        } else {
+                            openWriterStudio(true);
+                        }
+                        return;
+                    } catch (strapiError) {
+                        console.error('Strapi registration failed:', strapiError);
+                        throw strapiError;
+                    }
+                } else {
+                    throw new Error('Registration requires Strapi backend connection.');
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                alert(`Registration failed: ${error.message}\n\nPlease ensure the Strapi backend is properly configured.`);
+            } finally {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+                if (success) {
+                    event.target.reset();
+                }
+            }
+        }
 
         // Quick access CTA
         function openMagazine() {

@@ -86,32 +86,103 @@ Edit the CSS variables at the top of the stylesheet:
 }
 ```
 
-## 🔐 Login System
+## 🔐 Authentication System
 
-The login buttons are functional placeholders. To connect them to a real authentication system:
+The Gallery now features a complete authentication system integrated with Strapi Cloud:
 
-1. Set up a backend (Node.js, Python, etc.)
-2. Create an authentication API
-3. Update the `handleLogin()` function in `index.html` to make API calls
-4. Implement session management
-5. Create editor and writer dashboards
+### Strapi Backend
+- **Backend URL:** https://supportive-ducks-9506a8aa47.strapiapp.com
+- **Authentication:** JWT-based authentication with automatic token management
+- **Session Persistence:** Auto-login on page load with valid JWT tokens
+
+### User Features
+
+**Registration:**
+- Create new accounts with username, email, and password
+- Select role (Poet/Writer or Editor)
+- Automatic profile creation with extended fields
+
+**Login:**
+- Authenticate with email and password
+- Fallback to mock users for development
+- Session restored automatically on page reload
+
+**User Profiles:**
+- Extended user profiles with:
+  - Display name
+  - Bio (max 300 characters)
+  - Profile image URL
+  - Social links (website, location)
+- Profile editing from Writer's Studio
+- Syncs with Strapi backend when connected
+
+### Submission Management
+
+**For Poets/Writers:**
+- Create and save drafts (auto-save every 2 seconds)
+- Submit poems for editorial review
+- Track submission status (draft, submitted, under_review, approved, published)
+- View submission history
+- Version tracking for revisions
+
+**For Editors:**
+- Review all submissions
+- Approve/reject poems
+- Add editorial notes and feedback
+- Manage publication categories
+
+### API Integration
+
+The frontend integrates with the following Strapi endpoints:
+- `POST /api/auth/local` - User login
+- `POST /api/auth/local/register` - User registration
+- `GET /api/users/me` - Get current user profile
+- `PUT /api/users/:id` - Update user profile
+- `GET /api/submissions` - List submissions (filtered by user role)
+- `POST /api/submissions` - Create new submission
+- `PUT /api/submissions/:id` - Update submission
+- `DELETE /api/submissions/:id` - Delete submission
+
+### Setup Instructions
+
+To configure the Strapi backend, see [STRAPI_SETUP.md](./STRAPI_SETUP.md) for detailed instructions on:
+1. Creating the Submission content type
+2. Extending the User profile
+3. Configuring user roles (Poet and Editor)
+4. Setting up permissions
+5. Testing the integration
 
 ## 📂 Project Structure
 
 ```
 the-gallery-journal/
 ├── index.html          # Main homepage with all code
-└── README.md          # This file
+├── src/
+│   ├── strapi-client.js    # Strapi API client
+│   ├── server.js           # Express server (monitoring)
+│   ├── routes/
+│   │   └── health.js       # Health check endpoints
+│   └── monitoring/
+│       ├── agent.js        # Monitoring agent
+│       └── ai-agent.js     # AI-powered incident analysis
+├── STRAPI_SETUP.md     # Strapi configuration guide
+└── README.md           # This file
 ```
 
-This is a single-page application with embedded CSS and JavaScript for easy deployment.
+This is a single-page application with embedded CSS and JavaScript, now powered by Strapi Cloud for backend services.
 
 ## 🌐 Tech Stack
 
-- **HTML5** - Semantic structure
-- **CSS3** - Modern styling with CSS variables and animations
-- **Vanilla JavaScript** - No dependencies, lightweight and fast
-- **GitHub Pages** - Free hosting
+- **Frontend:**
+  - HTML5 - Semantic structure
+  - CSS3 - Modern styling with CSS variables and animations
+  - Vanilla JavaScript - No build dependencies
+- **Backend:**
+  - Strapi Cloud - Headless CMS for content management
+  - JWT Authentication - Secure token-based auth
+  - REST API - RESTful endpoints for all operations
+- **Hosting:**
+  - GitHub Pages - Free frontend hosting
 
 ## 📝 Featured Poets
 
@@ -126,12 +197,29 @@ This is a single-page application with embedded CSS and JavaScript for easy depl
 
 ## 🤝 Contributing
 
-Interested in submitting your work? Once the login system is connected to a backend, writers will be able to:
+Interested in submitting your work? Writers can now:
 
-- Create an account
-- Submit poems for review
-- Track submission status
-- Manage their published work
+1. **Create an Account**
+   - Click "Writer Log In" on the homepage
+   - Switch to "Register here" link
+   - Fill in username, email, password, and select role
+
+2. **Submit Poems**
+   - Access your Writer's Studio after logging in
+   - Use the typewriter interface or "+ New Poem" button
+   - Drafts auto-save every 2 seconds
+   - Submit for editorial review when ready
+
+3. **Track Submissions**
+   - View all submissions in your Writer's Studio
+   - Monitor status: Draft → Submitted → Under Review → Approved → Published
+   - Receive editor feedback and notes
+   - View version history
+
+4. **Manage Profile**
+   - Update display name and bio
+   - Add profile image and social links
+   - Changes sync with Strapi backend
 
 ## 📄 License
 

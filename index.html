@@ -2756,7 +2756,10 @@ finally.`
                 <div style="max-width: 1200px; margin: 0 auto; padding: 2rem;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                         <h2 style="font-family: var(--font-slab); font-weight: 300;">Writer's Studio</h2>
-                        <button class="studio-btn" onclick="openNewPoemEditor()">+ New Poem</button>
+                        <div style="display: flex; gap: 1rem;">
+                            <button class="studio-btn secondary" onclick="openProfileEditor()">Edit Profile</button>
+                            <button class="studio-btn" onclick="openNewPoemEditor()">+ New Poem</button>
+                        </div>
                     </div>
                     
                     <!-- Dashboard Tabs -->
@@ -3750,6 +3753,10 @@ Line breaks will be preserved exactly as you type them." style="width: 100%; pad
             return profiles[email] || {};
         }
 
+        function openProfileEditor() {
+            openProfileModal();
+        }
+
         function openProfileModal() {
             const user = requireRole('writer');
             if (!user) return;
@@ -3767,17 +3774,50 @@ Line breaks will be preserved exactly as you type them." style="width: 100%; pad
         }
 
         document.getElementById('pfCancel').addEventListener('click', closeProfileModal);
-        document.getElementById('pfSave').addEventListener('click', () => {
+        document.getElementById('pfSave').addEventListener('click', async () => {
             const user = getCurrentUser();
             if (!user || user.role !== 'writer') return closeProfileModal();
-            const profiles = loadProfiles();
-            profiles[user.email] = {
+            
+            const profileData = {
                 displayName: document.getElementById('pfDisplay').value.trim(),
                 bio: document.getElementById('pfBio').value.trim(),
                 location: document.getElementById('pfLocation').value.trim(),
                 website: document.getElementById('pfWebsite').value.trim(),
                 photo: document.getElementById('pfPhoto').value.trim()
             };
+
+            // Save to Strapi if authenticated
+            if (window.strapiClient && window.strapiClient.isAuthenticated() && user.id) {
+                try {
+                    await window.strapiClient.updateProfile(user.id, {
+                        displayName: profileData.displayName,
+                        bio: profileData.bio,
+                        socialLinks: {
+                            website: profileData.website,
+                            location: profileData.location
+                        },
+                        profileImage: profileData.photo
+                    });
+
+                    // Update local user object
+                    user.displayName = profileData.displayName;
+                    user.bio = profileData.bio;
+                    user.socialLinks = {
+                        website: profileData.website,
+                        location: profileData.location
+                    };
+                    localStorage.setItem('user', JSON.stringify(user));
+                    
+                    alert('Profile updated successfully!');
+                } catch (error) {
+                    console.error('Failed to update profile in Strapi:', error);
+                    alert('Warning: Could not sync profile with server. Changes saved locally.');
+                }
+            }
+
+            // Also save locally
+            const profiles = loadProfiles();
+            profiles[user.email] = profileData;
             saveProfiles(profiles);
             closeProfileModal();
             renderWriterStudio(user);

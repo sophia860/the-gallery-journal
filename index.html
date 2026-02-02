@@ -1843,16 +1843,36 @@ finally.`
             poemGrid.innerHTML = '';
             const entries = Object.entries(poems).filter(([, poem]) => poem.collection === collectionKey);
             entries.forEach(([id, poem], idx) => {
+                // Find nearby works based on collection (simple tag-based for now)
+                const nearbyWorks = Object.entries(poems)
+                    .filter(([otherId, other]) => otherId !== id && other.collection === poem.collection)
+                    .slice(0, 3);
+                
                 const card = document.createElement('div');
                 card.className = 'poem-card';
                 card.setAttribute('data-poem-id', id);
                 // Use stored wallNumber if available, otherwise fall back to index
                 const wallNum = poem.wallNumber || (idx + 1);
+                
+                // Split poem into lines for margin notes
+                const poemLines = poem.text.split('\n');
+                const poemLinesHtml = poemLines.map((line, lineIdx) => 
+                    `<div class="poem-line" data-poem-id="${id}" data-line="${lineIdx}" style="position: relative; padding: 0.2rem 0; cursor: pointer; transition: background 0.2s;" onmouseenter="this.style.background='rgba(196,30,58,0.05)'" onmouseleave="this.style.background='transparent'" onclick="openMarginNote('${id}', ${lineIdx}, '${line.replace(/'/g, "\\'")}')">
+                        ${line || '<br>'}
+                        <span class="margin-note-indicator" style="position: absolute; right: -20px; top: 50%; transform: translateY(-50%); opacity: 0; transition: opacity 0.2s; font-size: 0.7rem; color: var(--color-accent);">✎</span>
+                    </div>`
+                ).join('');
+                
                 card.innerHTML = `
                     <div class="poem-frame">
                         <div class="poem-main">
-                            <div class="poem-title">${poem.title}</div>
-                            <div class="poem-author">by ${poem.author}</div>
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                                <div>
+                                    <div class="poem-title">${poem.title}</div>
+                                    <div class="poem-author">by ${poem.author}</div>
+                                </div>
+                                <button onclick="shareQuoteCard('${id}')" style="font-family: var(--font-sans); font-size: 0.7rem; padding: 0.4rem 0.8rem; background: var(--color-accent); color: var(--color-paper); border: none; border-radius: 4px; cursor: pointer; letter-spacing: 0.05em;">SHARE</button>
+                            </div>
                             <div class="audio-player" style="margin: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem; opacity: 0.7;">
                                 <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="cursor: pointer;">
                                     <path d="M3 4v8l6-4z"/>
@@ -1862,12 +1882,42 @@ finally.`
                                 </div>
                                 <span style="font-size: 0.7rem; font-family: var(--font-sans);">0:00</span>
                             </div>
-                            <div class="poem-text">${poem.text.split('\n').join('<br>')}</div>
+                            <div class="poem-text" style="position: relative; padding-right: 30px;">
+                                ${poemLinesHtml}
+                            </div>
+                            <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(0,0,0,0.1);">
+                                <div style="font-family: var(--font-sans); font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-grey); margin-bottom: 0.75rem;">Nearby Works</div>
+                                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                    ${nearbyWorks.map(([nearbyId, nearby]) => `
+                                        <div style="font-size: 0.9rem; color: var(--color-grey); cursor: pointer; transition: color 0.2s;" onclick="scrollToPoem('${nearbyId}')" onmouseenter="this.style.color='var(--color-accent)'" onmouseleave="this.style.color='var(--color-grey)'">
+                                            → ${nearby.title} <span style="font-style: italic; font-size: 0.85rem;">by ${nearby.author}</span>
+                                        </div>
+                                    `).join('')}
+                                    ${nearbyWorks.length === 0 ? '<div style="font-size: 0.85rem; color: var(--color-grey); font-style: italic;">No nearby works in this collection yet.</div>' : ''}
+                                </div>
+                            </div>
                         </div>
                         <div class="poem-meta">Wall ${String(wallNum).padStart(2, '0')}</div>
                     </div>
+                    <div id="margin-notes-${id}" style="margin-top: 1rem; padding: 1rem; background: var(--color-cream); border-radius: 4px; display: none;">
+                        <div style="font-family: var(--font-sans); font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-grey); margin-bottom: 0.5rem;">Margin Notes</div>
+                        <div id="margin-notes-list-${id}" style="display: flex; flex-direction: column; gap: 0.5rem;"></div>
+                    </div>
                 `;
                 poemGrid.appendChild(card);
+                
+                // Add hover effect to show margin note indicator
+                const poemLinesEls = card.querySelectorAll('.poem-line');
+                poemLinesEls.forEach(lineEl => {
+                    lineEl.addEventListener('mouseenter', () => {
+                        const indicator = lineEl.querySelector('.margin-note-indicator');
+                        if (indicator) indicator.style.opacity = '0.7';
+                    });
+                    lineEl.addEventListener('mouseleave', () => {
+                        const indicator = lineEl.querySelector('.margin-note-indicator');
+                        if (indicator) indicator.style.opacity = '0';
+                    });
+                });
             });
             poemCards = Array.from(document.querySelectorAll('.poem-card'));
             activeIndex = 0;
@@ -2841,6 +2891,148 @@ Line breaks will be preserved exactly as you type them." style="width: 100%; pad
             const body = document.getElementById('new-poem-body').value || 'Your poem text will appear here...';
             
             alert(`Archive Preview:\n\nTitle: ${title}\n\nThis would appear in a minimalist archive list view with metadata and tags.`);
+        }
+        
+        // Community Features Functions
+        function openMarginNote(poemId, lineNumber, lineText) {
+            const modal = document.createElement('div');
+            modal.className = 'modal active';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 600px;">
+                    <button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
+                    <h3 style="margin-bottom: 1rem; font-family: var(--font-slab); font-weight: 300;">Add Margin Note</h3>
+                    <div style="padding: 1rem; background: var(--color-cream); border-radius: 4px; margin-bottom: 1rem; font-style: italic; color: var(--color-grey);">
+                        Line ${lineNumber + 1}: "${lineText}"
+                    </div>
+                    <textarea id="margin-note-text" rows="4" placeholder="Share your thoughts on this line..." style="width: 100%; padding: 0.75rem; border: 1px solid rgba(0,0,0,0.12); border-radius: 4px; font-family: var(--font-serif); font-size: 1rem; margin-bottom: 1rem;"></textarea>
+                    <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                        <button class="studio-btn secondary" onclick="this.closest('.modal').remove()">Cancel</button>
+                        <button class="studio-btn" onclick="saveMarginNote('${poemId}', ${lineNumber}, '${lineText.replace(/'/g, "\\'")}')">Add Note</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        
+        function saveMarginNote(poemId, lineNumber, lineText) {
+            const noteText = document.getElementById('margin-note-text').value.trim();
+            if (!noteText) {
+                alert('Please enter a note.');
+                return;
+            }
+            
+            // Save to localStorage
+            const marginNotes = JSON.parse(localStorage.getItem('marginNotes') || '{}');
+            if (!marginNotes[poemId]) {
+                marginNotes[poemId] = [];
+            }
+            
+            marginNotes[poemId].push({
+                lineNumber: lineNumber,
+                lineText: lineText,
+                noteText: noteText,
+                author: 'Anonymous Reader',
+                timestamp: new Date().toISOString()
+            });
+            
+            localStorage.setItem('marginNotes', JSON.stringify(marginNotes));
+            
+            // Show margin notes section
+            const notesSection = document.getElementById(`margin-notes-${poemId}`);
+            if (notesSection) {
+                notesSection.style.display = 'block';
+                const notesList = document.getElementById(`margin-notes-list-${poemId}`);
+                const noteEl = document.createElement('div');
+                noteEl.style.cssText = 'padding: 0.75rem; background: var(--color-paper); border-radius: 4px; border-left: 3px solid var(--color-accent);';
+                noteEl.innerHTML = `
+                    <div style="font-size: 0.8rem; color: var(--color-grey); margin-bottom: 0.25rem;">
+                        Line ${lineNumber + 1}: <span style="font-style: italic;">"${lineText}"</span>
+                    </div>
+                    <div style="font-size: 0.95rem; color: var(--color-ink);">${noteText}</div>
+                    <div style="font-size: 0.75rem; color: var(--color-grey); margin-top: 0.5rem;">
+                        — Anonymous Reader • ${new Date().toLocaleDateString()}
+                    </div>
+                `;
+                notesList.appendChild(noteEl);
+            }
+            
+            document.querySelector('.modal').remove();
+            alert('Margin note added!');
+        }
+        
+        function scrollToPoem(poemId) {
+            const card = document.querySelector(`[data-poem-id="${poemId}"]`);
+            if (card) {
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                const idx = poemCards.indexOf(card);
+                if (idx >= 0) {
+                    activeIndex = idx;
+                    highlightCard(activeIndex);
+                }
+            }
+        }
+        
+        function shareQuoteCard(poemId) {
+            const poem = poems[poemId];
+            if (!poem) return;
+            
+            // Create shareable quote card modal
+            const modal = document.createElement('div');
+            modal.className = 'modal active';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 700px;">
+                    <button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
+                    <h3 style="margin-bottom: 1.5rem; font-family: var(--font-slab); font-weight: 300;">Share Quote Card</h3>
+                    
+                    <!-- Quote Card Preview -->
+                    <div id="quote-card-preview" style="background: linear-gradient(135deg, #C41E3A 0%, #8b2332 100%); padding: 3rem; border-radius: 8px; color: white; margin-bottom: 2rem; text-align: center; min-height: 400px; display: flex; flex-direction: column; justify-content: center;">
+                        <div style="font-family: var(--font-serif); font-size: 1.5rem; line-height: 1.8; font-style: italic; margin-bottom: 2rem;" id="quote-excerpt">
+                            "${poem.text.split('\n').slice(0, 3).join(' ').slice(0, 150)}..."
+                        </div>
+                        <div style="font-family: var(--font-sans); font-size: 1rem; letter-spacing: 0.1em; opacity: 0.9;">
+                            <div style="margin-bottom: 0.25rem;">${poem.title}</div>
+                            <div style="font-size: 0.9rem; opacity: 0.8;">by ${poem.author}</div>
+                        </div>
+                        <div style="margin-top: 2rem; font-family: var(--font-sans); font-size: 0.75rem; letter-spacing: 0.15em; opacity: 0.7;">
+                            THE GALLERY • WINTER 2026
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--color-grey);">Customize Excerpt</label>
+                        <textarea id="custom-excerpt" rows="3" style="width: 100%; padding: 0.75rem; border: 1px solid rgba(0,0,0,0.12); border-radius: 4px; font-family: var(--font-serif); font-size: 1rem;">${poem.text.split('\n').slice(0, 3).join(' ').slice(0, 150)}...</textarea>
+                        <button class="studio-btn secondary" style="margin-top: 0.5rem;" onclick="updateQuotePreview()">Update Preview</button>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                        <button class="studio-btn secondary" onclick="this.closest('.modal').remove()">Close</button>
+                        <button class="studio-btn" onclick="downloadQuoteCard()">Download as Image</button>
+                        <button class="studio-btn" onclick="copyQuoteText()">Copy Text</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        
+        function updateQuotePreview() {
+            const customText = document.getElementById('custom-excerpt').value;
+            const excerptEl = document.getElementById('quote-excerpt');
+            if (excerptEl) {
+                excerptEl.textContent = `"${customText}"`;
+            }
+        }
+        
+        function downloadQuoteCard() {
+            alert('Quote card download functionality would use html2canvas or similar library to generate an image. For now, use screenshot tools.');
+        }
+        
+        function copyQuoteText() {
+            const customText = document.getElementById('custom-excerpt').value;
+            navigator.clipboard.writeText(customText).then(() => {
+                alert('Quote copied to clipboard!');
+            }).catch(() => {
+                alert('Failed to copy. Please select and copy manually.');
+            });
         }
 
         function renderEditorStudio(user, filter = 'all') {

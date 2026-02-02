@@ -324,6 +324,15 @@
             max-width: var(--max-width);
         }
 
+        .poem-text {
+            font-size: 1.03rem;
+            line-height: 1.9;
+            color: var(--color-ink);
+            max-width: var(--max-width);
+            white-space: pre-wrap;
+            margin-top: 1rem;
+        }
+
         .read-more {
             font-family: var(--font-sans);
             font-size: 0.78rem;
@@ -1146,6 +1155,12 @@
 
             .hero h1 {
                 font-size: 2.5rem;
+                line-height: 1.4;
+            }
+
+            .poem-text {
+                font-size: 18px;
+                line-height: 2.2;
             }
 
             .modal-content {
@@ -1164,15 +1179,63 @@
                 padding: 2rem 1.5rem;
             }
         }
+
+        /* Dark mode - Afterhours theme */
+        body.afterhours {
+            --color-paper: var(--color-dark-mode);
+            --color-ink: #f5f1e8;
+            --color-grey: #b0b0b0;
+            --color-cream: #2a2a2a;
+        }
+
+        body.afterhours .top-nav {
+            background-color: rgba(26, 26, 26, 0.95);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        body.afterhours .poem-frame {
+            background: #1a1a1a;
+            border-color: #2a2a2a;
+            box-shadow: 
+                0 10px 25px rgba(0,0,0,0.3),
+                inset 0 0 0 1px rgba(255,255,255,0.05);
+        }
+
+        body.afterhours .magazine-cta {
+            background: #1a1a1a;
+            border-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 16px 38px rgba(0,0,0,0.3), 0 1px 0 rgba(255,255,255,0.05);
+        }
+
+        /* Reading mode - Intimate Page */
+        body.intimate-page .poem-main {
+            max-width: 500px;
+        }
+
+        body.intimate-page .gallery-wall {
+            max-width: 600px;
+            padding: 2rem 1.5rem;
+        }
     </style>
 </head>
 <body>
     <!-- Top Navigation -->
     <nav class="top-nav">
-        <div class="login-buttons">
-            <button class="login-btn" onclick="openLoginModal('editor')">Editor Log In</button>
-            <span class="login-divider">|</span>
-            <button class="login-btn" onclick="openLoginModal('writer')">Writer Log In</button>
+        <div style="display: flex; gap: 2rem; align-items: center; flex-wrap: wrap; width: 100%; justify-content: space-between;">
+            <div style="display: flex; gap: 1.5rem; align-items: center;">
+                <button class="toggle-btn" id="themeToggle" style="font-family: var(--font-sans); font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--color-accent); background: none; border: none; cursor: pointer; padding: 0.5rem 1rem;">
+                    Daylight
+                </button>
+                <span style="color: var(--color-grey);">|</span>
+                <button class="toggle-btn" id="readingModeToggle" style="font-family: var(--font-sans); font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--color-accent); background: none; border: none; cursor: pointer; padding: 0.5rem 1rem;">
+                    Gallery Wall
+                </button>
+            </div>
+            <div class="login-buttons">
+                <button class="login-btn" onclick="openLoginModal('editor')">Editor Log In</button>
+                <span class="login-divider">|</span>
+                <button class="login-btn" onclick="openLoginModal('writer')">Writer Log In</button>
+            </div>
         </div>
     </nav>
 
@@ -1737,8 +1800,16 @@ finally.`
                         <div class="poem-main">
                             <div class="poem-title">${poem.title}</div>
                             <div class="poem-author">by ${poem.author}</div>
-                            <div class="poem-preview">${poem.text.split('\\n').slice(0,3).join('<br>')}...</div>
-                            <div class="read-more">Enter the piece →</div>
+                            <div class="audio-player" style="margin: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem; opacity: 0.7;">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="cursor: pointer;">
+                                    <path d="M3 4v8l6-4z"/>
+                                </svg>
+                                <div style="flex: 1; height: 2px; background: currentColor; opacity: 0.3; position: relative;">
+                                    <div style="position: absolute; left: 0; top: -2px; width: 30%; height: 6px; background: currentColor; opacity: 0.5;"></div>
+                                </div>
+                                <span style="font-size: 0.7rem; font-family: var(--font-sans);">0:00</span>
+                            </div>
+                            <div class="poem-text">${poem.text.split('\n').join('<br>')}</div>
                         </div>
                         <div class="poem-meta">Wall ${String(wallNum).padStart(2, '0')}</div>
                     </div>
@@ -1754,17 +1825,8 @@ finally.`
         function bindCardEvents() {
             poemCards.forEach((card, idx) => {
                 card.addEventListener('click', () => {
-                    const poemId = card.getAttribute('data-poem-id');
-                    const poem = poems[poemId];
                     activeIndex = idx;
                     highlightCard(activeIndex);
-                    
-                    modalTitle.textContent = poem.title;
-                    modalAuthor.textContent = `by ${poem.author}`;
-                    modalText.textContent = poem.text;
-                    
-                    modal.classList.add('active');
-                    document.body.style.overflow = 'hidden';
                 });
             });
         }
@@ -2237,6 +2299,53 @@ finally.`
         
         // Initialize with default collection
         renderCollection('love');
+
+        // Theme toggle - Daylight / Afterhours
+        const themeToggle = document.getElementById('themeToggle');
+        let isAfterhoursMode = false;
+        
+        themeToggle.addEventListener('click', () => {
+            isAfterhoursMode = !isAfterhoursMode;
+            if (isAfterhoursMode) {
+                document.body.classList.add('afterhours');
+                themeToggle.textContent = 'Afterhours';
+            } else {
+                document.body.classList.remove('afterhours');
+                themeToggle.textContent = 'Daylight';
+            }
+            localStorage.setItem('theme', isAfterhoursMode ? 'afterhours' : 'daylight');
+        });
+
+        // Reading mode toggle - Gallery Wall / Intimate Page
+        const readingModeToggle = document.getElementById('readingModeToggle');
+        let isIntimateMode = false;
+        
+        readingModeToggle.addEventListener('click', () => {
+            isIntimateMode = !isIntimateMode;
+            if (isIntimateMode) {
+                document.body.classList.add('intimate-page');
+                readingModeToggle.textContent = 'Intimate Page';
+            } else {
+                document.body.classList.remove('intimate-page');
+                readingModeToggle.textContent = 'Gallery Wall';
+            }
+            localStorage.setItem('readingMode', isIntimateMode ? 'intimate' : 'gallery');
+        });
+
+        // Restore saved preferences
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'afterhours') {
+            isAfterhoursMode = true;
+            document.body.classList.add('afterhours');
+            themeToggle.textContent = 'Afterhours';
+        }
+
+        const savedReadingMode = localStorage.getItem('readingMode');
+        if (savedReadingMode === 'intimate') {
+            isIntimateMode = true;
+            document.body.classList.add('intimate-page');
+            readingModeToggle.textContent = 'Intimate Page';
+        }
 
         /* Studios logic (client-side) */
         function getCurrentUser() {

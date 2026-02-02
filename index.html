@@ -1963,15 +1963,6 @@ finally.`
                                 </div>
                                 <button onclick="shareQuoteCard('${id}')" style="font-family: var(--font-sans); font-size: 0.7rem; padding: 0.4rem 0.8rem; background: var(--color-accent); color: var(--color-paper); border: none; border-radius: 4px; cursor: pointer; letter-spacing: 0.05em;">SHARE</button>
                             </div>
-                            <div class="audio-player" style="margin: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem; opacity: 0.7;">
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="cursor: pointer;">
-                                    <path d="M3 4v8l6-4z"/>
-                                </svg>
-                                <div style="flex: 1; height: 2px; background: currentColor; opacity: 0.3; position: relative;">
-                                    <div style="position: absolute; left: 0; top: -2px; width: 30%; height: 6px; background: currentColor; opacity: 0.5;"></div>
-                                </div>
-                                <span style="font-size: 0.7rem; font-family: var(--font-sans);">0:00</span>
-                            </div>
                             <div class="poem-text" style="position: relative; padding-right: 30px;">
                                 ${poemTextHtml}
                             </div>
@@ -3007,11 +2998,6 @@ finally.`
                             <textarea id="new-poem-body" rows="12" placeholder="Write your poem here...
                             
 Line breaks will be preserved exactly as you type them." style="width: 100%; padding: 0.75rem; border: 1px solid rgba(0,0,0,0.12); border-radius: 4px; font-family: var(--font-serif); font-size: 1rem; line-height: 1.8; white-space: pre-wrap;"></textarea>
-                        </div>
-                        <div>
-                            <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--color-grey);">Audio (optional)</label>
-                            <input type="file" id="new-poem-audio" accept="audio/*" style="width: 100%; padding: 0.75rem; border: 1px solid rgba(0,0,0,0.12); border-radius: 4px;">
-                            <div style="font-size: 0.8rem; color: var(--color-grey); margin-top: 0.25rem;">Upload an audio reading of your poem (MP3, WAV)</div>
                         </div>
                         <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem;">
                             <button class="studio-btn secondary" onclick="this.closest('.modal').remove()">Cancel</button>

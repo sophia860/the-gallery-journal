@@ -1297,9 +1297,9 @@
         <div class="section-header">Collections</div>
 
         <div class="collections-nav" id="collectionsNav">
-            <button class="collection-tab active" data-collection="nature">Love &amp; Relationships</button>
-            <button class="collection-tab" data-collection="memory">Nature &amp; The Natural World</button>
-            <button class="collection-tab" data-collection="urban">Grief, Loss &amp; Memory</button>
+            <button class="collection-tab active" data-collection="love">Love &amp; Relationships</button>
+            <button class="collection-tab" data-collection="nature">Nature &amp; The Natural World</button>
+            <button class="collection-tab" data-collection="grief">Grief, Loss &amp; Memory</button>
             <button class="collection-tab" data-collection="family">Family &amp; Identity</button>
         </div>
 
@@ -1476,7 +1476,7 @@
             1: {
                 title: "Your Eyes",
                 author: "Pam Martin-Lawrence",
-                collection: "nature",
+                collection: "love",
                 text: `Your eyes. OMG yes your eyes. They're serotonin and I'm smiling. They're champagne and I'm fizzing. Just one glance and you've got me jonesing like a junkie.
 
 My drug of choice - if you were my dealer I'd have you on speed dial. I want you on speed dial. With your eyes. You would always deliver.
@@ -1486,7 +1486,7 @@ Still high I risk another glimpse. But your eyes! Laser-focused. Locked and load
             2: {
                 title: "Thoughts on love during a heatwave",
                 author: "Ella B Winters",
-                collection: "nature",
+                collection: "love",
                 text: `I sit in the dark every day,
 curtains drawn, face
 perilously close to the
@@ -1507,7 +1507,7 @@ just for me, so I can rest.`
             3: {
                 title: "Ocean Pockets",
                 author: "Indee Sehrish Watson",
-                collection: "memory",
+                collection: "nature",
                 text: `We rummage through the
 Deep pockets of the ocean,
 Seeking a plaything, a shell,
@@ -1528,7 +1528,7 @@ Coiling, blue waves.`
             4: {
                 title: "The Clear Sky",
                 author: "Bhavna Jain",
-                collection: "memory",
+                collection: "nature",
                 text: `On an evening
 With an orange sky
 I looked into the great wide open
@@ -1541,7 +1541,7 @@ Thoughts on a fleeting spree`
             5: {
                 title: "Blessings",
                 author: "Leonie Rowland",
-                collection: "urban",
+                collection: "grief",
                 text: `Almost thirty years of knowing where you are, but only now
 realising: incense burning on a windowsill next to black
 leaves untidied ashes red string in small piles that used to be
@@ -1553,7 +1553,7 @@ arrangement of a god that chose smoke over clarity.`
             6: {
                 title: "Dialogue in Times Square",
                 author: "Seth Trochtenberg",
-                collection: "urban",
+                collection: "grief",
                 text: `Do you live?
 I think I do.
 I'd scream in joy.
@@ -1606,15 +1606,15 @@ finally.`
         const modalText = document.getElementById('modalText');
 
         const collectionCopy = {
-            nature: {
+            love: {
                 title: "Love & Relationships — Gallery Room",
                 desc: "Intimate moments and connections between people, exploring the depth of human bonds."
             },
-            memory: {
+            nature: {
                 title: "Nature & The Natural World — Gallery Room",
                 desc: "A quiet wing where light, water, and the natural world bend through language."
             },
-            urban: {
+            grief: {
                 title: "Grief, Loss & Memory — Gallery Room",
                 desc: "Echoes, lineage, and the self unfolding across time and remembrance."
             },
@@ -1626,7 +1626,7 @@ finally.`
 
         let poemCards = [];
         let activeIndex = 0;
-        let currentCollection = 'nature';
+        let currentCollection = 'love';
 
         // load published poems from localStorage into poems map
         function hydratePublishedPoems() {
@@ -1636,7 +1636,7 @@ finally.`
                     poems[p.id] = {
                         title: p.title,
                         author: p.author,
-                        collection: p.collection || 'memory',
+                        collection: p.collection || 'love',
                         text: p.text
                     };
                 });
@@ -1845,10 +1845,10 @@ finally.`
             poems[newId] = {
                 title: sub.title,
                 author: sub.displayName || sub.author,
-                collection: sub.collection || currentCollection || 'memory',
+                collection: sub.collection || currentCollection || 'love',
                 text: sub.body
             };
-            renderCollection(currentCollection || 'memory');
+            renderCollection(currentCollection || 'love');
             logActivity(`Published "${sub.title}" to gallery`);
         }
 
@@ -1876,7 +1876,7 @@ finally.`
         });
 
         // Initialize with default collection
-        renderCollection('nature');
+        renderCollection('love');
 
         /* Studios logic (client-side) */
         function getCurrentUser() {

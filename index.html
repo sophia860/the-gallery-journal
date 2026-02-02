@@ -1216,6 +1216,59 @@
             max-width: 600px;
             padding: 2rem 1.5rem;
         }
+        
+        /* Writer Studio Styles */
+        .writer-tab {
+            font-family: var(--font-sans);
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            padding: 0.75rem 0;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            color: var(--color-grey);
+            transition: all 0.2s ease;
+        }
+        
+        .writer-tab.active {
+            color: var(--color-accent);
+            border-bottom-color: var(--color-accent);
+        }
+        
+        .writer-tab:hover {
+            color: var(--color-ink);
+        }
+        
+        .writer-section {
+            padding: 1.5rem 0;
+        }
+        
+        .writer-list {
+            display: grid;
+            gap: 1rem;
+        }
+        
+        .writer-card {
+            padding: 1.5rem;
+            background: var(--color-paper);
+            border: 1px solid rgba(13, 13, 13, 0.08);
+            border-radius: var(--button-radius);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+        }
+        
+        .writer-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .writer-card h4 {
+            font-family: var(--font-serif);
+            font-size: 1.2rem;
+            color: var(--color-ink);
+        }
     </style>
 </head>
 <body>
@@ -2387,44 +2440,407 @@ finally.`
 
         function renderWriterStudio(user) {
             const panel = document.getElementById('studioPanel');
-            // only render content when explicitly opened; panel visibility is controlled by caller
+            const drafts = loadDrafts().filter(d => d.author === user.email);
             const submissions = loadSubmissions().filter(s => s.author === user.email);
+            const submitted = submissions.filter(s => s.status === 'pending' || s.status === 'revisions_requested');
+            const published = submissions.filter(s => s.status === 'published');
+            const archived = submissions.filter(s => s.status === 'rejected');
             const profile = getProfile(user.email);
+            
+            // Calculate mock resonance metrics
+            const totalReads = published.reduce((sum, p) => sum + (p.reads || Math.floor(Math.random() * 500)), 0);
+            const totalShares = published.reduce((sum, p) => sum + (p.shares || Math.floor(Math.random() * 50)), 0);
+            const totalHighlights = published.reduce((sum, p) => sum + (p.highlights || Math.floor(Math.random() * 100)), 0);
+            
             panel.innerHTML = `
-                <h4>Writer's Studio — ${user.email}</h4>
-                <div class="profile-card" id="writerProfileCard">
-                    <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap;">
-                        ${profile.photo ? `<img src="${profile.photo}" alt="Profile" style="width:60px;height:60px;object-fit:cover;border-radius:50%;border:1px solid rgba(0,0,0,0.1);">` : ''}
-                        <div>
-                            <div><strong>${profile.displayName || 'Set your display name'}</strong></div>
-                            ${profile.bio ? `<div style="font-size:0.9rem;color:#555;max-width:520px;">${profile.bio}</div>` : '<div style="font-size:0.9rem;color:#777;">Add a short bio (max 300 chars).</div>'}
-                            <div style="font-size:0.85rem;color:#777;">${profile.location || ''} ${profile.website ? '• ' + profile.website : ''}</div>
+                <div style="max-width: 1200px; margin: 0 auto; padding: 2rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <h2 style="font-family: var(--font-slab); font-weight: 300;">Writer's Studio</h2>
+                        <button class="studio-btn" onclick="openNewPoemEditor()">+ New Poem</button>
+                    </div>
+                    
+                    <!-- Dashboard Tabs -->
+                    <div style="border-bottom: 2px solid var(--color-cream); margin-bottom: 2rem;">
+                        <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+                            <button onclick="switchWriterTab('drafts')" id="tab-drafts" class="writer-tab active">Drafts (${drafts.length})</button>
+                            <button onclick="switchWriterTab('submitted')" id="tab-submitted" class="writer-tab">Submitted (${submitted.length})</button>
+                            <button onclick="switchWriterTab('published')" id="tab-published" class="writer-tab">Published (${published.length})</button>
+                            <button onclick="switchWriterTab('archive')" id="tab-archive" class="writer-tab">Archive (${archived.length})</button>
+                            <button onclick="switchWriterTab('resonance')" id="tab-resonance" class="writer-tab">Resonance</button>
                         </div>
                     </div>
-                    <div class="profile-actions">
-                        <button class="studio-btn secondary" onclick="openProfileModal()">Profile Settings</button>
-                        <button class="studio-btn" onclick="openTypewriter()">Open Focus Mode</button>
+                    
+                    <!-- Drafts Section -->
+                    <div id="writer-section-drafts" class="writer-section">
+                        <h3 style="margin-bottom: 1rem;">Your Drafts</h3>
+                        <div id="drafts-list" class="writer-list">
+                            ${drafts.length === 0 ? '<p style="color: var(--color-grey);">No drafts yet. Start writing!</p>' : ''}
+                        </div>
+                    </div>
+                    
+                    <!-- Submitted Section -->
+                    <div id="writer-section-submitted" class="writer-section" style="display: none;">
+                        <h3 style="margin-bottom: 1rem;">Submitted for Review</h3>
+                        <div id="submitted-list" class="writer-list">
+                            ${submitted.length === 0 ? '<p style="color: var(--color-grey);">No submissions under review.</p>' : ''}
+                        </div>
+                    </div>
+                    
+                    <!-- Published Section -->
+                    <div id="writer-section-published" class="writer-section" style="display: none;">
+                        <h3 style="margin-bottom: 1rem;">Published Works</h3>
+                        <div id="published-list" class="writer-list">
+                            ${published.length === 0 ? '<p style="color: var(--color-grey);">No published poems yet.</p>' : ''}
+                        </div>
+                    </div>
+                    
+                    <!-- Archive Section -->
+                    <div id="writer-section-archive" class="writer-section" style="display: none;">
+                        <h3 style="margin-bottom: 1rem;">Archive</h3>
+                        <div id="archive-list" class="writer-list">
+                            ${archived.length === 0 ? '<p style="color: var(--color-grey);">No archived poems.</p>' : ''}
+                        </div>
+                    </div>
+                    
+                    <!-- Resonance Analytics -->
+                    <div id="writer-section-resonance" class="writer-section" style="display: none;">
+                        <h3 style="margin-bottom: 1rem;">Resonance Analytics</h3>
+                        <p style="color: var(--color-grey); margin-bottom: 2rem;">Track how your published works connect with readers.</p>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                            <div style="padding: 1.5rem; background: var(--color-cream); border-radius: var(--button-radius);">
+                                <div style="font-size: 2rem; font-weight: 600; color: var(--color-accent);">${totalReads}</div>
+                                <div style="font-size: 0.9rem; color: var(--color-grey);">Total Reads</div>
+                            </div>
+                            <div style="padding: 1.5rem; background: var(--color-cream); border-radius: var(--button-radius);">
+                                <div style="font-size: 2rem; font-weight: 600; color: var(--color-accent);">${totalShares}</div>
+                                <div style="font-size: 0.9rem; color: var(--color-grey);">Shares</div>
+                            </div>
+                            <div style="padding: 1.5rem; background: var(--color-cream); border-radius: var(--button-radius);">
+                                <div style="font-size: 2rem; font-weight: 600; color: var(--color-accent);">${totalHighlights}</div>
+                                <div style="font-size: 0.9rem; color: var(--color-grey);">Highlights</div>
+                            </div>
+                        </div>
+                        <div id="resonance-details" class="writer-list">
+                            ${published.length === 0 ? '<p style="color: var(--color-grey);">Publish your first poem to see detailed analytics.</p>' : ''}
+                        </div>
                     </div>
                 </div>
-                <div class="studio-list" id="writerSubmissions" style="margin-top:1rem;">
-                    ${submissions.length === 0 ? '<p>No submissions yet.</p>' : ''}
+            `;
+            
+            // Populate drafts
+            const draftsListEl = panel.querySelector('#drafts-list');
+            drafts.forEach(draft => {
+                const card = document.createElement('div');
+                card.className = 'writer-card';
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div style="flex: 1;">
+                            <h4 style="margin-bottom: 0.5rem;">${draft.title || 'Untitled'}</h4>
+                            <div style="font-size: 0.9rem; color: var(--color-grey); margin-bottom: 0.5rem; white-space: pre-wrap; max-height: 100px; overflow: hidden;">${draft.body ? draft.body.slice(0, 150) + '...' : ''}</div>
+                            <div style="font-size: 0.8rem; color: var(--color-grey);">Last edited: ${draft.updatedAt ? new Date(draft.updatedAt).toLocaleDateString() : 'Unknown'}</div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="studio-btn secondary" onclick="editDraft(${draft.id})">Edit</button>
+                            <button class="studio-btn secondary" onclick="submitDraft(${draft.id})">Submit</button>
+                            <button class="studio-btn secondary" onclick="deleteDraft(${draft.id})">Delete</button>
+                        </div>
+                    </div>
+                `;
+                draftsListEl.appendChild(card);
+            });
+            
+            // Populate submitted
+            const submittedListEl = panel.querySelector('#submitted-list');
+            submitted.forEach(sub => {
+                const card = document.createElement('div');
+                card.className = 'writer-card';
+                card.innerHTML = `
+                    <div>
+                        <h4 style="margin-bottom: 0.5rem;">${sub.title}</h4>
+                        <div class="badge ${sub.status}" style="display: inline-block; margin-bottom: 0.5rem;">${sub.status}</div>
+                        <div style="font-size: 0.9rem; color: var(--color-grey); margin-bottom: 0.5rem;">Submitted: ${sub.submittedAt ? new Date(sub.submittedAt).toLocaleDateString() : 'Unknown'}</div>
+                        ${sub.editorFeedback ? `<div style="padding: 0.75rem; background: var(--color-cream); border-radius: 4px; margin-top: 0.5rem;"><strong>Editor Feedback:</strong><br>${sub.editorFeedback}</div>` : ''}
+                    </div>
+                `;
+                submittedListEl.appendChild(card);
+            });
+            
+            // Populate published
+            const publishedListEl = panel.querySelector('#published-list');
+            published.forEach(pub => {
+                const reads = pub.reads || Math.floor(Math.random() * 500);
+                const shares = pub.shares || Math.floor(Math.random() * 50);
+                const highlights = pub.highlights || Math.floor(Math.random() * 100);
+                const card = document.createElement('div');
+                card.className = 'writer-card';
+                card.innerHTML = `
+                    <div>
+                        <h4 style="margin-bottom: 0.5rem;">${pub.title}</h4>
+                        <div style="font-size: 0.9rem; color: var(--color-grey); margin-bottom: 0.5rem;">
+                            Published in: ${pub.publishedCategory || 'Gallery'} • Wall ${pub.wallNumber || '01'}
+                        </div>
+                        <div style="display: flex; gap: 1.5rem; font-size: 0.85rem; color: var(--color-grey); margin-top: 0.5rem;">
+                            <span>${reads} reads</span>
+                            <span>${shares} shares</span>
+                            <span>${highlights} highlights</span>
+                        </div>
+                        <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem;">
+                            <button class="studio-btn secondary" onclick="viewInGallery('${pub.publishedCategory}')">View in Gallery Room</button>
+                            <button class="studio-btn secondary" onclick="viewInArchive(${pub.id})">View in Archive</button>
+                        </div>
+                    </div>
+                `;
+                publishedListEl.appendChild(card);
+            });
+            
+            // Populate archive
+            const archiveListEl = panel.querySelector('#archive-list');
+            archived.forEach(arch => {
+                const card = document.createElement('div');
+                card.className = 'writer-card';
+                card.innerHTML = `
+                    <div>
+                        <h4 style="margin-bottom: 0.5rem;">${arch.title}</h4>
+                        <div style="font-size: 0.9rem; color: var(--color-grey);">Archived: ${arch.rejectedAt ? new Date(arch.rejectedAt).toLocaleDateString() : 'Unknown'}</div>
+                        ${arch.editorFeedback ? `<div style="padding: 0.75rem; background: var(--color-cream); border-radius: 4px; margin-top: 0.5rem;"><strong>Editor Note:</strong><br>${arch.editorFeedback}</div>` : ''}
+                    </div>
+                `;
+                archiveListEl.appendChild(card);
+            });
+            
+            // Populate resonance details
+            const resonanceDetailsEl = panel.querySelector('#resonance-details');
+            published.forEach(pub => {
+                const reads = pub.reads || Math.floor(Math.random() * 500);
+                const shares = pub.shares || Math.floor(Math.random() * 50);
+                const highlights = pub.highlights || Math.floor(Math.random() * 100);
+                const card = document.createElement('div');
+                card.className = 'writer-card';
+                card.innerHTML = `
+                    <div>
+                        <h4 style="margin-bottom: 0.5rem;">${pub.title}</h4>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 0.75rem;">
+                            <div>
+                                <div style="font-size: 1.5rem; font-weight: 600; color: var(--color-accent);">${reads}</div>
+                                <div style="font-size: 0.8rem; color: var(--color-grey);">Reads</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 1.5rem; font-weight: 600; color: var(--color-accent);">${shares}</div>
+                                <div style="font-size: 0.8rem; color: var(--color-grey);">Shares</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 1.5rem; font-weight: 600; color: var(--color-accent);">${highlights}</div>
+                                <div style="font-size: 0.8rem; color: var(--color-grey);">Highlights</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                resonanceDetailsEl.appendChild(card);
+            });
+        }
+        
+        // Writer Studio Helper Functions
+        function switchWriterTab(tabName) {
+            // Hide all sections
+            document.querySelectorAll('.writer-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.writer-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(`writer-section-${tabName}`).style.display = 'block';
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+        
+        function openNewPoemEditor() {
+            // Create a new poem editor modal
+            const modal = document.createElement('div');
+            modal.className = 'modal active';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 900px;">
+                    <button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
+                    <h2 style="margin-bottom: 1.5rem; font-family: var(--font-slab); font-weight: 300;">New Poem</h2>
+                    <div style="display: grid; gap: 1rem;">
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--color-grey);">Title</label>
+                            <input type="text" id="new-poem-title" style="width: 100%; padding: 0.75rem; border: 1px solid rgba(0,0,0,0.12); border-radius: 4px; font-family: var(--font-serif); font-size: 1rem;">
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--color-grey);">Room</label>
+                                <select id="new-poem-room" style="width: 100%; padding: 0.75rem; border: 1px solid rgba(0,0,0,0.12); border-radius: 4px;">
+                                    <option value="love">Love & Relationships</option>
+                                    <option value="nature">Nature & The Natural World</option>
+                                    <option value="grief">Grief, Loss & Memory</option>
+                                    <option value="family">Family & Identity</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--color-grey);">Collections / Tags</label>
+                                <input type="text" id="new-poem-tags" placeholder="love, memory, urban (comma-separated)" style="width: 100%; padding: 0.75rem; border: 1px solid rgba(0,0,0,0.12); border-radius: 4px;">
+                            </div>
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--color-grey);">Poem Text (line breaks preserved)</label>
+                            <textarea id="new-poem-body" rows="12" placeholder="Write your poem here...
+                            
+Line breaks will be preserved exactly as you type them." style="width: 100%; padding: 0.75rem; border: 1px solid rgba(0,0,0,0.12); border-radius: 4px; font-family: var(--font-serif); font-size: 1rem; line-height: 1.8; white-space: pre-wrap;"></textarea>
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--color-grey);">Audio (optional)</label>
+                            <input type="file" id="new-poem-audio" accept="audio/*" style="width: 100%; padding: 0.75rem; border: 1px solid rgba(0,0,0,0.12); border-radius: 4px;">
+                            <div style="font-size: 0.8rem; color: var(--color-grey); margin-top: 0.25rem;">Upload an audio reading of your poem (MP3, WAV)</div>
+                        </div>
+                        <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem;">
+                            <button class="studio-btn secondary" onclick="this.closest('.modal').remove()">Cancel</button>
+                            <button class="studio-btn secondary" onclick="savePoemAsDraft()">Save as Draft</button>
+                            <button class="studio-btn" onclick="submitNewPoem()">Submit for Review</button>
+                        </div>
+                        <div style="margin-top: 1rem; padding: 1rem; background: var(--color-cream); border-radius: 4px;">
+                            <strong>Preview Buttons:</strong>
+                            <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                                <button class="studio-btn secondary" onclick="previewGalleryRoom()">Preview Gallery Room View</button>
+                                <button class="studio-btn secondary" onclick="previewArchiveView()">Preview Archive View</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             `;
-            const listEl = panel.querySelector('#writerSubmissions');
-            submissions.forEach(sub => {
-                const card = document.createElement('div');
-                card.className = 'submission-card';
-                card.innerHTML = `
-                    <strong>${sub.title}</strong>
-                    <div class="badge ${sub.status}">${sub.status}</div>
-                    <div style="font-size:0.9rem;color:#555;">${sub.body.slice(0,140)}${sub.body.length>140?'...':''}</div>
-                    ${sub.tags ? `<div style="font-size:0.8rem;color:#777;">Tags: ${sub.tags.join(', ')}</div>` : ''}
-                    ${sub.notes ? `<div style="font-size:0.8rem;color:#777;">Notes: ${sub.notes}</div>` : ''}
-                    <div style="font-size:0.8rem;color:#777;">Display name: ${sub.displayName || profile.displayName || 'N/A'}</div>
-                    ${sub.bio ? `<div style="font-size:0.8rem;color:#777;">Bio: ${sub.bio}</div>` : ''}
-                `;
-                listEl.appendChild(card);
-            });
+            document.body.appendChild(modal);
+        }
+        
+        function savePoemAsDraft() {
+            const title = document.getElementById('new-poem-title').value;
+            const room = document.getElementById('new-poem-room').value;
+            const tags = document.getElementById('new-poem-tags').value.split(',').map(t => t.trim()).filter(t => t);
+            const body = document.getElementById('new-poem-body').value;
+            const user = getCurrentUser();
+            
+            if (!body) {
+                alert('Please write your poem before saving.');
+                return;
+            }
+            
+            const drafts = loadDrafts();
+            const newDraft = {
+                id: Date.now(),
+                title: title || 'Untitled',
+                body: body,
+                room: room,
+                tags: tags,
+                author: user.email,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+            
+            drafts.push(newDraft);
+            saveDrafts(drafts);
+            
+            alert('Poem saved as draft!');
+            document.querySelector('.modal').remove();
+            openWriterStudio();
+        }
+        
+        function submitNewPoem() {
+            const title = document.getElementById('new-poem-title').value;
+            const room = document.getElementById('new-poem-room').value;
+            const tags = document.getElementById('new-poem-tags').value.split(',').map(t => t.trim()).filter(t => t);
+            const body = document.getElementById('new-poem-body').value;
+            const user = getCurrentUser();
+            
+            if (!title || !body) {
+                alert('Please provide a title and poem text.');
+                return;
+            }
+            
+            const submissions = loadSubmissions();
+            const newSubmission = {
+                id: Date.now(),
+                title: title,
+                body: body,
+                room: room,
+                tags: tags,
+                author: user.email,
+                status: 'pending',
+                submittedAt: new Date().toISOString()
+            };
+            
+            submissions.push(newSubmission);
+            saveSubmissions(submissions);
+            
+            alert('Poem submitted for review!');
+            document.querySelector('.modal').remove();
+            openWriterStudio();
+        }
+        
+        function editDraft(draftId) {
+            alert('Edit functionality coming soon! Draft ID: ' + draftId);
+        }
+        
+        function submitDraft(draftId) {
+            const drafts = loadDrafts();
+            const draft = drafts.find(d => d.id === draftId);
+            if (!draft) return;
+            
+            const submissions = loadSubmissions();
+            const newSubmission = {
+                id: Date.now(),
+                title: draft.title,
+                body: draft.body,
+                room: draft.room,
+                tags: draft.tags,
+                author: draft.author,
+                status: 'pending',
+                submittedAt: new Date().toISOString()
+            };
+            
+            submissions.push(newSubmission);
+            saveSubmissions(submissions);
+            
+            // Remove from drafts
+            const updatedDrafts = drafts.filter(d => d.id !== draftId);
+            saveDrafts(updatedDrafts);
+            
+            alert('Draft submitted for review!');
+            openWriterStudio();
+        }
+        
+        function deleteDraft(draftId) {
+            if (!confirm('Are you sure you want to delete this draft?')) return;
+            
+            const drafts = loadDrafts();
+            const updatedDrafts = drafts.filter(d => d.id !== draftId);
+            saveDrafts(updatedDrafts);
+            
+            openWriterStudio();
+        }
+        
+        function viewInGallery(collection) {
+            // Scroll to gallery and switch to collection
+            document.querySelector('.container').scrollIntoView({ behavior: 'smooth' });
+            renderCollection(collection);
+        }
+        
+        function viewInArchive(poemId) {
+            alert('Archive view coming soon! Poem ID: ' + poemId);
+        }
+        
+        function previewGalleryRoom() {
+            const title = document.getElementById('new-poem-title').value || 'Your Poem Title';
+            const body = document.getElementById('new-poem-body').value || 'Your poem text will appear here...';
+            
+            alert(`Gallery Room Preview:\n\nTitle: ${title}\n\nThis would appear as a framed card in the gallery room with the full poem text visible.`);
+        }
+        
+        function previewArchiveView() {
+            const title = document.getElementById('new-poem-title').value || 'Your Poem Title';
+            const body = document.getElementById('new-poem-body').value || 'Your poem text will appear here...';
+            
+            alert(`Archive Preview:\n\nTitle: ${title}\n\nThis would appear in a minimalist archive list view with metadata and tags.`);
         }
 
         function renderEditorStudio(user, filter = 'all') {

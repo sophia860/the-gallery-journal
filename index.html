@@ -1959,7 +1959,7 @@ finally.`
                         const escapedForJs = line.replace(/`/g, '\\`').replace(/\$/g, '\\$').replace(/'/g, "\\'").replace(/"/g, '\\"');
                         return `<div class="poem-line" data-poem-id="${id}" data-line="${lineIdx}" style="position: relative; padding: 0.2rem 0; cursor: pointer; transition: background 0.2s;" onmouseenter="this.style.background='rgba(196,30,58,0.05)'" onmouseleave="this.style.background='transparent'" onclick="openMarginNote('${id}', ${lineIdx}, '${escapedForJs}')">
                             ${escapedLine || '<br>'}
-                            <span class="margin-note-indicator" style="position: absolute; right: -20px; top: 50%; transform: translateY(-50%); opacity: 0; transition: opacity 0.2s; font-size: 0.7rem; color: var(--color-accent);">✎</span>
+                            <span class="margin-note-indicator" style="position: absolute; right: -20px; top: 50%; transform: translateY(-50%); opacity: 0.5; transition: opacity 0.2s; font-size: 0.7rem; color: var(--color-accent);">✎</span>
                         </div>`;
                     }).join('');
                 } else {
@@ -2011,7 +2011,7 @@ finally.`
                         });
                         lineEl.addEventListener('mouseleave', () => {
                             const indicator = lineEl.querySelector('.margin-note-indicator');
-                            if (indicator) indicator.style.opacity = '0';
+                            if (indicator) indicator.style.opacity = '0.5';
                         });
                     });
                 }

@@ -369,6 +369,10 @@
             gap: 1rem;
             flex-wrap: wrap;
             margin-bottom: 1.5rem;
+                        overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            padding-bottom: 0.5rem;
         }
 
         .collection-tab {
@@ -1533,6 +1537,8 @@
             <button class="collection-tab" data-collection="nature">Nature &amp; The Natural World</button>
             <button class="collection-tab" data-collection="grief">Grief, Loss &amp; Memory</button>
             <button class="collection-tab" data-collection="family">Family &amp; Identity</button>
+                            <button class="collection-tab" data-collection="time">Time &amp; Mortality</button>
+                <button class="collection-tab" data-collection="self">Self &amp; Introspection</button>
         </div>
 
         <div class="collection-title" id="collectionTitle">Love &amp; Relationships — Gallery Room</div>
@@ -1893,6 +1899,14 @@ finally.`
             family: {
                 title: "Family & Identity — Gallery Room",
                 desc: "Stories of kinship, lineage, and the mirrors we find in those who share our blood and our lives."
+            },
+            time: {
+                title: "Time & Mortality — Gallery Room",
+                desc: "Meditations on aging, seasons, and the passage of time."
+            },
+            self: {
+                title: "Self & Introspection — Gallery Room",
+                desc: "Poems of personal growth, inner thoughts, and self-discovery."
             }
         };
 

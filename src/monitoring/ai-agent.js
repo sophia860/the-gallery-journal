@@ -21,7 +21,7 @@ const config = {
 const incidentMemory = {
   recent: [],
   patterns: {},
-  recommendations: []
+  patternCount: 0 // Track count separately for O(1) operations
 };
 
 /**
@@ -169,7 +169,22 @@ function updatePatterns(alert, analysis) {
   if (incidentMemory.recent.length > 100) incidentMemory.recent.shift();
   
   const key = `${alert.type}:${alert.endpoint}`;
-  incidentMemory.patterns[key] = (incidentMemory.patterns[key] || 0) + 1;
+  
+  // Check if we need to make room before adding a new pattern
+  if (!incidentMemory.patterns[key] && incidentMemory.patternCount >= 1000) {
+    // Remove the first pattern (oldest in insertion order for modern JS)
+    const firstKey = Object.keys(incidentMemory.patterns)[0];
+    delete incidentMemory.patterns[firstKey];
+    incidentMemory.patternCount--;
+  }
+  
+  // Update or create pattern
+  if (!incidentMemory.patterns[key]) {
+    incidentMemory.patterns[key] = 1;
+    incidentMemory.patternCount++;
+  } else {
+    incidentMemory.patterns[key]++;
+  }
 }
 
 /**
@@ -235,9 +250,10 @@ async function postJSON(url, data, headers = {}) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...headers }
     }, (res) => {
-      let d = '';
-      res.on('data', chunk => d += chunk);
+      const chunks = [];
+      res.on('data', chunk => chunks.push(chunk));
       res.on('end', () => {
+        const d = Buffer.concat(chunks).toString();
         try { resolve(JSON.parse(d)); } catch { resolve(d); }
       });
     });
@@ -250,10 +266,11 @@ async function postJSON(url, data, headers = {}) {
 // Webhook server to receive alerts
 http.createServer(async (req, res) => {
   if (req.method === 'POST' && req.url === '/webhook') {
-    let body = '';
-    req.on('data', chunk => body += chunk);
+    const chunks = [];
+    req.on('data', chunk => chunks.push(chunk));
     req.on('end', async () => {
       try {
+        const body = Buffer.concat(chunks).toString();
         const payload = JSON.parse(body);
         const incident = await analyzeIncident(payload.alert);
         await sendNotification(incident);

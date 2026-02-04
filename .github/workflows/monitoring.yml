@@ -39,7 +39,7 @@ jobs:
       - name: Check /health endpoint
         id: health
         run: |
-          URL="${{ github.event.inputs.endpoint_url || env.BACKEND_URL }}/health"
+          URL="${{ github.event.inputs.endpoint_url || env.BACKEND_URL }}/api"
           echo "Checking health endpoint: $URL"
           
           RESPONSE=$(curl -s -w "\n%{http_code}" --max-time 30 "$URL" || echo "FAILED\n000")
@@ -62,7 +62,7 @@ jobs:
       - name: Check /ready endpoint
         id: ready
         run: |
-          URL="${{ github.event.inputs.endpoint_url || env.BACKEND_URL }}/ready"
+          URL="${{ github.event.inputs.endpoint_url || env.BACKEND_URL }}/api"
           echo "Checking readiness endpoint: $URL"
           
           RESPONSE=$(curl -s -w "\n%{http_code}" --max-time 30 "$URL" || echo "FAILED\n000")
@@ -84,7 +84,7 @@ jobs:
       - name: Check /metrics endpoint
         id: metrics
         run: |
-          URL="${{ github.event.inputs.endpoint_url || env.BACKEND_URL }}/metrics"
+          URL="${{ github.event.inputs.endpoint_url || env.BACKEND_URL }}/api"
           echo "Checking metrics endpoint: $URL"
           
           RESPONSE=$(curl -s -w "\n%{http_code}" --max-time 30 "$URL" || echo "FAILED\n000")

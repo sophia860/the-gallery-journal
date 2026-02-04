@@ -3,10 +3,10 @@ name: Deploy GitHub Pages
 on:
   push:
     branches:
-      - copilot/update-live-gallery-design
+      - main
   pull_request:
     branches:
-      - copilot/update-live-gallery-design
+      - main
   workflow_dispatch:
 
 permissions:

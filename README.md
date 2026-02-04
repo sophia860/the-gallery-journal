@@ -4,6 +4,15 @@
 
 Welcome to The Gallery, a literary magazine showcasing contemporary poetry.
 
+## 🚀 Deployment
+
+**NEW:** Ready to deploy? Check these guides:
+
+- **[📊 Deployment Status Report](DEPLOYMENT_STATUS.md)** - Comprehensive assessment of deployment readiness, blockers, and what needs to be done
+- **[📘 Deployment Guide](DEPLOYMENT_GUIDE.md)** - Step-by-step instructions for deploying frontend, backend, and Strapi CMS
+
+**Quick Start:** The frontend is ready to deploy to GitHub Pages in ~15 minutes. See [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) for instructions.
+
 ## 🌟 Live Site
 
 Once GitHub Pages is enabled, your site will be available at:

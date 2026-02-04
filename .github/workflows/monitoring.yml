@@ -19,7 +19,7 @@ on:
 
 env:
   # Set your production URL here
-  BACKEND_URL: ${{ secrets.BACKEND_URL || 'https://the-gallery-journal.example.com' }}
+  BACKEND_URL: ${{ secrets.BACKEND_URL || 'https://supportive-ducks-9506a8aa47.strapiapp.com' }}
   SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
 
 jobs:

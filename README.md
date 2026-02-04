@@ -4,6 +4,16 @@
 
 Welcome to The Gallery, a literary magazine showcasing contemporary poetry.
 
+## 🚀 Deployment
+
+**NEW:** Ready to deploy? Start here:
+
+- **[⚡ Quick Start](QUICK_START.md)** - TL;DR deployment status and fastest path to launch (5 min read)
+- **[📊 Deployment Status](DEPLOYMENT_STATUS.md)** - Comprehensive assessment of deployment readiness (15 min read)
+- **[📘 Deployment Guide](DEPLOYMENT_GUIDE.md)** - Step-by-step deployment instructions (reference guide)
+
+**Quick Answer:** Frontend is ready to deploy NOW (15 minutes). Backend needs 2-4 hours. Full system: 1-2 days.
+
 ## 🌟 Live Site
 
 Once GitHub Pages is enabled, your site will be available at:

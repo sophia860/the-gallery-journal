@@ -135,8 +135,7 @@ class StrapiClient {
    */
   logout() {
     this.setToken(null);
-    this.userCache = null;
-    this.userCacheExpiry = null;
+    this.clearUserCache();
     localStorage.removeItem('user');
   }
 
@@ -171,8 +170,7 @@ class StrapiClient {
         body: JSON.stringify(profileData),
       });
       // Invalidate cache after profile update
-      this.userCache = null;
-      this.userCacheExpiry = null;
+      this.clearUserCache();
       return response;
     } catch (error) {
       throw new Error(`Failed to update profile: ${error.message}`);

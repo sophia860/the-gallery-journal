@@ -21,7 +21,7 @@ const config = {
 const incidentMemory = {
   recent: [],
   patterns: {},
-  recommendations: []
+  patternCount: 0 // Track count separately for O(1) operations
 };
 
 /**
@@ -169,13 +169,21 @@ function updatePatterns(alert, analysis) {
   if (incidentMemory.recent.length > 100) incidentMemory.recent.shift();
   
   const key = `${alert.type}:${alert.endpoint}`;
-  incidentMemory.patterns[key] = (incidentMemory.patterns[key] || 0) + 1;
   
-  // Prevent memory leak - cap patterns at 1000 unique keys
-  const patternKeys = Object.keys(incidentMemory.patterns);
-  if (patternKeys.length > 1000) {
-    // Remove oldest pattern (first key)
-    delete incidentMemory.patterns[patternKeys[0]];
+  // Check if we need to make room before adding a new pattern
+  if (!incidentMemory.patterns[key] && incidentMemory.patternCount >= 1000) {
+    // Remove the first pattern (oldest in insertion order for modern JS)
+    const firstKey = Object.keys(incidentMemory.patterns)[0];
+    delete incidentMemory.patterns[firstKey];
+    incidentMemory.patternCount--;
+  }
+  
+  // Update or create pattern
+  if (!incidentMemory.patterns[key]) {
+    incidentMemory.patterns[key] = 1;
+    incidentMemory.patternCount++;
+  } else {
+    incidentMemory.patterns[key]++;
   }
 }
 

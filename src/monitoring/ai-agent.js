@@ -170,6 +170,13 @@ function updatePatterns(alert, analysis) {
   
   const key = `${alert.type}:${alert.endpoint}`;
   incidentMemory.patterns[key] = (incidentMemory.patterns[key] || 0) + 1;
+  
+  // Prevent memory leak - cap patterns at 1000 unique keys
+  const patternKeys = Object.keys(incidentMemory.patterns);
+  if (patternKeys.length > 1000) {
+    // Remove oldest pattern (first key)
+    delete incidentMemory.patterns[patternKeys[0]];
+  }
 }
 
 /**
@@ -235,9 +242,10 @@ async function postJSON(url, data, headers = {}) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...headers }
     }, (res) => {
-      let d = '';
-      res.on('data', chunk => d += chunk);
+      const chunks = [];
+      res.on('data', chunk => chunks.push(chunk));
       res.on('end', () => {
+        const d = Buffer.concat(chunks).toString();
         try { resolve(JSON.parse(d)); } catch { resolve(d); }
       });
     });
@@ -250,10 +258,11 @@ async function postJSON(url, data, headers = {}) {
 // Webhook server to receive alerts
 http.createServer(async (req, res) => {
   if (req.method === 'POST' && req.url === '/webhook') {
-    let body = '';
-    req.on('data', chunk => body += chunk);
+    const chunks = [];
+    req.on('data', chunk => chunks.push(chunk));
     req.on('end', async () => {
       try {
+        const body = Buffer.concat(chunks).toString();
         const payload = JSON.parse(body);
         const incident = await analyzeIncident(payload.alert);
         await sendNotification(incident);

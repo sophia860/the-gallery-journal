@@ -53,9 +53,10 @@ async function checkEndpoint(endpoint) {
       timeout: endpoint.timeout,
       headers: { 'User-Agent': 'MonitoringAgent/1.0' }
     }, (res) => {
-      let data = '';
-      res.on('data', chunk => data += chunk);
+      const chunks = [];
+      res.on('data', chunk => chunks.push(chunk));
       res.on('end', () => {
+        const data = Buffer.concat(chunks).toString();
         resolve({
           success: res.statusCode >= 200 && res.statusCode < 300,
           statusCode: res.statusCode,
@@ -121,6 +122,10 @@ async function processResult(endpoint, result) {
 async function sendAlert(alert) {
   console.log(`\n[ALERT] ${alert.type.toUpperCase()}: ${alert.message}\n`);
   state.incidents.push({ ...alert, timestamp: new Date().toISOString() });
+  // Prevent memory leak - cap incidents history at 500
+  if (state.incidents.length > 500) {
+    state.incidents.shift();
+  }
   
   if (config.aiWebhook) {
     try {

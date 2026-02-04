@@ -16,17 +16,18 @@ const users = [
   { email: 'writer@example.com', password: 'password', role: 'writer' }
 ];
 
+// Create a Map for O(1) email lookup
+const userMap = new Map(users.map(u => [u.email.toLowerCase(), u]));
+
 app.post('/api/auth/login', (req, res) => {
   const { email, password } = req.body || {};
   if (!email || !password) {
     return res.status(400).json({ message: 'Email and password are required.' });
   }
 
-  const user = users.find(
-    (u) => u.email.toLowerCase() === email.toLowerCase() && u.password === password
-  );
+  const user = userMap.get(email.toLowerCase());
 
-  if (!user) {
+  if (!user || user.password !== password) {
     return res.status(401).json({ message: 'Invalid credentials.' });
   }
 

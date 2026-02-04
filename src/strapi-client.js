@@ -10,6 +10,9 @@ class StrapiClient {
   constructor() {
     this.baseURL = STRAPI_URL;
     this.token = this.getToken();
+    this.userCache = null;
+    this.userCacheExpiry = null;
+    this.userCacheTTL = 300000; // 5 minutes in milliseconds
   }
 
   /**
@@ -83,6 +86,9 @@ class StrapiClient {
 
       if (response.jwt) {
         this.setToken(response.jwt);
+        // Cache the user profile immediately
+        this.userCache = response.user;
+        this.userCacheExpiry = Date.now() + this.userCacheTTL;
       }
 
       return {
@@ -110,6 +116,9 @@ class StrapiClient {
 
       if (response.jwt) {
         this.setToken(response.jwt);
+        // Cache the user profile immediately
+        this.userCache = response.user;
+        this.userCacheExpiry = Date.now() + this.userCacheTTL;
       }
 
       return {
@@ -126,15 +135,25 @@ class StrapiClient {
    */
   logout() {
     this.setToken(null);
+    this.userCache = null;
+    this.userCacheExpiry = null;
     localStorage.removeItem('user');
   }
 
   /**
-   * Get current user profile
+   * Get current user profile (with caching)
    */
   async getMe() {
+    // Check if we have a valid cached user
+    if (this.userCache && this.userCacheExpiry && Date.now() < this.userCacheExpiry) {
+      return this.userCache;
+    }
+    
     try {
       const response = await this.request('/api/users/me?populate=*');
+      // Cache the user profile
+      this.userCache = response;
+      this.userCacheExpiry = Date.now() + this.userCacheTTL;
       return response;
     } catch (error) {
       throw new Error(`Failed to fetch user profile: ${error.message}`);
@@ -151,6 +170,9 @@ class StrapiClient {
         method: 'PUT',
         body: JSON.stringify(profileData),
       });
+      // Invalidate cache after profile update
+      this.userCache = null;
+      this.userCacheExpiry = null;
       return response;
     } catch (error) {
       throw new Error(`Failed to update profile: ${error.message}`);
@@ -178,8 +200,10 @@ class StrapiClient {
    */
   async getMySubmissions() {
     try {
-      const response = await this.request('/api/submissions?populate=*&filters[author][id][$eq]=' + 
-        (await this.getMe()).id);
+      const me = await this.getMe();
+      const response = await this.request(
+        `/api/submissions?populate=*&filters[author][id][$eq]=${me.id}`
+      );
       return response.data;
     } catch (error) {
       throw new Error(`Failed to fetch submissions: ${error.message}`);
@@ -294,6 +318,14 @@ class StrapiClient {
       this.logout();
       return false;
     }
+  }
+
+  /**
+   * Clear user cache (useful for forcing refresh)
+   */
+  clearUserCache() {
+    this.userCache = null;
+    this.userCacheExpiry = null;
   }
 }
 

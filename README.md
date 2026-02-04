@@ -6,12 +6,13 @@ Welcome to The Gallery, a literary magazine showcasing contemporary poetry.
 
 ## 🚀 Deployment
 
-**NEW:** Ready to deploy? Check these guides:
+**NEW:** Ready to deploy? Start here:
 
-- **[📊 Deployment Status Report](DEPLOYMENT_STATUS.md)** - Comprehensive assessment of deployment readiness, blockers, and what needs to be done
-- **[📘 Deployment Guide](DEPLOYMENT_GUIDE.md)** - Step-by-step instructions for deploying frontend, backend, and Strapi CMS
+- **[⚡ Quick Start](QUICK_START.md)** - TL;DR deployment status and fastest path to launch (5 min read)
+- **[📊 Deployment Status](DEPLOYMENT_STATUS.md)** - Comprehensive assessment of deployment readiness (15 min read)
+- **[📘 Deployment Guide](DEPLOYMENT_GUIDE.md)** - Step-by-step deployment instructions (reference guide)
 
-**Quick Start:** The frontend is ready to deploy to GitHub Pages in ~15 minutes. See [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) for instructions.
+**Quick Answer:** Frontend is ready to deploy NOW (15 minutes). Backend needs 2-4 hours. Full system: 1-2 days.
 
 ## 🌟 Live Site
 

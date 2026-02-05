@@ -2,6 +2,8 @@
 
 This guide will help you set up PayPal payment integration for The Gallery's Writer Studio submission system.
 
+**PayPal Account**: This integration is configured to use the PayPal Business account: **sophiamaybea@gmail.com**
+
 ## Overview
 
 The Gallery now includes an optional PayPal payment integration that allows writers to make contributions when submitting their work. This is designed as a **voluntary contribution system**, not a mandatory submission fee.
@@ -16,10 +18,12 @@ The Gallery now includes an optional PayPal payment integration that allows writ
 
 ## Setup Instructions
 
-### 1. Create a PayPal Business Account
+### 1. Access Your PayPal Business Account
+
+**Account Email**: sophiamaybea@gmail.com
 
 1. Go to [PayPal Developer](https://developer.paypal.com/)
-2. Sign in or create a PayPal Business account
+2. Sign in with **sophiamaybea@gmail.com**
 3. Navigate to **Dashboard** → **My Apps & Credentials**
 
 ### 2. Get Your Client ID

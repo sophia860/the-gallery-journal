@@ -36,6 +36,8 @@ The Gallery now includes an optional PayPal payment integration that allows writ
 
 ### 3. Configure the Application
 
+⚠️ **IMPORTANT**: The file currently contains a placeholder `YOUR_PAYPAL_CLIENT_ID` that **must be replaced** before deployment.
+
 Open `index.html` and find this line near the top (around line 1420):
 
 ```html
@@ -96,7 +98,7 @@ Edit the payment options in `index.html` (around line 1757):
 
 ### Change Default Amount
 
-The default selected amount is $10. To change it, modify line 3302:
+The default selected amount is $10. To change it, modify line 3263:
 
 ```javascript
 let selectedPaymentAmount = 10; // Change this value

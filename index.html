@@ -1754,19 +1754,19 @@
             <p>Help us keep The Gallery running by making an optional contribution. Your support enables us to continue showcasing literary talent and paying our editors.</p>
             
             <div class="payment-options">
-                <div class="payment-option" onclick="selectPaymentAmount(5)">
+                <div class="payment-option" onclick="selectPaymentAmount(5, event)">
                     <div class="amount">$5</div>
                     <div class="label">Coffee</div>
                 </div>
-                <div class="payment-option selected" onclick="selectPaymentAmount(10)">
+                <div class="payment-option selected" onclick="selectPaymentAmount(10, event)">
                     <div class="amount">$10</div>
                     <div class="label">Standard</div>
                 </div>
-                <div class="payment-option" onclick="selectPaymentAmount(25)">
+                <div class="payment-option" onclick="selectPaymentAmount(25, event)">
                     <div class="amount">$25</div>
                     <div class="label">Supporter</div>
                 </div>
-                <div class="payment-option" onclick="selectPaymentAmount(50)">
+                <div class="payment-option" onclick="selectPaymentAmount(50, event)">
                     <div class="amount">$50</div>
                     <div class="label">Patron</div>
                 </div>
@@ -3263,14 +3263,16 @@ Line breaks will be preserved exactly as you type them." style="width: 100%; pad
         let selectedPaymentAmount = 10; // Default amount
         let pendingSubmissionData = null; // Store submission data while waiting for payment
         
-        function selectPaymentAmount(amount) {
+        function selectPaymentAmount(amount, event) {
             selectedPaymentAmount = amount;
             
             // Update UI to show selected option
             document.querySelectorAll('.payment-option').forEach(option => {
                 option.classList.remove('selected');
             });
-            event.target.closest('.payment-option').classList.add('selected');
+            if (event && event.target) {
+                event.target.closest('.payment-option').classList.add('selected');
+            }
             
             // Re-render PayPal button with new amount
             renderPayPalButton();
@@ -3310,7 +3312,7 @@ Line breaks will be preserved exactly as you type them." style="width: 100%; pad
                             amount: {
                                 value: selectedPaymentAmount.toString()
                             },
-                            description: 'Submission fee for The Gallery literary journal'
+                            description: 'Voluntary contribution to The Gallery literary journal'
                         }]
                     });
                 },

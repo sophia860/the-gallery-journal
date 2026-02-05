@@ -121,6 +121,7 @@ The Gallery now features a complete authentication system integrated with Strapi
 **For Poets/Writers:**
 - Create and save drafts (auto-save every 2 seconds)
 - Submit poems for editorial review
+- **Optional PayPal integration** for voluntary contributions
 - Track submission status (draft, submitted, under_review, approved, published)
 - View submission history
 - Version tracking for revisions
@@ -130,6 +131,23 @@ The Gallery now features a complete authentication system integrated with Strapi
 - Approve/reject poems
 - Add editorial notes and feedback
 - Manage publication categories
+
+### PayPal Integration
+
+The Gallery includes optional PayPal integration for writer contributions:
+- **Voluntary contributions** when submitting poems
+- Multiple payment tiers ($5, $10, $25, $50)
+- Skip option for free submissions
+- Secure PayPal payment processing
+- Payment tracking with submissions
+
+**PayPal Account**: sophiamaybea@gmail.com
+
+**Configuration Required**: Replace the Client ID placeholder in `index.html` with your actual PayPal Client ID.
+
+To enable PayPal, see:
+- [PAYPAL_CONFIG.md](./PAYPAL_CONFIG.md) - Quick setup for sophiamaybea@gmail.com account
+- [PAYPAL_SETUP.md](./PAYPAL_SETUP.md) - Detailed configuration guide
 
 ### API Integration
 

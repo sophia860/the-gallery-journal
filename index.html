@@ -1311,7 +1311,114 @@
             font-size: 1.2rem;
             color: var(--color-ink);
         }
+        
+        /* PayPal Payment Modal Styles */
+        .paypal-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            opacity: 0;
+            animation: fadeIn 0.3s ease forwards;
+        }
+        
+        .paypal-modal-content {
+            background: var(--color-paper);
+            border-radius: var(--button-radius);
+            padding: 2.5rem;
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+            transform: scale(0.9);
+            animation: scaleIn 0.3s ease forwards;
+        }
+        
+        .paypal-modal h3 {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: var(--color-ink);
+        }
+        
+        .paypal-modal p {
+            font-family: var(--font-serif);
+            color: var(--color-grey);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+        
+        .payment-options {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .payment-option {
+            flex: 1;
+            min-width: 120px;
+            padding: 1rem;
+            border: 2px solid var(--color-cream);
+            border-radius: var(--button-radius);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+        
+        .payment-option:hover {
+            border-color: var(--color-accent);
+            background: var(--color-cream);
+        }
+        
+        .payment-option.selected {
+            border-color: var(--color-accent);
+            background: var(--color-cream);
+        }
+        
+        .payment-option .amount {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--color-accent);
+            margin-bottom: 0.25rem;
+        }
+        
+        .payment-option .label {
+            font-size: 0.85rem;
+            color: var(--color-grey);
+        }
+        
+        #paypal-button-container {
+            margin: 1.5rem 0;
+        }
+        
+        .payment-skip {
+            text-align: center;
+            margin-top: 1rem;
+        }
+        
+        .payment-skip button {
+            background: none;
+            border: none;
+            color: var(--color-grey);
+            cursor: pointer;
+            text-decoration: underline;
+            font-family: var(--font-serif);
+            font-size: 0.9rem;
+        }
+        
+        .payment-skip button:hover {
+            color: var(--color-ink);
+        }
     </style>
+    <!-- PayPal SDK - Account: sophiamaybea@gmail.com -->
+    <!-- Replace YOUR_PAYPAL_CLIENT_ID with the Client ID from PayPal Developer Dashboard -->
+    <script src="https://www.paypal.com/sdk/js?client-id=YOUR_PAYPAL_CLIENT_ID&currency=USD"></script>
 </head>
 <body>
     <!-- Top Navigation -->
@@ -1638,6 +1745,39 @@
                     Already have an account? <a href="#" onclick="event.preventDefault(); switchToLogin();" style="color: var(--color-accent); text-decoration: underline;">Login here</a>
                 </p>
             </form>
+        </div>
+    </div>
+
+    <!-- PayPal Payment Modal -->
+    <div id="paypalModal" class="paypal-modal" style="display: none;">
+        <div class="paypal-modal-content">
+            <h3>Support The Gallery</h3>
+            <p>Help us keep The Gallery running by making an optional contribution. Your support enables us to continue showcasing literary talent and paying our editors.</p>
+            
+            <div class="payment-options">
+                <div class="payment-option" onclick="selectPaymentAmount(5, event)">
+                    <div class="amount">$5</div>
+                    <div class="label">Coffee</div>
+                </div>
+                <div class="payment-option selected" onclick="selectPaymentAmount(10, event)">
+                    <div class="amount">$10</div>
+                    <div class="label">Standard</div>
+                </div>
+                <div class="payment-option" onclick="selectPaymentAmount(25, event)">
+                    <div class="amount">$25</div>
+                    <div class="label">Supporter</div>
+                </div>
+                <div class="payment-option" onclick="selectPaymentAmount(50, event)">
+                    <div class="amount">$50</div>
+                    <div class="label">Patron</div>
+                </div>
+            </div>
+            
+            <div id="paypal-button-container"></div>
+            
+            <div class="payment-skip">
+                <button onclick="skipPayment()">Skip and submit for free</button>
+            </div>
         </div>
     </div>
 
@@ -3086,42 +3226,8 @@ Line breaks will be preserved exactly as you type them." style="width: 100%; pad
                 submittedAt: new Date().toISOString()
             };
 
-            // Try to submit to Strapi first
-            if (window.strapiClient && window.strapiClient.isAuthenticated()) {
-                try {
-                    const strapiSubmission = await window.strapiClient.createSubmission({
-                        title: title,
-                        body: body,
-                        category: room,
-                        tags: tags,
-                        status: 'submitted',
-                        submittedAt: new Date().toISOString()
-                    });
-                    
-                    // Also save locally for offline access
-                    const submissions = loadSubmissions();
-                    newSubmission.strapiId = strapiSubmission.id;
-                    submissions.push(newSubmission);
-                    saveSubmissions(submissions);
-                    
-                    alert('Poem submitted for review!');
-                    document.querySelector('.modal').remove();
-                    openWriterStudio();
-                    return;
-                } catch (error) {
-                    console.error('Failed to submit to Strapi, saving locally:', error);
-                    alert('Warning: Could not sync with server. Your submission has been saved locally.');
-                }
-            }
-            
-            // Fallback to local storage
-            const submissions = loadSubmissions();
-            submissions.push(newSubmission);
-            saveSubmissions(submissions);
-            
-            alert('Poem submitted for review!');
-            document.querySelector('.modal').remove();
-            openWriterStudio();
+            // Show PayPal modal for optional payment
+            showPayPalModal(newSubmission);
         }
         
         function editDraft(draftId) {
@@ -3146,32 +3252,175 @@ Line breaks will be preserved exactly as you type them." style="width: 100%; pad
                 tags: draft.tags,
                 author: draft.author,
                 status: 'pending',
-                submittedAt: new Date().toISOString()
+                submittedAt: new Date().toISOString(),
+                draftId: draftId // Store draft ID for removal after payment
             };
 
+            // Show PayPal modal for optional payment
+            showPayPalModal(newSubmission);
+        }
+        
+        // PayPal Integration Functions
+        let selectedPaymentAmount = 10; // Default amount
+        let pendingSubmissionData = null; // Store submission data while waiting for payment
+        
+        function selectPaymentAmount(amount, event) {
+            selectedPaymentAmount = amount;
+            
+            // Update UI to show selected option
+            document.querySelectorAll('.payment-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            if (event && event.target) {
+                event.target.closest('.payment-option').classList.add('selected');
+            }
+            
+            // Re-render PayPal button with new amount
+            renderPayPalButton();
+        }
+        
+        function showPayPalModal(submissionData) {
+            // Store submission data for after payment
+            pendingSubmissionData = submissionData;
+            
+            // Show modal
+            const modal = document.getElementById('paypalModal');
+            modal.style.display = 'flex';
+            
+            // Render PayPal button
+            renderPayPalButton();
+        }
+        
+        function hidePayPalModal() {
+            document.getElementById('paypalModal').style.display = 'none';
+            pendingSubmissionData = null;
+        }
+        
+        function renderPayPalButton() {
+            const container = document.getElementById('paypal-button-container');
+            container.innerHTML = ''; // Clear existing button
+            
+            // Check if PayPal SDK is loaded
+            if (typeof paypal === 'undefined') {
+                container.innerHTML = '<p style="color: var(--color-grey); text-align: center;">PayPal is not configured. Please contact the administrator.</p>';
+                return;
+            }
+            
+            paypal.Buttons({
+                createOrder: function(data, actions) {
+                    return actions.order.create({
+                        purchase_units: [{
+                            amount: {
+                                value: selectedPaymentAmount.toString()
+                            },
+                            description: 'Voluntary contribution to The Gallery literary journal'
+                        }]
+                    });
+                },
+                onApprove: function(data, actions) {
+                    return actions.order.capture().then(function(details) {
+                        // Payment successful
+                        console.log('Payment completed by ' + details.payer.name.given_name);
+                        
+                        // Add payment info to submission
+                        if (pendingSubmissionData) {
+                            pendingSubmissionData.paymentAmount = selectedPaymentAmount;
+                            pendingSubmissionData.paymentId = details.id;
+                            pendingSubmissionData.paymentStatus = 'completed';
+                        }
+                        
+                        // Complete submission (hidePayPalModal is called inside)
+                        completeSubmission();
+                    });
+                },
+                onError: function(err) {
+                    console.error('PayPal error:', err);
+                    alert('Payment failed. You can skip payment and submit for free, or try again.');
+                },
+                onCancel: function(data) {
+                    console.log('Payment cancelled');
+                    alert('Payment cancelled. You can skip payment and submit for free.');
+                }
+            }).render('#paypal-button-container');
+        }
+        
+        function skipPayment() {
+            // Mark as free submission
+            if (pendingSubmissionData) {
+                pendingSubmissionData.paymentAmount = 0;
+                pendingSubmissionData.paymentStatus = 'skipped';
+            }
+            
+            // Complete submission (hidePayPalModal is called inside completeSubmission)
+            completeSubmission();
+        }
+        
+        async function completeSubmission() {
+            if (!pendingSubmissionData) {
+                console.error('No pending submission data');
+                return;
+            }
+            
+            const submissionData = pendingSubmissionData;
+            
+            // Hide modal and clear pending data
+            hidePayPalModal();
+            
             // Try to submit to Strapi first
             if (window.strapiClient && window.strapiClient.isAuthenticated()) {
                 try {
-                    const strapiSubmission = await window.strapiClient.createSubmission({
-                        title: draft.title,
-                        body: draft.body,
-                        category: draft.room,
-                        tags: draft.tags,
-                        status: 'submitted',
-                        submittedAt: new Date().toISOString()
-                    });
+                    // Check if this was a draft with strapiId
+                    const drafts = loadDrafts();
+                    const draft = drafts.find(d => d.id === submissionData.draftId);
                     
-                    // Also save locally
+                    let strapiSubmission;
+                    if (draft && draft.strapiId) {
+                        // Update existing Strapi draft to submitted status
+                        strapiSubmission = await window.strapiClient.updateSubmission(draft.strapiId, {
+                            title: submissionData.title,
+                            body: submissionData.body,
+                            category: submissionData.room || submissionData.category,
+                            tags: submissionData.tags,
+                            status: 'submitted',
+                            submittedAt: new Date().toISOString(),
+                            paymentAmount: submissionData.paymentAmount,
+                            paymentId: submissionData.paymentId,
+                            paymentStatus: submissionData.paymentStatus
+                        });
+                        submissionData.strapiId = draft.strapiId;
+                    } else {
+                        // Create new submission in Strapi
+                        strapiSubmission = await window.strapiClient.createSubmission({
+                            title: submissionData.title,
+                            body: submissionData.body,
+                            category: submissionData.room || submissionData.category,
+                            tags: submissionData.tags,
+                            status: 'submitted',
+                            submittedAt: new Date().toISOString(),
+                            paymentAmount: submissionData.paymentAmount,
+                            paymentId: submissionData.paymentId,
+                            paymentStatus: submissionData.paymentStatus
+                        });
+                        submissionData.strapiId = strapiSubmission.id;
+                    }
+                    
+                    // Also save locally for offline access
                     const submissions = loadSubmissions();
-                    newSubmission.strapiId = strapiSubmission.id;
-                    submissions.push(newSubmission);
+                    submissions.push(submissionData);
                     saveSubmissions(submissions);
                     
-                    // Remove from drafts
-                    const updatedDrafts = drafts.filter(d => d.id !== draftId);
-                    saveDrafts(updatedDrafts);
+                    // If this was from a draft, remove it
+                    if (submissionData.draftId) {
+                        const updatedDrafts = drafts.filter(d => d.id !== submissionData.draftId);
+                        saveDrafts(updatedDrafts);
+                    }
                     
-                    alert('Draft submitted for review!');
+                    alert('Poem submitted for review! Thank you for your ' + (submissionData.paymentAmount > 0 ? 'contribution' : 'submission') + '.');
+                    
+                    // Close any modals
+                    const modals = document.querySelectorAll('.modal');
+                    modals.forEach(m => m.remove());
+                    
                     openWriterStudio();
                     return;
                 } catch (error) {
@@ -3182,14 +3431,22 @@ Line breaks will be preserved exactly as you type them." style="width: 100%; pad
             
             // Fallback to local storage
             const submissions = loadSubmissions();
-            submissions.push(newSubmission);
+            submissions.push(submissionData);
             saveSubmissions(submissions);
             
-            // Remove from drafts
-            const updatedDrafts = drafts.filter(d => d.id !== draftId);
-            saveDrafts(updatedDrafts);
+            // If this was from a draft, remove it
+            if (submissionData.draftId) {
+                const drafts = loadDrafts();
+                const updatedDrafts = drafts.filter(d => d.id !== submissionData.draftId);
+                saveDrafts(updatedDrafts);
+            }
             
-            alert('Draft submitted for review!');
+            alert('Poem submitted for review! Thank you for your ' + (submissionData.paymentAmount > 0 ? 'contribution' : 'submission') + '.');
+            
+            // Close any modals
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(m => m.remove());
+            
             openWriterStudio();
         }
         
@@ -3667,6 +3924,10 @@ Line breaks will be preserved exactly as you type them." style="width: 100%; pad
                 return;
             }
             const profile = getProfile(user.email);
+            
+            // Store draft ID if this was from a saved draft
+            const draftIdToRemove = currentDraftId;
+            
             const newSubmission = {
                 id: Date.now().toString(),
                 title,
@@ -3681,51 +3942,15 @@ Line breaks will be preserved exactly as you type them." style="width: 100%; pad
                 labels: [],
                 rating: 0,
                 timeline: [{ action: 'submitted', ts: new Date().toISOString() }],
-                internalNotes: ''
+                internalNotes: '',
+                draftId: draftIdToRemove // Store for removal after payment
             };
 
-            // Try to submit to Strapi first
-            if (window.strapiClient && window.strapiClient.isAuthenticated()) {
-                try {
-                    // Check if this was a draft with strapiId
-                    const drafts = loadDrafts();
-                    const draft = drafts.find(d => d.id === currentDraftId);
-                    
-                    if (draft && draft.strapiId) {
-                        // Update existing Strapi draft to submitted status
-                        const strapiSubmission = await window.strapiClient.updateSubmission(draft.strapiId, {
-                            title: title,
-                            body: body,
-                            tags: newSubmission.tags,
-                            status: 'submitted',
-                            submittedAt: new Date().toISOString()
-                        });
-                        newSubmission.strapiId = draft.strapiId;
-                    } else {
-                        // Create new submission in Strapi
-                        const strapiSubmission = await window.strapiClient.createSubmission({
-                            title: title,
-                            body: body,
-                            tags: newSubmission.tags,
-                            status: 'submitted',
-                            submittedAt: new Date().toISOString()
-                        });
-                        newSubmission.strapiId = strapiSubmission.id;
-                    }
-                } catch (error) {
-                    console.error('Failed to submit to Strapi, saving locally:', error);
-                    alert('Warning: Could not sync with server. Your submission has been saved locally.');
-                }
-            }
+            // Close the typewriter overlay
+            closeTypewriter();
 
-            const submissions = loadSubmissions();
-            submissions.push(newSubmission);
-            saveSubmissions(submissions);
-            
-            // Also store as draft with status
-            saveCurrentDraft('submitted');
-            renderWriterStudio(user);
-            alert('Submitted to editors.');
+            // Show PayPal modal for optional payment
+            showPayPalModal(newSubmission);
         }
 
         twBody.addEventListener('input', () => {

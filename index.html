@@ -2092,7 +2092,7 @@ finally.`
                 // For writers/editors: Split poem into lines for margin notes
                 // For public: Show poem as simple text block
                 let poemTextHtml;
-                if (isWriterOrEditor) {
+                if (false) {
                     const poemLines = poem.text.split('\n');
                     poemTextHtml = poemLines.map((line, lineIdx) => {
                         const escapedLine = escapeHtml(line);
@@ -2142,7 +2142,7 @@ finally.`
                 poemGrid.appendChild(card);
                 
                 // Add hover effect to show margin note indicator (only for writers/editors)
-                if (isWriterOrEditor) {
+                if (false) {
                     const poemLinesEls = card.querySelectorAll('.poem-line');
                     poemLinesEls.forEach(lineEl => {
                         lineEl.addEventListener('mouseenter', () => {

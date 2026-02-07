@@ -40,9 +40,9 @@ jobs:
           ENDPOINT="${BACKEND_URL%/}/api/health"
           echo "Checking health endpoint: $ENDPOINT"
 
-          START_TIME=$(date +%s%3N)
+          START_TIME=$(($(date +%s)*1000))
           HTTP_CODE=$(curl -o /tmp/health-body -s -w "%{http_code}" --max-time 10 "$ENDPOINT" || echo 000)
-          END_TIME=$(date +%s%3N)
+          END_TIME=$(($(date +%s)*1000))
           BODY=$(cat /tmp/health-body 2>/dev/null || true)
           DURATION_MS=$((END_TIME-START_TIME))
 

@@ -125,7 +125,7 @@ body{font-family:var(--font-sans);font-size:16px;background:var(--color-paper);c
 /* Responsive */
 @media(max-width:768px){
 .top-bar{padding:0.8rem 1rem;}
-.top-bar nav{gap:0.75rem;}
+.top-bar nav{gap:0.75rem;overflow-x:auto;flex-wrap:wrap;} .top-bar{flex-wrap:wrap;}
 .stats{grid-template-columns:repeat(2,1fr);}
 .issue-builder .issue-meta{grid-template-columns:1fr;}
 }
@@ -210,7 +210,7 @@ body{font-family:var(--font-sans);font-size:16px;background:var(--color-paper);c
 <h3>Publish to Gallery</h3>
 <div id="publishInfo" style="margin-bottom:1rem;"></div>
 <div style="margin:1rem 0;"><label style="display:block;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-grey);margin-bottom:0.3rem;">Category</label>
-<select id="publishCat" style="width:100%;padding:0.6rem;border:1px solid rgba(0,0,0,0.1);"><option value="love">Love &amp; Relationships</option><option value="nature">Nature &amp; The Natural World</option><option value="grief">Grief, Loss &amp; Memory</option><option value="family">Family &amp; Identity</option></select></div>
+<select id="publishCat" style="width:100%;padding:0.6rem;border:1px solid rgba(0,0,0,0.1);"><option value="love">Love &amp; Relationships</option><option value="nature">Nature &amp; The Natural World</option><option value="grief">Grief, Loss &amp; Memory</option><option value="family">Family &amp; Identity</option><option value="time">Time &amp; Mortality</option><option value="self">Self &amp; Introspection</option></select></div>
 <div style="margin:1rem 0;"><label style="display:block;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-grey);margin-bottom:0.3rem;">Wall Number (optional)</label>
 <input type="number" id="publishWall" min="1" placeholder="Auto-assign" style="width:100%;padding:0.6rem;border:1px solid rgba(0,0,0,0.1);"></div>
 <div style="display:flex;gap:0.5rem;"><button class="btn secondary" onclick="closeModal('publishModal')">Cancel</button><button class="btn accent" id="confirmPublish">Publish to Gallery</button></div>
@@ -225,7 +225,7 @@ body{font-family:var(--font-sans);font-size:16px;background:var(--color-paper);c
 <div style="margin:1rem 0;"><label style="display:block;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-grey);margin-bottom:0.3rem;">Scheduled Publish Date</label>
 <input type="date" id="queueDate" style="width:100%;padding:0.6rem;border:1px solid rgba(0,0,0,0.1);font-family:var(--font-serif);font-size:1rem;"></div>
 <div style="margin:1rem 0;"><label style="display:block;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-grey);margin-bottom:0.3rem;">Category</label>
-<select id="queueCat" style="width:100%;padding:0.6rem;border:1px solid rgba(0,0,0,0.1);"><option value="love">Love &amp; Relationships</option><option value="nature">Nature &amp; The Natural World</option><option value="grief">Grief, Loss &amp; Memory</option><option value="family">Family &amp; Identity</option></select></div>
+<select id="queueCat" style="width:100%;padding:0.6rem;border:1px solid rgba(0,0,0,0.1);"><option value="love">Love &amp; Relationships</option><option value="nature">Nature &amp; The Natural World</option><option value="grief">Grief, Loss &amp; Memory</option><option value="family">Family &amp; Identity</option><option value="time">Time &amp; Mortality</option><option value="self">Self &amp; Introspection</option></select></div>
 <div style="display:flex;gap:0.5rem;"><button class="btn secondary" onclick="closeModal('queueModal')">Cancel</button><button class="btn queue-btn" id="confirmQueue">Add to Queue</button></div>
 </div>
 </div>
@@ -236,7 +236,7 @@ body{font-family:var(--font-sans);font-size:16px;background:var(--color-paper);c
 <h3>Add to Issue</h3>
 <div id="addToIssueInfo" style="margin-bottom:1rem;"></div>
 <div style="margin:1rem 0;"><label style="display:block;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-grey);margin-bottom:0.3rem;">Category</label>
-<select id="addToIssueCat" style="width:100%;padding:0.6rem;border:1px solid rgba(0,0,0,0.1);"><option value="love">Love &amp; Relationships</option><option value="nature">Nature &amp; The Natural World</option><option value="grief">Grief, Loss &amp; Memory</option><option value="family">Family &amp; Identity</option></select></div>
+<select id="addToIssueCat" style="width:100%;padding:0.6rem;border:1px solid rgba(0,0,0,0.1);"><option value="love">Love &amp; Relationships</option><option value="nature">Nature &amp; The Natural World</option><option value="grief">Grief, Loss &amp; Memory</option><option value="family">Family &amp; Identity</option><option value="time">Time &amp; Mortality</option><option value="self">Self &amp; Introspection</option></select></div>
 <p style="color:var(--color-grey);font-size:0.85rem;margin:0.75rem 0;">This work will be marked as accepted and added to the Issue Builder for batch publishing.</p>
 <div style="display:flex;gap:0.5rem;"><button class="btn secondary" onclick="closeModal('addToIssueModal')">Cancel</button><button class="btn issue-btn" id="confirmAddToIssue">Add to Issue</button></div>
 </div>
@@ -431,7 +431,7 @@ localStorage.setItem('publishedPoems',JSON.stringify(pub));
 logActivity('Published "'+list[i].title+'" to '+cat+' gallery');
 }
 closeModal('publishModal');renderStats();renderSubmissions(currentFilter);
-alert('Published to gallery!');
+alert('Published to gallery!');if(window.strapiClient&&window.strapiClient.isAuthenticated()){try{window.strapiClient.updateSubmission(publishId,{status:'published',publishedCategory:cat,wallNumber:wn}).catch(e=>console.warn('Strapi sync failed:',e))}catch(e){}}
 });
 function getNextWall(cat){
 const pub=JSON.parse(localStorage.getItem('publishedPoems')||'[]');
@@ -480,7 +480,7 @@ localStorage.setItem('publishedPoems',JSON.stringify(pub));
 }
 logActivity('Published "'+list[i].title+'" (from queue)');
 renderStats();renderSubmissions(currentFilter);
-alert('Published to gallery!');
+alert('Published to gallery!');if(window.strapiClient&&window.strapiClient.isAuthenticated()){try{window.strapiClient.updateSubmission(publishId,{status:'published',publishedCategory:cat,wallNumber:wn}).catch(e=>console.warn('Strapi sync failed:',e))}catch(e){}}
 }
 
 function removeFromQueue(id){
@@ -585,7 +585,7 @@ el.innerHTML=subs.map(s=>'<div class="queue-card"><div class="q-info"><div class
 /* Issue Builder - uses in_issue status */
 function renderIssueBuilder(){
 const subs=loadSubmissions();
-const accepted=subs.filter(s=>s.status==='in_issue'||s.status==='approved'||s.status==='pending');
+const accepted=subs.filter(s=>s.status==='in_issue');
 const el=document.getElementById('acceptedList');
 if(!accepted.length){el.innerHTML='<div style="color:var(--color-grey);padding:1rem;">No submissions available. Use "Add to Issue" on pending submissions to add them here.</div>';return;}
 el.innerHTML=accepted.map(s=>'<div class="accepted-item" data-id="'+s.id+'"><input type="checkbox" class="issue-check" data-id="'+s.id+'" '+(s.status==='in_issue'?'checked':'')+'><span class="drag-handle">&#x2630;</span><span class="item-title">'+s.title+'</span><span class="item-author">'+(s.displayName||s.author)+'</span><select class="issue-cat" data-id="'+s.id+'" style="padding:0.3rem;border:1px solid rgba(0,0,0,0.1);font-size:0.8rem;">'+Object.entries(CATEGORIES).map(([k,v])=>'<option value="'+k+'" '+(s.publishedCategory===k?'selected':'')+'>'+v+'</option>').join('')+'</select></div>').join('');
@@ -624,11 +624,27 @@ if(!feed.length){el.innerHTML='<div style="color:var(--color-grey);">No recent a
 el.innerHTML=feed.map(a=>'<div class="activity-item"><span>'+a.text+'</span> <span class="time">'+new Date(a.ts).toLocaleString()+'</span></div>').join('');
 }
 
+  /* Auto-publish queued items past their scheduled date */
+function checkQueuedPublish(){
+const list=loadSubmissions();let changed=false;
+const pub=JSON.parse(localStorage.getItem('publishedPoems')||'[]');
+list.forEach((s,i)=>{
+if(s.status==='queued'&&s.scheduledDate&&new Date(s.scheduledDate)<=new Date()){
+const cat=s.publishedCategory||'love';const wn=getNextWall(cat);
+list[i].status='published';list[i].wallNumber=wn;
+(list[i].timeline=list[i].timeline||[]).push({action:'auto_published',ts:new Date().toISOString(),category:cat,wallNumber:wn});
+if(!pub.find(p=>p.id=='pub-'+s.id)){pub.push({id:'pub-'+s.id,title:s.title,author:s.displayName||s.author,collection:cat,text:s.body,wallNumber:wn});}
+logActivity('Auto-published "'+s.title+'" (scheduled date reached)');changed=true;
+}});
+if(changed){saveSubmissions(list);localStorage.setItem('publishedPoems',JSON.stringify(pub));}
+}
+
 /* Session restore */
 (function init(){
 const u=getUser();
 if(u&&u.role==='editor'&&localStorage.getItem('authToken')){
 showDashboard(u);
+  checkQueuedPublish();
 }
 })();
 </script>

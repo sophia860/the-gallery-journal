@@ -10,6 +10,8 @@ class StrapiClient {
   constructor() {
     this.baseURL = STRAPI_URL;
     this.token = this.getToken();
+    this._meCache = null;
+    this._meCacheTime = 0;
   }
 
   /**
@@ -30,6 +32,8 @@ class StrapiClient {
       localStorage.removeItem('strapi_jwt');
       this.token = null;
     }
+    this._meCache = null;
+    this._meCacheTime = 0;
   }
 
   /**
@@ -132,9 +136,20 @@ class StrapiClient {
   /**
    * Get current user profile
    */
-  async getMe() {
+  async getMe(useCache = true) {
     try {
+      const CACHE_TTL_MS = 60 * 1000;
+      if (
+        useCache &&
+        this._meCache &&
+        Date.now() - this._meCacheTime < CACHE_TTL_MS
+      ) {
+        return this._meCache;
+      }
+
       const response = await this.request('/api/users/me?populate=*');
+      this._meCache = response;
+      this._meCacheTime = Date.now();
       return response;
     } catch (error) {
       throw new Error(`Failed to fetch user profile: ${error.message}`);
@@ -288,7 +303,7 @@ class StrapiClient {
     }
 
     try {
-      await this.getMe();
+      await this.getMe(false);
       return true;
     } catch (error) {
       this.logout();

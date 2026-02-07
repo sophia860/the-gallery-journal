@@ -2994,42 +2994,104 @@ finally.`
                             ${published.length === 0 ? '<p style="color: var(--color-grey);">Publish your first poem to see detailed analytics.</p>' : ''}
                         </div>
 
-                                            <!-- Boards Section -->
+                    <!-- Boards Section - Interactive Planning Boards -->
                     <div id="writer-section-boards" class="writer-section" style="display: none;">
                         <h3 style="margin-bottom: 1rem;">📋 Planning Boards</h3>
-                        <p style="color: var(--color-grey); margin-bottom: 1rem;">Organize your writing projects with visual planning boards.</p>
-                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
-                            <div style="background: var(--color-cream); padding: 1rem; border-radius: var(--button-radius); min-height: 200px;">
-                                <h4 style="margin-bottom: 0.5rem; color: var(--color-accent);">📝 Ideas</h4>
-                                <p style="font-size: 0.9rem; color: var(--color-grey);">Drag cards here</p>
+                        <p style="color: var(--color-grey); margin-bottom: 1rem;">Drag and drop cards to organize your writing projects.</p>
+                        
+                        <div id="kanban-board" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+                            <!-- Ideas Column -->
+                            <div class="kanban-column" id="column-ideas" ondrop="dropCard(event)" ondragover="allowDrop(event)" style="background: var(--color-cream); padding: 1rem; border-radius: var(--button-radius); min-height: 250px;">
+                                <h4 style="margin-bottom: 0.75rem; color: var(--color-accent); display: flex; justify-content: space-between; align-items: center;">
+                                    💡 Ideas <span id="ideas-count" style="font-size: 0.8rem; background: var(--color-accent); color: white; padding: 2px 8px; border-radius: 10px;">0</span>
+                                </h4>
+                                <div id="cards-ideas" style="min-height: 180px;"></div>
                             </div>
-                            <div style="background: var(--color-cream); padding: 1rem; border-radius: var(--button-radius); min-height: 200px;">
-                                <h4 style="margin-bottom: 0.5rem; color: var(--color-accent);">✏️ In Progress</h4>
-                                <p style="font-size: 0.9rem; color: var(--color-grey);">Drag cards here</p>
+                            
+                            <!-- In Progress Column -->
+                            <div class="kanban-column" id="column-progress" ondrop="dropCard(event)" ondragover="allowDrop(event)" style="background: var(--color-cream); padding: 1rem; border-radius: var(--button-radius); min-height: 250px;">
+                                <h4 style="margin-bottom: 0.75rem; color: var(--color-accent); display: flex; justify-content: space-between; align-items: center;">
+                                    ✏️ In Progress <span id="progress-count" style="font-size: 0.8rem; background: #f5a623; color: white; padding: 2px 8px; border-radius: 10px;">0</span>
+                                </h4>
+                                <div id="cards-progress" style="min-height: 180px;"></div>
                             </div>
-                            <div style="background: var(--color-cream); padding: 1rem; border-radius: var(--button-radius); min-height: 200px;">
-                                <h4 style="margin-bottom: 0.5rem; color: var(--color-accent);">✅ Complete</h4>
-                                <p style="font-size: 0.9rem; color: var(--color-grey);">Drag cards here</p>
+                            
+                            <!-- Complete Column -->
+                            <div class="kanban-column" id="column-complete" ondrop="dropCard(event)" ondragover="allowDrop(event)" style="background: var(--color-cream); padding: 1rem; border-radius: var(--button-radius); min-height: 250px;">
+                                <h4 style="margin-bottom: 0.75rem; color: var(--color-accent); display: flex; justify-content: space-between; align-items: center;">
+                                    ✅ Complete <span id="complete-count" style="font-size: 0.8rem; background: #4caf50; color: white; padding: 2px 8px; border-radius: 10px;">0</span>
+                                </h4>
+                                <div id="cards-complete" style="min-height: 180px;"></div>
                             </div>
                         </div>
-                        <button class="studio-btn secondary" onclick="addBoardCard()">+ Add Card</button>
+                        
+                        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                            <button class="studio-btn secondary" onclick="showAddCardModal()">➕ Add New Card</button>
+                            <button class="studio-btn secondary" onclick="clearAllCards()">🗑️ Clear All</button>
+                            <button class="studio-btn secondary" onclick="loadSampleCards()">📥 Load Sample Cards</button>
+                        </div>
                     </div>
 
-                                        <!-- Collab Section -->
+
+
+                    <!-- Collab Section - Interactive Collaboration -->
                     <div id="writer-section-collab" class="writer-section" style="display: none;">
                         <h3 style="margin-bottom: 1rem;">👥 Collaborative Editing</h3>
                         <p style="color: var(--color-grey); margin-bottom: 1rem;">Work together with other writers in real-time.</p>
-                        <div style="background: var(--color-cream); padding: 1.5rem; border-radius: var(--button-radius); margin-bottom: 1rem;">
-                            <h4 style="margin-bottom: 1rem; color: var(--color-accent);">Active Collaborations</h4>
-                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                                <p style="color: var(--color-grey);">No active collaborations yet. Invite a collaborator to get started.</p>
+                        
+                        <!-- Online Status -->
+                        <div style="background: var(--color-cream); padding: 1rem; border-radius: var(--button-radius); margin-bottom: 1rem;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                                <span style="width: 10px; height: 10px; background: #4caf50; border-radius: 50%; animation: pulse 2s infinite;"></span>
+                                <span style="color: var(--color-accent); font-weight: 600;">You are online</span>
+                                <span style="color: var(--color-grey); font-size: 0.9rem;">| Session ID: <span id="session-id" style="font-family: monospace;">--</span></span>
+                            </div>
+                            
+                            <h4 style="margin-bottom: 0.75rem; color: var(--color-accent);">👤 Active Collaborators</h4>
+                            <div id="collaborators-list" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem; background: white; padding: 0.5rem 1rem; border-radius: 20px;">
+                                    <div style="width: 30px; height: 30px; background: var(--color-accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">Y</div>
+                                    <span>You (Host)</span>
+                                    <span style="width: 8px; height: 8px; background: #4caf50; border-radius: 50%;"></span>
+                                </div>
+                            </div>
+                            
+                            <!-- Session Link -->
+                            <div style="background: white; padding: 0.75rem; border-radius: var(--button-radius); display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="text" id="share-link" value="Loading..." readonly style="flex: 1; border: none; font-family: monospace; font-size: 0.85rem; background: transparent;">
+                                <button class="studio-btn secondary" onclick="copyShareLink()" style="padding: 0.5rem 1rem;">📋 Copy</button>
                             </div>
                         </div>
-                        <div style="display: flex; gap: 1rem;">
-                            <button class="studio-btn secondary" onclick="inviteCollaborator()">📧 Invite Collaborator</button>
-                            <button class="studio-btn secondary" onclick="startCollabSession()">🔗 Start Session</button>
+                        
+                        <!-- Collaboration Features -->
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+                            <div style="background: var(--color-cream); padding: 1rem; border-radius: var(--button-radius); text-align: center; cursor: pointer;" onclick="showCommentsPanel()">
+                                <div style="font-size: 2rem; margin-bottom: 0.5rem;">💬</div>
+                                <h4 style="color: var(--color-accent); margin-bottom: 0.25rem;">Comments</h4>
+                                <p style="color: var(--color-grey); font-size: 0.85rem;">Leave feedback on specific sections</p>
+                            </div>
+                            <div style="background: var(--color-cream); padding: 1rem; border-radius: var(--button-radius); text-align: center; cursor: pointer;" onclick="showSuggestionsPanel()">
+                                <div style="font-size: 2rem; margin-bottom: 0.5rem;">💡</div>
+                                <h4 style="color: var(--color-accent); margin-bottom: 0.25rem;">Suggestions</h4>
+                                <p style="color: var(--color-grey); font-size: 0.85rem;">Propose edits for review</p>
+                            </div>
+                            <div style="background: var(--color-cream); padding: 1rem; border-radius: var(--button-radius); text-align: center; cursor: pointer;" onclick="showVersionHistory()">
+                                <div style="font-size: 2rem; margin-bottom: 0.5rem;">📅</div>
+                                <h4 style="color: var(--color-accent); margin-bottom: 0.25rem;">Version History</h4>
+                                <p style="color: var(--color-grey); font-size: 0.85rem;">Track all changes over time</p>
+                            </div>
+                            <div style="background: var(--color-cream); padding: 1rem; border-radius: var(--button-radius); text-align: center; cursor: pointer;" onclick="showChatPanel()">
+                                <div style="font-size: 2rem; margin-bottom: 0.5rem;">🗨️</div>
+                                <h4 style="color: var(--color-accent); margin-bottom: 0.25rem;">Live Chat</h4>
+                                <p style="color: var(--color-grey); font-size: 0.85rem;">Discuss with collaborators</p>
+                            </div>
                         </div>
-                    </div>
+                        
+                        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                            <button class="studio-btn secondary" onclick="inviteCollaborator()">📧 Invite Collaborator</button>
+                            <button class="studio-btn secondary" onclick="startNewSession()">🔗 New Session</button>
+                            <button class="studio-btn secondary" onclick="endSession()">🚪 End Session</button>
+                        </div>
                     </div>
                 </div>
             `;
@@ -3162,26 +3224,6 @@ finally.`
     function addBoardCard() {
         const cardTitle = prompt('Enter card title:');
         if (cardTitle) {
-            alert('Card "' + cardTitle + '" added to Ideas column!');
-        }
-    }
-
-    // Collab Helper Functions
-    function inviteCollaborator() {
-        const email = prompt('Enter collaborator email:');
-        if (email) {
-            alert('Invitation sent to ' + email + '!');
-        }
-    }
-
-    function startCollabSession() {
-        alert('Starting collaborative session... Share the link with your collaborators!');
-    }
-        
-        function openNewPoemEditor() {
-            // Create a new poem editor modal
-            const modal = document.createElement('div');
-            modal.className = 'modal active';
             modal.innerHTML = `
                 <div class="modal-content" style="max-width: 900px;">
                     <button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>

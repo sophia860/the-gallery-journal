@@ -148,7 +148,6 @@ class StrapiClient {
       }
 
       const response = await this.request('/api/users/me?populate=*');
-      // Strapi typically returns numeric ids but allow string ids if the API is configured that way
       if (response && response.id) {
         this._meCache = response;
         this._meCacheTime = Date.now();
@@ -161,6 +160,9 @@ class StrapiClient {
     }
   }
 
+  /**
+   * Reset cached user profile data and timestamps
+   */
   clearMeCache() {
     this._meCache = null;
     this._meCacheTime = 0;

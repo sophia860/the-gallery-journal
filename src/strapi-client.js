@@ -142,15 +142,14 @@ class StrapiClient {
       if (
         useCache &&
         this._meCache &&
-        this._meCache.id !== null &&
-        this._meCache.id !== undefined &&
+        this._meCache.id != null &&
         Date.now() - this._meCacheTime < ME_CACHE_TTL_MS
       ) {
         return this._meCache;
       }
 
       const response = await this.request('/api/users/me?populate=*');
-      if (response?.id !== null && response?.id !== undefined) {
+      if (response?.id != null) {
         this._meCache = response;
         this._meCacheTime = Date.now();
       } else {

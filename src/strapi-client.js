@@ -11,8 +11,9 @@ const ME_CACHE_TTL_MS = 60 * 1000;
 class StrapiClient {
   constructor() {
     this.baseURL = STRAPI_URL;
+    this._meCache = null;
+    this._meCacheTime = 0;
     this.token = this.getToken();
-    this._clearMeCache();
   }
 
   /**
@@ -147,7 +148,7 @@ class StrapiClient {
       }
 
       const response = await this.request('/api/users/me?populate=*');
-      if (typeof response?.id === 'number') {
+      if (response && (typeof response.id === 'number' || typeof response.id === 'string')) {
         this._meCache = response;
         this._meCacheTime = Date.now();
       } else {

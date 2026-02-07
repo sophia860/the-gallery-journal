@@ -34,7 +34,7 @@ class StrapiClient {
       localStorage.removeItem('strapi_jwt');
       this.token = null;
     }
-    this._clearMeCache();
+    this.clearMeCache();
   }
 
   /**
@@ -148,11 +148,12 @@ class StrapiClient {
       }
 
       const response = await this.request('/api/users/me?populate=*');
+      // Strapi typically returns numeric ids but allow string ids if the API is configured that way
       if (response && (typeof response.id === 'number' || typeof response.id === 'string')) {
         this._meCache = response;
         this._meCacheTime = Date.now();
       } else {
-        this._clearMeCache();
+        this.clearMeCache();
       }
       return response;
     } catch (error) {
@@ -160,7 +161,7 @@ class StrapiClient {
     }
   }
 
-  _clearMeCache() {
+  clearMeCache() {
     this._meCache = null;
     this._meCacheTime = 0;
   }

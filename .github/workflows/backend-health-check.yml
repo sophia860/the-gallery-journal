@@ -40,28 +40,27 @@ jobs:
           ENDPOINT="${BACKEND_URL%/}/api/health"
           echo "Checking health endpoint: $ENDPOINT"
 
-          RESULT=$(curl -s -w "%{http_code} %{time_total}" --max-time 5 -o /tmp/health-body "$ENDPOINT" || echo "000 0")
+          RESULT=$(curl -s -w "%{http_code} %{time_total}" --max-time 5 -o /tmp/health-body "$ENDPOINT" || echo "ERROR 0")
           BODY=$(cat /tmp/health-body 2>/dev/null || true)
-          HTTP_CODE=$(echo "$RESULT" | awk '{print $1}')
+          RAW_HTTP_CODE=$(echo "$RESULT" | awk '{print $1}')
           TIME_TOTAL=$(echo "$RESULT" | awk '{print $2}')
-          RESPONSE_MS=$(TIME_TOTAL="$TIME_TOTAL" python - <<'PY'
-import os, math
-print(int(math.floor(float(os.environ.get("TIME_TOTAL", "0")) * 1000)))
-PY
-)
+          RESPONSE_MS=$(echo "$TIME_TOTAL" | awk '{printf "%d", $1 * 1000}')
 
-          case $HTTP_CODE in
+          case $RAW_HTTP_CODE in
             ''|*[!0-9]*) HTTP_CODE=0 ;;
+            *) HTTP_CODE=$RAW_HTTP_CODE ;;
           esac
 
-          if echo "$BODY" | grep -qi '"status"[[:space:]]*:[[:space:]]*"ok"'; then
+          if command -v jq >/dev/null 2>&1 && echo "$BODY" | jq -e '.status == "ok"' >/dev/null 2>&1; then
+            BODY_OK=true
+          elif echo "$BODY" | grep -qi '"status"[[:space:]]*:[[:space:]]*"ok"'; then
             BODY_OK=true
           else
             BODY_OK=false
           fi
 
           echo "endpoint=$ENDPOINT" >> $GITHUB_OUTPUT
-          echo "status_code=$HTTP_CODE" >> $GITHUB_OUTPUT
+          echo "status_code=${RAW_HTTP_CODE:-0}" >> $GITHUB_OUTPUT
           echo "response_time_ms=$RESPONSE_MS" >> $GITHUB_OUTPUT
           echo "body_ok=$BODY_OK" >> $GITHUB_OUTPUT
 

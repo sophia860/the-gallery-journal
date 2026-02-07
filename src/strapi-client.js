@@ -12,6 +12,7 @@ class StrapiClient {
     this.token = this.getToken();
     this._meCache = null;
     this._meCacheTime = 0;
+    this._meCacheTtlMs = 60 * 1000;
   }
 
   /**
@@ -138,18 +139,19 @@ class StrapiClient {
    */
   async getMe(useCache = true) {
     try {
-      const CACHE_TTL_MS = 60 * 1000;
       if (
         useCache &&
         this._meCache &&
-        Date.now() - this._meCacheTime < CACHE_TTL_MS
+        Date.now() - this._meCacheTime < this._meCacheTtlMs
       ) {
         return this._meCache;
       }
 
       const response = await this.request('/api/users/me?populate=*');
-      this._meCache = response;
-      this._meCacheTime = Date.now();
+      if (response) {
+        this._meCache = response;
+        this._meCacheTime = Date.now();
+      }
       return response;
     } catch (error) {
       throw new Error(`Failed to fetch user profile: ${error.message}`);

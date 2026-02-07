@@ -12,8 +12,7 @@ class StrapiClient {
   constructor() {
     this.baseURL = STRAPI_URL;
     this.token = this.getToken();
-    this._meCache = null;
-    this._meCacheTime = 0;
+    this._clearMeCache();
   }
 
   /**
@@ -34,8 +33,7 @@ class StrapiClient {
       localStorage.removeItem('strapi_jwt');
       this.token = null;
     }
-    this._meCache = null;
-    this._meCacheTime = 0;
+    this._clearMeCache();
   }
 
   /**
@@ -149,17 +147,21 @@ class StrapiClient {
       }
 
       const response = await this.request('/api/users/me?populate=*');
-      if (response?.id != null) {
+      if (response && response.id !== null && response.id !== undefined) {
         this._meCache = response;
         this._meCacheTime = Date.now();
       } else {
-        this._meCache = null;
-        this._meCacheTime = 0;
+        this._clearMeCache();
       }
       return response;
     } catch (error) {
       throw new Error(`Failed to fetch user profile: ${error.message}`);
     }
+  }
+
+  _clearMeCache() {
+    this._meCache = null;
+    this._meCacheTime = 0;
   }
 
   /**

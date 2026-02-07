@@ -40,9 +40,10 @@ jobs:
           ENDPOINT="${BACKEND_URL%/}/api/health"
           echo "Checking health endpoint: $ENDPOINT"
 
-          RESULT=$(curl -s -w "%{http_code} %{time_total}" --max-time 5 -o /tmp/health-body "$ENDPOINT")
+          BODY_FILE=$(mktemp)
+          RESULT=$(curl -s -w "%{http_code} %{time_total}" --max-time 5 -o "$BODY_FILE" "$ENDPOINT")
           CURL_EXIT=$?
-          BODY=$(cat /tmp/health-body 2>/dev/null || true)
+          BODY=$(cat "$BODY_FILE" 2>/dev/null || true)
 
           RAW_HTTP_CODE=0
           TIME_TOTAL=0
@@ -61,9 +62,7 @@ jobs:
             *) HTTP_CODE=$RAW_HTTP_CODE ;;
           esac
 
-          if command -v jq >/dev/null 2>&1 && echo "$BODY" | jq -e '.status == "ok"' >/dev/null 2>&1; then
-            BODY_OK=true
-          elif echo "$BODY" | grep -qi '"status"[[:space:]]*:[[:space:]]*"ok"'; then
+          if echo "$BODY" | jq -e '.status == "ok"' >/dev/null 2>&1; then
             BODY_OK=true
           else
             BODY_OK=false
@@ -73,6 +72,8 @@ jobs:
           echo "status_code=$HTTP_CODE" >> $GITHUB_OUTPUT
           echo "response_time_ms=$RESPONSE_MS" >> $GITHUB_OUTPUT
           echo "body_ok=$BODY_OK" >> $GITHUB_OUTPUT
+
+          rm -f "$BODY_FILE"
 
           # Pass only when HTTP 200 and latency under 5 seconds
           if [ "$HTTP_CODE" -eq 200 ] && [ "$RESPONSE_MS" -lt 5000 ]; then
@@ -118,8 +119,7 @@ jobs:
             const statusCode = process.env.STATUS_CODE || 'Unknown';
             const responseTime = process.env.RESPONSE_TIME || 'Unknown';
             const bodyOk = process.env.BODY_OK || 'false';
-            const isoTimestamp = new Date().toISOString();
-            const timestamp = `${isoTimestamp.slice(0, 19).replace('T', ' ')} UTC`;
+            const timestamp = new Date().toUTCString();
 
             const title = `🚨 Backend Health Check Failed — ${timestamp}`;
             const body = [

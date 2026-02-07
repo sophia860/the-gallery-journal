@@ -42,7 +42,7 @@ body{font-family:var(--font-sans);font-size:16px;background:var(--color-paper);c
 .nav-link.accent{color:var(--color-accent);}
 .main{padding:4.5rem 2rem 2rem;max-width:1200px;margin:0 auto;}
 /* Stats row */
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:0.75rem;margin-bottom:1.5rem;}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:0.75rem;margin-bottom:1.5rem;}
 .stat-card{background:var(--color-cream);border:1px solid rgba(0,0,0,0.06);padding:1rem;transition:var(--transition-soft);}
 .stat-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.04);}
 .stat-card .num{font-size:1.8rem;font-weight:600;color:var(--color-accent);}
@@ -71,7 +71,11 @@ body{font-family:var(--font-sans);font-size:16px;background:var(--color-paper);c
 .badge.rejected{border-color:#b22222;color:#b22222;background:rgba(178,34,34,0.08);}
 .badge.published{border-color:#4169E1;color:#4169E1;background:rgba(65,105,225,0.08);}
 .badge.revisions_requested{border-color:#D2691E;color:#D2691E;background:rgba(210,105,30,0.08);}
+.badge.queued{border-color:#6A5ACD;color:#6A5ACD;background:rgba(106,90,205,0.08);}
+.badge.in_issue{border-color:#20B2AA;color:#20B2AA;background:rgba(32,178,170,0.08);}
 .sub-card .meta{font-size:0.82rem;color:var(--color-grey);margin-bottom:0.5rem;}
+.sub-card .queue-date{font-size:0.78rem;color:#6A5ACD;font-style:italic;margin-bottom:0.4rem;}
+.sub-card .issue-tag{font-size:0.78rem;color:#20B2AA;font-style:italic;margin-bottom:0.4rem;}
 .sub-card .preview{background:var(--color-paper);border:1px solid rgba(0,0,0,0.04);padding:0.75rem;font-family:var(--font-serif);font-size:0.95rem;line-height:1.8;max-height:120px;overflow:hidden;transition:max-height .3s;white-space:pre-wrap;}
 .sub-card .preview.expanded{max-height:none;}
 .sub-card .actions{display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.75rem;}
@@ -81,10 +85,14 @@ body{font-family:var(--font-sans);font-size:16px;background:var(--color-paper);c
 .btn.secondary:hover{background:var(--color-ink);color:var(--color-paper);}
 .btn.accent{background:var(--color-accent);border-color:var(--color-accent);}
 .btn.accent:hover{background:#a01830;}
+.btn.queue-btn{background:#6A5ACD;border-color:#6A5ACD;}
+.btn.queue-btn:hover{background:#5a4abf;}
+.btn.issue-btn{background:#20B2AA;border-color:#20B2AA;}
+.btn.issue-btn:hover{background:#1a9e97;}
 /* Modal overlay */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;justify-content:center;align-items:center;}
 .modal-overlay.active{display:flex;}
-.modal-box{background:var(--color-cream);padding:2rem;max-width:640px;width:92%;max-height:85vh;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,0.12);animation:slideUp .3s ease;}
+.modal-box{background:var(--color-cream);padding:2rem;max-width:640px;width:92%;max-height:85vh;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,0.12);animation:slideUp .3s ease;position:relative;}
 @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
 .modal-box h3{font-family:var(--font-slab);font-weight:300;font-size:1.5rem;margin-bottom:1rem;}
 .modal-box .close{position:absolute;top:1rem;right:1.5rem;font-size:1.8rem;background:none;border:none;cursor:pointer;color:var(--color-accent);}
@@ -101,15 +109,19 @@ body{font-family:var(--font-sans);font-size:16px;background:var(--color-paper);c
 .accepted-item .drag-handle{color:var(--color-grey);cursor:grab;}
 .accepted-item .item-title{font-family:var(--font-serif);flex:1;}
 .accepted-item .item-author{color:var(--color-grey);font-size:0.85rem;}
-/* One-click publish button */
 .publish-issue-btn{display:flex;align-items:center;gap:0.5rem;padding:0.9rem 1.6rem;background:var(--color-accent);color:#fff;border:none;font-family:var(--font-sans);font-size:0.82rem;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;transition:var(--transition-soft);}
 .publish-issue-btn:hover{background:#a01830;transform:translateY(-1px);box-shadow:0 4px 12px rgba(196,30,58,0.3);}
+/* Queue view */
+.queue-list{display:grid;gap:0.75rem;}
+.queue-card{background:var(--color-cream);border:1px solid rgba(106,90,205,0.2);padding:1rem;display:flex;justify-content:space-between;align-items:center;gap:1rem;}
+.queue-card .q-info{flex:1;}
+.queue-card .q-title{font-family:var(--font-serif);font-size:1.05rem;font-weight:500;}
+.queue-card .q-meta{font-size:0.82rem;color:var(--color-grey);}
+.queue-card .q-date{font-size:0.85rem;color:#6A5ACD;font-weight:500;}
 /* Activity feed */
-.activity-feed{max-height:200px;overflow-y:auto;}
-.activity-item{padding:0.4rem 0;font-size:0.85rem;color:var(--color-grey);border-bottom:1px solid rgba(0,0,0,0.04);}
+.activity-feed{max-height:400px;overflow-y:auto;}
+.activity-item{padding:0.5rem 0;font-size:0.85rem;color:var(--color-grey);border-bottom:1px solid rgba(0,0,0,0.04);}
 .activity-item .time{font-size:0.75rem;color:var(--color-grey);}
-/* Labels */
-.label-pill{display:inline-flex;align-items:center;gap:0.25rem;padding:0.15rem 0.5rem;border-radius:999px;border:1px solid;font-size:0.72rem;}
 /* Responsive */
 @media(max-width:768px){
 .top-bar{padding:0.8rem 1rem;}
@@ -120,11 +132,11 @@ body{font-family:var(--font-sans);font-size:16px;background:var(--color-paper);c
 </style>
 </head>
 <body>
-<!-- AUTH GATE -->
+<!-- Auth Gate -->
 <div id="authGate">
 <div class="auth-card">
 <h1>Editor's Studio</h1>
-<p class="subtitle">Access the editorial dashboard</p>
+<div class="subtitle">Access the editorial dashboard</div>
 <form id="loginForm" onsubmit="return false;">
 <div class="field"><label>Email</label><input type="email" id="email" required></div>
 <div class="field"><label>Password</label><input type="password" id="password" required></div>
@@ -133,32 +145,24 @@ body{font-family:var(--font-sans);font-size:16px;background:var(--color-paper);c
 <div class="auth-footer"><a href="index.html">&larr; Back to The Gallery</a></div>
 </div>
 </div>
-
-<!-- DASHBOARD -->
+<!-- Dashboard -->
 <div id="dashboard">
-<!-- Top bar -->
 <div class="top-bar">
 <div class="logo">The <span>Gallery</span> &mdash; Editor's Studio</div>
 <nav>
 <button class="nav-link active" data-view="submissions">Submissions</button>
+<button class="nav-link" data-view="queue">Queue</button>
 <button class="nav-link" data-view="issue">Issue Builder</button>
 <button class="nav-link" data-view="activity">Activity</button>
-<a href="index.html" class="nav-link accent" target="_blank">Writers Studio &rarr;</a>
+<a href="index.html" class="nav-link accent">Writers Studio &rarr;</a>
 <button class="nav-link" id="logoutBtn">Logout</button>
 </nav>
 </div>
-
 <div class="main">
-<!-- Welcome -->
-<div style="margin-bottom:1.5rem;">
-<h2 style="font-family:var(--font-slab);font-weight:300;font-size:1.6rem;">Welcome back, <span id="editorName">Editor</span></h2>
-<p style="color:var(--color-grey);font-size:0.9rem;">Manage submissions, curate issues, and publish to the gallery.</p>
-</div>
-
-<!-- Stats -->
+<h2 style="font-family:var(--font-slab);font-weight:300;font-size:1.6rem;margin-bottom:0.25rem;">Welcome back, <span id="editorName">Editor</span></h2>
+<p style="color:var(--color-grey);margin-bottom:1.5rem;">Manage submissions, curate issues, and publish to the gallery.</p>
 <div class="stats" id="statsRow"></div>
-
-<!-- SUBMISSIONS VIEW -->
+<!-- Submissions View -->
 <div id="submissionsView">
 <div class="section-hdr">Submissions</div>
 <div class="toolbar">
@@ -168,365 +172,464 @@ body{font-family:var(--font-sans);font-size:16px;background:var(--color-paper);c
 <div class="filters" id="filterRow"></div>
 <div class="sub-list" id="subList"></div>
 </div>
-
-<!-- ISSUE BUILDER VIEW -->
+<!-- Queue View -->
+<div id="queueView" style="display:none;">
+<div class="section-hdr">Publishing Queue</div>
+<p style="color:var(--color-grey);margin-bottom:1rem;">Scheduled submissions awaiting their publish date.</p>
+<div class="queue-list" id="queueList"></div>
+</div>
+<!-- Issue Builder View -->
 <div id="issueView" style="display:none;">
 <div class="section-hdr">Issue Builder</div>
 <div class="issue-builder">
 <h3>Assemble New Issue</h3>
-<p class="desc">Select accepted works, arrange them in order, and publish the entire issue to the live gallery in one click.</p>
+<div class="desc">Select accepted works, arrange them in order, and publish the entire issue to the live gallery in one click.</div>
 <div class="issue-meta">
 <div><label>Issue Title</label><input type="text" id="issueTitle" value="Winter 2026 - Issue 02"></div>
 <div><label>Season / Theme</label><select id="issueSeason"><option>Winter 2026</option><option>Spring 2026</option><option>Summer 2026</option></select></div>
 </div>
-<div style="font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-grey);margin-bottom:0.5rem;">Select works to include (drag to reorder)</div>
+<div style="font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-grey);margin-bottom:0.5rem;">Select works to include (drag to reorder)</div>
 <div class="accepted-list" id="acceptedList"></div>
-<div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;margin-top:1rem;">
-<button class="publish-issue-btn" id="publishIssueBtn">
-<span>&#9656;</span> Publish Issue to Gallery
-</button>
-<span style="font-size:0.82rem;color:var(--color-grey);" id="issueStatus"></span>
+<div style="display:flex;align-items:center;gap:1rem;margin-top:1rem;">
+<button class="publish-issue-btn" id="publishIssueBtn">&#9654; Publish Issue to Gallery</button>
+<span id="issueStatus" style="color:var(--color-accent);font-size:0.85rem;"></span>
 </div>
 </div>
 </div>
-
-<!-- ACTIVITY VIEW -->
+<!-- Activity View -->
 <div id="activityView" style="display:none;">
 <div class="section-hdr">Recent Activity</div>
-<div class="activity-feed" id="activityFeed" style="max-height:none;"></div>
+<div class="activity-feed" id="activityFeed"></div>
 </div>
-
-</div><!-- .main -->
-</div><!-- #dashboard -->
-
+</div><!-- end main -->
+</div><!-- end dashboard -->
 <!-- Publish Modal -->
 <div class="modal-overlay" id="publishModal">
-<div class="modal-box" style="position:relative;">
+<div class="modal-box">
 <button class="close" onclick="closeModal('publishModal')">&times;</button>
 <h3>Publish to Gallery</h3>
-<div id="publishInfo"></div>
+<div id="publishInfo" style="margin-bottom:1rem;"></div>
 <div style="margin:1rem 0;"><label style="display:block;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-grey);margin-bottom:0.3rem;">Category</label>
-<select id="publishCat" style="width:100%;padding:0.6rem;border:1px solid rgba(0,0,0,0.1);"><option value="love">Love & Relationships</option><option value="nature">Nature & The Natural World</option><option value="grief">Grief, Loss & Memory</option><option value="family">Family & Identity</option></select></div>
-<div style="margin-bottom:1rem;"><label style="display:block;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-grey);margin-bottom:0.3rem;">Wall Number (optional)</label>
+<select id="publishCat" style="width:100%;padding:0.6rem;border:1px solid rgba(0,0,0,0.1);"><option value="love">Love &amp; Relationships</option><option value="nature">Nature &amp; The Natural World</option><option value="grief">Grief, Loss &amp; Memory</option><option value="family">Family &amp; Identity</option></select></div>
+<div style="margin:1rem 0;"><label style="display:block;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-grey);margin-bottom:0.3rem;">Wall Number (optional)</label>
 <input type="number" id="publishWall" min="1" placeholder="Auto-assign" style="width:100%;padding:0.6rem;border:1px solid rgba(0,0,0,0.1);"></div>
 <div style="display:flex;gap:0.5rem;"><button class="btn secondary" onclick="closeModal('publishModal')">Cancel</button><button class="btn accent" id="confirmPublish">Publish to Gallery</button></div>
 </div>
 </div>
-
+<!-- Queue Modal -->
+<div class="modal-overlay" id="queueModal">
+<div class="modal-box">
+<button class="close" onclick="closeModal('queueModal')">&times;</button>
+<h3>Add to Publishing Queue</h3>
+<div id="queueInfo" style="margin-bottom:1rem;"></div>
+<div style="margin:1rem 0;"><label style="display:block;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-grey);margin-bottom:0.3rem;">Scheduled Publish Date</label>
+<input type="date" id="queueDate" style="width:100%;padding:0.6rem;border:1px solid rgba(0,0,0,0.1);font-family:var(--font-serif);font-size:1rem;"></div>
+<div style="margin:1rem 0;"><label style="display:block;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-grey);margin-bottom:0.3rem;">Category</label>
+<select id="queueCat" style="width:100%;padding:0.6rem;border:1px solid rgba(0,0,0,0.1);"><option value="love">Love &amp; Relationships</option><option value="nature">Nature &amp; The Natural World</option><option value="grief">Grief, Loss &amp; Memory</option><option value="family">Family &amp; Identity</option></select></div>
+<div style="display:flex;gap:0.5rem;"><button class="btn secondary" onclick="closeModal('queueModal')">Cancel</button><button class="btn queue-btn" id="confirmQueue">Add to Queue</button></div>
+</div>
+</div>
+<!-- Add to Issue Modal -->
+<div class="modal-overlay" id="addToIssueModal">
+<div class="modal-box">
+<button class="close" onclick="closeModal('addToIssueModal')">&times;</button>
+<h3>Add to Issue</h3>
+<div id="addToIssueInfo" style="margin-bottom:1rem;"></div>
+<div style="margin:1rem 0;"><label style="display:block;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-grey);margin-bottom:0.3rem;">Category</label>
+<select id="addToIssueCat" style="width:100%;padding:0.6rem;border:1px solid rgba(0,0,0,0.1);"><option value="love">Love &amp; Relationships</option><option value="nature">Nature &amp; The Natural World</option><option value="grief">Grief, Loss &amp; Memory</option><option value="family">Family &amp; Identity</option></select></div>
+<p style="color:var(--color-grey);font-size:0.85rem;margin:0.75rem 0;">This work will be marked as accepted and added to the Issue Builder for batch publishing.</p>
+<div style="display:flex;gap:0.5rem;"><button class="btn secondary" onclick="closeModal('addToIssueModal')">Cancel</button><button class="btn issue-btn" id="confirmAddToIssue">Add to Issue</button></div>
+</div>
+</div>
 <!-- Reject Modal -->
 <div class="modal-overlay" id="rejectModal">
-<div class="modal-box" style="position:relative;">
+<div class="modal-box">
 <button class="close" onclick="closeModal('rejectModal')">&times;</button>
 <h3>Reject Submission</h3>
-<div id="rejectInfo"></div>
+<div id="rejectInfo" style="margin-bottom:1rem;"></div>
 <div style="margin:1rem 0;"><label style="display:block;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-grey);margin-bottom:0.3rem;">Feedback (optional)</label>
-<textarea id="rejectFeedback" rows="4" style="width:100%;padding:0.6rem;border:1px solid rgba(0,0,0,0.1);font-family:var(--font-serif);"></textarea></div>
+<textarea id="rejectFeedback" rows="3" style="width:100%;padding:0.6rem;border:1px solid rgba(0,0,0,0.1);font-family:var(--font-serif);resize:vertical;"></textarea></div>
 <div style="display:flex;gap:0.5rem;"><button class="btn secondary" onclick="closeModal('rejectModal')">Cancel</button><button class="btn" id="confirmReject">Reject</button></div>
 </div>
 </div>
-
 <!-- Revisions Modal -->
 <div class="modal-overlay" id="revisionsModal">
-<div class="modal-box" style="position:relative;">
+<div class="modal-box">
 <button class="close" onclick="closeModal('revisionsModal')">&times;</button>
 <h3>Request Revisions</h3>
-<div id="revisionsInfo"></div>
+<div id="revisionsInfo" style="margin-bottom:1rem;"></div>
 <div style="margin:1rem 0;"><label style="display:block;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-grey);margin-bottom:0.3rem;">Revision Feedback</label>
-<textarea id="revisionsFeedback" rows="4" style="width:100%;padding:0.6rem;border:1px solid rgba(0,0,0,0.1);font-family:var(--font-serif);" placeholder="Describe what changes you'd like the writer to make..."></textarea></div>
+<textarea id="revisionsFeedback" rows="4" style="width:100%;padding:0.6rem;border:1px solid rgba(0,0,0,0.1);font-family:var(--font-serif);resize:vertical;"></textarea></div>
 <div style="display:flex;gap:0.5rem;"><button class="btn secondary" onclick="closeModal('revisionsModal')">Cancel</button><button class="btn" id="confirmRevisions">Send Revision Request</button></div>
 </div>
 </div>
-
 <!-- Detail Modal -->
 <div class="modal-overlay" id="detailModal">
-<div class="modal-box" style="position:relative;max-width:800px;">
+<div class="modal-box">
 <button class="close" onclick="closeModal('detailModal')">&times;</button>
 <h3 id="detailTitle"></h3>
-<div id="detailMeta" class="meta"></div>
-<div id="detailBody" style="margin:1rem 0;padding:1rem;background:var(--color-paper);border:1px solid rgba(0,0,0,0.04);font-family:var(--font-serif);line-height:1.9;white-space:pre-wrap;"></div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0;">
-<div><div style="font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-grey);margin-bottom:0.3rem;">Rating</div><div id="detailRating"></div></div>
-<div><div style="font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-grey);margin-bottom:0.3rem;">Internal Notes</div><textarea id="detailNotes" rows="3" style="width:100%;padding:0.5rem;border:1px solid rgba(0,0,0,0.1);font-size:0.9rem;"></textarea></div>
+<div id="detailMeta" style="color:var(--color-grey);font-size:0.85rem;margin-bottom:1rem;"></div>
+<div id="detailBody" style="background:var(--color-paper);padding:1rem;font-family:var(--font-serif);line-height:1.8;white-space:pre-wrap;margin-bottom:1rem;max-height:300px;overflow-y:auto;"></div>
+<div style="margin-bottom:1rem;"><label style="display:block;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-grey);margin-bottom:0.3rem;">Rating</label><span id="detailRating"></span></div>
+<div style="margin-bottom:1rem;"><label style="display:block;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-grey);margin-bottom:0.3rem;">Internal Notes</label>
+<textarea id="detailNotes" rows="3" style="width:100%;padding:0.6rem;border:1px solid rgba(0,0,0,0.1);font-family:var(--font-serif);resize:vertical;"></textarea></div>
+<div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
+<button class="btn accent" id="detailPublish">Accept &amp; Publish</button>
+<button class="btn queue-btn" id="detailQueue">Add to Queue</button>
+<button class="btn issue-btn" id="detailAddToIssue">Add to Issue</button>
+<button class="btn" id="detailReject">Reject</button>
+<button class="btn secondary" id="detailRevisions">Request Revisions</button>
+<button class="btn secondary" id="detailSaveNotes">Save Notes</button>
 </div>
-<div style="display:flex;gap:0.4rem;flex-wrap:wrap;"><button class="btn accent" id="detailPublish">Accept & Publish</button><button class="btn" id="detailReject">Reject</button><button class="btn secondary" id="detailRevisions">Request Revisions</button><button class="btn secondary" id="detailSaveNotes">Save Notes</button></div>
 </div>
 </div>
-
 <script src="src/strapi-client.js"></script>
 <script>
-  /* STRAPI_URL defined in strapi-client.js */
+/* STRAPI_URL defined in strapi-client.js */
 const MOCK_USERS={'editor@example.com':{password:'password',role:'editor'}};
 const CATEGORIES={love:'Love & Relationships',nature:'Nature & The Natural World',grief:'Grief, Loss & Memory',family:'Family & Identity',time:'Time & Mortality',self:'Self & Introspection'};
 
-/* LocalStorage helpers */
 function load(k){try{return JSON.parse(localStorage.getItem(k)||'[]')}catch{return []}}
 function save(k,v){localStorage.setItem(k,JSON.stringify(v))}
 function loadSubmissions(){return load('submissions')}
 function saveSubmissions(l){save('submissions',l)}
-function loadLabels(){return load('labels')}
 function logActivity(t){const f=load('activityFeed');f.unshift({text:t,ts:new Date().toISOString()});save('activityFeed',f.slice(0,50))}
 function getUser(){try{return JSON.parse(localStorage.getItem('user')||'null')}catch{return null}}
-
-/* Modal helpers */
 function closeModal(id){document.getElementById(id).classList.remove('active')}
 function openModal(id){document.getElementById(id).classList.add('active')}
 
-/* Auth */
 const authGate=document.getElementById('authGate');
 const dashboard=document.getElementById('dashboard');
-
 function showDashboard(user){
-  authGate.style.display='none';
-  dashboard.style.display='block';
-  document.getElementById('editorName').textContent=user.displayName||user.username||user.email;
-  renderStats();
-  renderSubmissions('all');
+authGate.style.display='none';dashboard.style.display='block';
+document.getElementById('editorName').textContent=user.displayName||user.username||user.email;
+renderStats();renderSubmissions('all');
 }
 
 document.getElementById('loginForm').addEventListener('submit',async(e)=>{
-  e.preventDefault();
-  const email=document.getElementById('email').value.trim().toLowerCase();
-  const pw=document.getElementById('password').value;
-  const btn=document.getElementById('loginBtn');
-  btn.textContent='Signing in...';btn.disabled=true;
-  try{
-    if(window.strapiClient){
-      try{
-        const r=await window.strapiClient.login({identifier:email,password:pw});
-        const me=await window.strapiClient.getMe();
-        const u={id:me.id,email:me.email,username:me.username,displayName:me.displayName||me.username,role:me.role||'editor',loggedInAt:new Date().toISOString()};
-        localStorage.setItem('authToken',r.jwt);
-        localStorage.setItem('user',JSON.stringify(u));
-        showDashboard(u);return;
-      }catch(se){console.warn('Strapi login failed, trying mock:',se.message)}
-    }
-    const mock=MOCK_USERS[email];
-    if(!mock||mock.password!==pw)throw new Error('Invalid credentials. Try editor@example.com / password');
-    const u={email,role:'editor',loggedInAt:new Date().toISOString()};
-    localStorage.setItem('authToken',btoa(email+Date.now()));
-    localStorage.setItem('user',JSON.stringify(u));
-    showDashboard(u);
-  }catch(err){alert(err.message)}
-  finally{btn.textContent='Enter';btn.disabled=false}
+e.preventDefault();
+const email=document.getElementById('email').value.trim().toLowerCase();
+const pw=document.getElementById('password').value;
+const btn=document.getElementById('loginBtn');
+btn.textContent='Signing in...';btn.disabled=true;
+try{
+if(window.strapiClient){
+try{
+const r=await window.strapiClient.login({identifier:email,password:pw});
+const me=await window.strapiClient.getMe();
+const u={id:me.id,email:me.email,username:me.username,displayName:me.displayName||me.username,role:me.role||'editor',loggedInAt:new Date().toISOString()};
+localStorage.setItem('authToken',r.jwt);localStorage.setItem('user',JSON.stringify(u));
+showDashboard(u);return;
+}catch(se){console.warn('Strapi login failed, trying mock:',se.message)}
+}
+const mock=MOCK_USERS[email];
+if(!mock||mock.password!==pw) throw new Error('Invalid credentials. Try editor@example.com / password');
+const u={email,role:'editor',loggedInAt:new Date().toISOString()};
+localStorage.setItem('authToken',btoa(email+Date.now()));localStorage.setItem('user',JSON.stringify(u));
+showDashboard(u);
+}catch(err){alert(err.message)}
+finally{btn.textContent='Enter';btn.disabled=false}
 });
 
 document.getElementById('logoutBtn').addEventListener('click',()=>{
-  localStorage.removeItem('user');localStorage.removeItem('authToken');localStorage.removeItem('strapi_jwt');
-  dashboard.style.display='none';authGate.style.display='flex';
+localStorage.removeItem('user');localStorage.removeItem('authToken');localStorage.removeItem('strapi_jwt');
+dashboard.style.display='none';authGate.style.display='flex';
 });
 
-/* Nav */
+/* Nav with queue view */
 document.querySelectorAll('.nav-link[data-view]').forEach(b=>{
-  b.addEventListener('click',()=>{
-    document.querySelectorAll('.nav-link').forEach(n=>n.classList.remove('active'));
-    b.classList.add('active');
-    const v=b.dataset.view;
-    document.getElementById('submissionsView').style.display=v==='submissions'?'':'none';
-    document.getElementById('issueView').style.display=v==='issue'?'':'none';
-    document.getElementById('activityView').style.display=v==='activity'?'':'none';
-    if(v==='issue')renderIssueBuilder();
-    if(v==='activity')renderActivityFeed();
-  });
+b.addEventListener('click',()=>{
+document.querySelectorAll('.nav-link').forEach(n=>n.classList.remove('active'));
+b.classList.add('active');
+const v=b.dataset.view;
+document.getElementById('submissionsView').style.display=v==='submissions'?'':'none';
+document.getElementById('queueView').style.display=v==='queue'?'':'none';
+document.getElementById('issueView').style.display=v==='issue'?'':'none';
+document.getElementById('activityView').style.display=v==='activity'?'':'none';
+if(v==='queue')renderQueueView();
+if(v==='issue')renderIssueBuilder();
+if(v==='activity')renderActivityFeed();
+});
 });
 
-/* Stats */
+/* Stats - includes queued and in_issue */
 function renderStats(){
-  const subs=loadSubmissions();
-  const s={total:subs.length,pending:subs.filter(x=>x.status==='pending').length,approved:subs.filter(x=>x.status==='approved').length,published:subs.filter(x=>x.status==='published').length,revisions:subs.filter(x=>x.status==='revisions_requested').length,rejected:subs.filter(x=>x.status==='rejected').length};
-  document.getElementById('statsRow').innerHTML=Object.entries(s).map(([k,v])=>`<div class="stat-card"><div class="num">${v}</div><div class="lbl">${k}</div></div>`).join('');
+const subs=loadSubmissions();
+const s={total:subs.length,pending:subs.filter(x=>x.status==='pending').length,queued:subs.filter(x=>x.status==='queued').length,in_issue:subs.filter(x=>x.status==='in_issue').length,published:subs.filter(x=>x.status==='published').length,rejected:subs.filter(x=>x.status==='rejected').length};
+const labels={total:'Total',pending:'Pending',queued:'Queued',in_issue:'In Issue',published:'Published',rejected:'Rejected'};
+document.getElementById('statsRow').innerHTML=Object.entries(s).map(([k,v])=>'<div class="stat-card"><div class="num">'+v+'</div><div class="lbl">'+(labels[k]||k)+'</div></div>').join('');
 }
 
-/* Render submissions */
+/* Render submissions with three accept options */
 let currentFilter='all';
 function renderSubmissions(filter){
-  currentFilter=filter;
-  const subs=loadSubmissions();
-  const search=document.getElementById('searchInput').value.toLowerCase();
-  const sort=document.getElementById('sortSelect').value;
-  let list=subs.filter(s=>filter==='all'||s.status===filter);
-  if(search)list=list.filter(s=>`${s.title} ${s.body} ${s.author} ${s.displayName||''}`.toLowerCase().includes(search));
-  if(sort==='title')list.sort((a,b)=>a.title.localeCompare(b.title));
-  else if(sort==='rating')list.sort((a,b)=>(b.rating||0)-(a.rating||0));
-  else list.sort((a,b)=>new Date(b.submittedAt||0)-new Date(a.submittedAt||0));
-  
-  /* Filters */
-  const filters=['all','pending','approved','revisions_requested','published','rejected'];
-  document.getElementById('filterRow').innerHTML=filters.map(f=>`<button class="filter-btn ${f===filter?'active':''}" data-f="${f}">${f==='revisions_requested'?'Revisions':f.charAt(0).toUpperCase()+f.slice(1)} (${f==='all'?subs.length:subs.filter(s=>s.status===f).length})</button>`).join('');
-  document.querySelectorAll('.filter-btn').forEach(b=>b.addEventListener('click',()=>renderSubmissions(b.dataset.f)));
-  
-  const el=document.getElementById('subList');
-  if(!list.length){el.innerHTML='<div style="color:var(--color-grey);padding:2rem;text-align:center;">No submissions found.</div>';return}
-  el.innerHTML=list.map(s=>`
-    <div class="sub-card">
-      <div class="head"><span class="title-text">${s.title}</span><span class="badge ${s.status}">${s.status.replace('_',' ')}</span></div>
-      <div class="meta">by ${s.displayName||s.author} &bull; ${new Date(s.submittedAt||Date.now()).toLocaleDateString()}</div>
-      <div class="preview" id="prev-${s.id}">${(s.body||'').replace(/\n/g,'<br>')}</div>
-      <div class="actions">
-        <button class="btn accent" onclick="openPublish('${s.id}')">Accept & Publish</button>
-        <button class="btn" onclick="openReject('${s.id}')">Reject</button>
-        <button class="btn secondary" onclick="openRevisions('${s.id}')">Revisions</button>
-        <button class="btn secondary" onclick="document.getElementById('prev-${s.id}').classList.toggle('expanded')">Toggle</button>
-        <button class="btn secondary" onclick="openDetail('${s.id}')">Details</button>
-      </div>
-    </div>
-  `).join('');
-}
+currentFilter=filter;
+const subs=loadSubmissions();
+const search=document.getElementById('searchInput').value.toLowerCase();
+const sort=document.getElementById('sortSelect').value;
+let list=subs.filter(s=>filter==='all'||s.status===filter);
+if(search) list=list.filter(s=>(s.title+' '+s.body+' '+s.author+' '+(s.displayName||'')).toLowerCase().includes(search));
+if(sort==='title') list.sort((a,b)=>a.title.localeCompare(b.title));
+else if(sort==='rating') list.sort((a,b)=>(b.rating||0)-(a.rating||0));
+else list.sort((a,b)=>new Date(b.submittedAt||0)-new Date(a.submittedAt||0));
 
+const filters=['all','pending','queued','in_issue','published','revisions_requested','rejected'];
+const fLabels={all:'All',pending:'Pending',queued:'Queued',in_issue:'In Issue',published:'Published',revisions_requested:'Revisions',rejected:'Rejected'};
+document.getElementById('filterRow').innerHTML=filters.map(f=>'<button class="filter-btn '+(f===filter?'active':'')+'" data-f="'+f+'">'+(fLabels[f]||f)+' ('+( f==='all'?subs.length:subs.filter(s=>s.status===f).length)+')</button>').join('');
+document.querySelectorAll('.filter-btn').forEach(b=>b.addEventListener('click',()=>renderSubmissions(b.dataset.f)));
+
+const el=document.getElementById('subList');
+if(!list.length){el.innerHTML='<div style="color:var(--color-grey);padding:2rem;text-align:center;">No submissions found.</div>';return;}
+el.innerHTML=list.map(s=>{
+let statusExtra='';
+if(s.status==='queued' && s.scheduledDate) statusExtra='<div class="queue-date">Scheduled: '+new Date(s.scheduledDate).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'})+'</div>';
+if(s.status==='in_issue') statusExtra='<div class="issue-tag">Added to issue builder &bull; Category: '+(CATEGORIES[s.publishedCategory]||'Unassigned')+'</div>';
+let btns='';
+if(s.status==='pending'||s.status==='revisions_requested'){
+btns='<button class="btn accent" onclick="openPublish(\''+s.id+'\')">Accept & Publish</button>';
+btns+='<button class="btn queue-btn" onclick="openQueue(\''+s.id+'\')">Add to Queue</button>';
+btns+='<button class="btn issue-btn" onclick="openAddToIssue(\''+s.id+'\')">Add to Issue</button>';
+btns+='<button class="btn" onclick="openReject(\''+s.id+'\')">Reject</button>';
+btns+='<button class="btn secondary" onclick="openRevisions(\''+s.id+'\')">Revisions</button>';
+} else if(s.status==='queued'){
+btns='<button class="btn accent" onclick="publishNow(\''+s.id+'\')">Publish Now</button>';
+btns+='<button class="btn secondary" onclick="removeFromQueue(\''+s.id+'\')">Remove from Queue</button>';
+} else if(s.status==='in_issue'){
+btns='<button class="btn accent" onclick="openPublish(\''+s.id+'\')">Publish Now</button>';
+btns+='<button class="btn secondary" onclick="removeFromIssue(\''+s.id+'\')">Remove from Issue</button>';
+}
+btns+='<button class="btn secondary" onclick="document.getElementById(\'prev-'+s.id+'\').classList.toggle(\'expanded\')">Toggle</button>';
+btns+='<button class="btn secondary" onclick="openDetail(\''+s.id+'\')">Details</button>';
+return '<div class="sub-card"><div class="head"><span class="title-text">'+s.title+'</span><span class="badge '+s.status+'">'+s.status.replace('_',' ')+'</span></div><div class="meta">by '+(s.displayName||s.author)+' &bull; '+new Date(s.submittedAt||Date.now()).toLocaleDateString()+'</div>'+statusExtra+'<div class="preview" id="prev-'+s.id+'">'+(s.body||'').replace(/\n/g,'<br>')+'</div><div class="actions">'+btns+'</div></div>';
+}).join('');
+}
 document.getElementById('searchInput').addEventListener('input',()=>renderSubmissions(currentFilter));
 document.getElementById('sortSelect').addEventListener('change',()=>renderSubmissions(currentFilter));
 
-/* Publish */
+/* Publish immediately */
 let publishId=null;
 function openPublish(id){
-  publishId=id;
-  const s=loadSubmissions().find(x=>x.id==id);if(!s)return;
-  document.getElementById('publishInfo').innerHTML=`<strong>"${s.title}"</strong> by ${s.displayName||s.author}`;
-  openModal('publishModal');
+publishId=id;
+const s=loadSubmissions().find(x=>x.id==id);if(!s) return;
+document.getElementById('publishInfo').innerHTML='<strong>"'+s.title+'"</strong> by '+(s.displayName||s.author);
+openModal('publishModal');
 }
 document.getElementById('confirmPublish').addEventListener('click',()=>{
-  if(!publishId)return;
-  const cat=document.getElementById('publishCat').value;
-  const wn=parseInt(document.getElementById('publishWall').value)||getNextWall(cat);
-  const list=loadSubmissions();const i=list.findIndex(s=>s.id==publishId);
-  if(i>=0){
-    list[i].status='published';list[i].publishedCategory=cat;list[i].wallNumber=wn;
-    (list[i].timeline=list[i].timeline||[]).push({action:'published',ts:new Date().toISOString(),category:cat,wallNumber:wn});
-    saveSubmissions(list);
-    const pub=JSON.parse(localStorage.getItem('publishedPoems')||'[]');
-    if(!pub.find(p=>p.id=='pub-'+publishId)){
-      pub.push({id:'pub-'+publishId,title:list[i].title,author:list[i].displayName||list[i].author,collection:cat,text:list[i].body,wallNumber:wn});
-      localStorage.setItem('publishedPoems',JSON.stringify(pub));
-    }
-    logActivity('Published "'+list[i].title+'" to '+cat+' gallery');
-  }
-  closeModal('publishModal');renderStats();renderSubmissions(currentFilter);
-  alert('Published to gallery!');
+if(!publishId) return;
+const cat=document.getElementById('publishCat').value;
+const wn=parseInt(document.getElementById('publishWall').value)||getNextWall(cat);
+const list=loadSubmissions();const i=list.findIndex(s=>s.id==publishId);
+if(i>=0){
+list[i].status='published';list[i].publishedCategory=cat;list[i].wallNumber=wn;
+(list[i].timeline=list[i].timeline||[]).push({action:'published',ts:new Date().toISOString(),category:cat,wallNumber:wn});
+saveSubmissions(list);
+const pub=JSON.parse(localStorage.getItem('publishedPoems')||'[]');
+if(!pub.find(p=>p.id=='pub-'+publishId)){
+pub.push({id:'pub-'+publishId,title:list[i].title,author:list[i].displayName||list[i].author,collection:cat,text:list[i].body,wallNumber:wn});
+localStorage.setItem('publishedPoems',JSON.stringify(pub));
+}
+logActivity('Published "'+list[i].title+'" to '+cat+' gallery');
+}
+closeModal('publishModal');renderStats();renderSubmissions(currentFilter);
+alert('Published to gallery!');
 });
 function getNextWall(cat){
-  const pub=JSON.parse(localStorage.getItem('publishedPoems')||'[]');
-  const mx=Math.max(0,...pub.filter(p=>p.collection===cat).map(p=>p.wallNumber||0));
-  return mx+1;
+const pub=JSON.parse(localStorage.getItem('publishedPoems')||'[]');
+const mx=Math.max(0,...pub.filter(p=>p.collection===cat).map(p=>p.wallNumber||0));
+return mx+1;
+}
+
+/* Queue functions */
+let queueId=null;
+function openQueue(id){
+queueId=id;
+const s=loadSubmissions().find(x=>x.id==id);if(!s) return;
+document.getElementById('queueInfo').innerHTML='<strong>"'+s.title+'"</strong> by '+(s.displayName||s.author);
+const tomorrow=new Date();tomorrow.setDate(tomorrow.getDate()+7);
+document.getElementById('queueDate').value=tomorrow.toISOString().split('T')[0];
+openModal('queueModal');
+}
+document.getElementById('confirmQueue').addEventListener('click',()=>{
+if(!queueId) return;
+const dt=document.getElementById('queueDate').value;
+if(!dt){alert('Please select a publish date.');return;}
+const cat=document.getElementById('queueCat').value;
+const list=loadSubmissions();const i=list.findIndex(s=>s.id==queueId);
+if(i>=0){
+list[i].status='queued';list[i].scheduledDate=dt;list[i].publishedCategory=cat;
+(list[i].timeline=list[i].timeline||[]).push({action:'queued',ts:new Date().toISOString(),scheduledDate:dt,category:cat});
+saveSubmissions(list);
+logActivity('Queued "'+list[i].title+'" for '+new Date(dt).toLocaleDateString());
+}
+closeModal('queueModal');renderStats();renderSubmissions(currentFilter);
+alert('Added to publishing queue! Scheduled for '+new Date(dt).toLocaleDateString());
+});
+
+function publishNow(id){
+const list=loadSubmissions();const i=list.findIndex(s=>s.id==id);
+if(i<0) return;
+const cat=list[i].publishedCategory||'love';
+const wn=getNextWall(cat);
+list[i].status='published';list[i].wallNumber=wn;
+(list[i].timeline=list[i].timeline||[]).push({action:'published',ts:new Date().toISOString(),category:cat,wallNumber:wn});
+saveSubmissions(list);
+const pub=JSON.parse(localStorage.getItem('publishedPoems')||'[]');
+if(!pub.find(p=>p.id=='pub-'+id)){
+pub.push({id:'pub-'+id,title:list[i].title,author:list[i].displayName||list[i].author,collection:cat,text:list[i].body,wallNumber:wn});
+localStorage.setItem('publishedPoems',JSON.stringify(pub));
+}
+logActivity('Published "'+list[i].title+'" (from queue)');
+renderStats();renderSubmissions(currentFilter);
+alert('Published to gallery!');
+}
+
+function removeFromQueue(id){
+const list=loadSubmissions();const i=list.findIndex(s=>s.id==id);
+if(i>=0){
+list[i].status='pending';delete list[i].scheduledDate;
+(list[i].timeline=list[i].timeline||[]).push({action:'removed_from_queue',ts:new Date().toISOString()});
+saveSubmissions(list);logActivity('Removed "'+list[i].title+'" from queue');
+}
+renderStats();renderSubmissions(currentFilter);
+}
+
+/* Add to Issue functions */
+let addToIssueId=null;
+function openAddToIssue(id){
+addToIssueId=id;
+const s=loadSubmissions().find(x=>x.id==id);if(!s) return;
+document.getElementById('addToIssueInfo').innerHTML='<strong>"'+s.title+'"</strong> by '+(s.displayName||s.author);
+openModal('addToIssueModal');
+}
+document.getElementById('confirmAddToIssue').addEventListener('click',()=>{
+if(!addToIssueId) return;
+const cat=document.getElementById('addToIssueCat').value;
+const list=loadSubmissions();const i=list.findIndex(s=>s.id==addToIssueId);
+if(i>=0){
+list[i].status='in_issue';list[i].publishedCategory=cat;
+(list[i].timeline=list[i].timeline||[]).push({action:'added_to_issue',ts:new Date().toISOString(),category:cat});
+saveSubmissions(list);
+logActivity('Added "'+list[i].title+'" to issue builder');
+}
+closeModal('addToIssueModal');renderStats();renderSubmissions(currentFilter);
+alert('Added to Issue Builder!');
+});
+
+function removeFromIssue(id){
+const list=loadSubmissions();const i=list.findIndex(s=>s.id==id);
+if(i>=0){
+list[i].status='pending';
+(list[i].timeline=list[i].timeline||[]).push({action:'removed_from_issue',ts:new Date().toISOString()});
+saveSubmissions(list);logActivity('Removed "'+list[i].title+'" from issue');
+}
+renderStats();renderSubmissions(currentFilter);
 }
 
 /* Reject */
 let rejectId=null;
 function openReject(id){
-  rejectId=id;
-  const s=loadSubmissions().find(x=>x.id==id);if(!s)return;
-  document.getElementById('rejectInfo').innerHTML=`<strong>"${s.title}"</strong> by ${s.displayName||s.author}`;
-  document.getElementById('rejectFeedback').value='';
-  openModal('rejectModal');
+rejectId=id;const s=loadSubmissions().find(x=>x.id==id);if(!s)return;
+document.getElementById('rejectInfo').innerHTML='<strong>"'+s.title+'"</strong> by '+(s.displayName||s.author);
+document.getElementById('rejectFeedback').value='';openModal('rejectModal');
 }
 document.getElementById('confirmReject').addEventListener('click',()=>{
-  if(!rejectId)return;
-  const fb=document.getElementById('rejectFeedback').value.trim();
-  const list=loadSubmissions();const i=list.findIndex(s=>s.id==rejectId);
-  if(i>=0){list[i].status='rejected';list[i].rejectionFeedback=fb;(list[i].timeline=list[i].timeline||[]).push({action:'rejected',ts:new Date().toISOString(),feedback:fb});saveSubmissions(list);logActivity('Rejected "'+list[i].title+'"');}
-  closeModal('rejectModal');renderStats();renderSubmissions(currentFilter);
+if(!rejectId) return;const fb=document.getElementById('rejectFeedback').value.trim();
+const list=loadSubmissions();const i=list.findIndex(s=>s.id==rejectId);
+if(i>=0){list[i].status='rejected';list[i].rejectionFeedback=fb;(list[i].timeline=list[i].timeline||[]).push({action:'rejected',ts:new Date().toISOString(),feedback:fb});saveSubmissions(list);logActivity('Rejected "'+list[i].title+'"');}
+closeModal('rejectModal');renderStats();renderSubmissions(currentFilter);
 });
 
 /* Revisions */
 let revId=null;
 function openRevisions(id){
-  revId=id;
-  const s=loadSubmissions().find(x=>x.id==id);if(!s)return;
-  document.getElementById('revisionsInfo').innerHTML=`<strong>"${s.title}"</strong> by ${s.displayName||s.author}`;
-  document.getElementById('revisionsFeedback').value='';
-  openModal('revisionsModal');
+revId=id;const s=loadSubmissions().find(x=>x.id==id);if(!s)return;
+document.getElementById('revisionsInfo').innerHTML='<strong>"'+s.title+'"</strong> by '+(s.displayName||s.author);
+document.getElementById('revisionsFeedback').value='';openModal('revisionsModal');
 }
 document.getElementById('confirmRevisions').addEventListener('click',()=>{
-  if(!revId)return;
-  const fb=document.getElementById('revisionsFeedback').value.trim();
-  if(!fb){alert('Please provide feedback.');return}
-  const list=loadSubmissions();const i=list.findIndex(s=>s.id==revId);
-  if(i>=0){list[i].status='revisions_requested';list[i].revisionFeedback=fb;(list[i].timeline=list[i].timeline||[]).push({action:'revisions_requested',ts:new Date().toISOString(),feedback:fb});saveSubmissions(list);logActivity('Requested revisions for "'+list[i].title+'"');}
-  closeModal('revisionsModal');renderStats();renderSubmissions(currentFilter);
-  alert('Revision request sent.');
+if(!revId) return;const fb=document.getElementById('revisionsFeedback').value.trim();
+if(!fb){alert('Please provide feedback.');return;}
+const list=loadSubmissions();const i=list.findIndex(s=>s.id==revId);
+if(i>=0){list[i].status='revisions_requested';list[i].revisionFeedback=fb;(list[i].timeline=list[i].timeline||[]).push({action:'revisions_requested',ts:new Date().toISOString(),feedback:fb});saveSubmissions(list);logActivity('Requested revisions for "'+list[i].title+'"');}
+closeModal('revisionsModal');renderStats();renderSubmissions(currentFilter);
+alert('Revision request sent.');
 });
 
 /* Detail */
 function openDetail(id){
-  const s=loadSubmissions().find(x=>x.id==id);if(!s)return;
-  document.getElementById('detailTitle').textContent=s.title;
-  document.getElementById('detailMeta').innerHTML=`by ${s.displayName||s.author} &bull; ${new Date(s.submittedAt||Date.now()).toLocaleString()}`;
-  document.getElementById('detailBody').textContent=s.body||'';
-  document.getElementById('detailNotes').value=s.internalNotes||'';
-  /* Rating */
-  const rEl=document.getElementById('detailRating');
-  rEl.innerHTML='';for(let i=1;i<=5;i++){const b=document.createElement('button');b.className='btn secondary';b.textContent=i<=(s.rating||0)?'\u2605':'\u2606';b.style.padding='0.3rem 0.5rem';b.onclick=()=>{const l=loadSubmissions();const x=l.findIndex(z=>z.id==id);if(x>=0){l[x].rating=i;saveSubmissions(l)}openDetail(id)};rEl.appendChild(b)}
-  document.getElementById('detailPublish').onclick=()=>{closeModal('detailModal');openPublish(id)};
-  document.getElementById('detailReject').onclick=()=>{closeModal('detailModal');openReject(id)};
-  document.getElementById('detailRevisions').onclick=()=>{closeModal('detailModal');openRevisions(id)};
-  document.getElementById('detailSaveNotes').onclick=()=>{const l=loadSubmissions();const x=l.findIndex(z=>z.id==id);if(x>=0){l[x].internalNotes=document.getElementById('detailNotes').value;saveSubmissions(l);logActivity('Saved notes for "'+s.title+'"');alert('Notes saved.')}}
-  openModal('detailModal');
+const s=loadSubmissions().find(x=>x.id==id);if(!s)return;
+document.getElementById('detailTitle').textContent=s.title;
+document.getElementById('detailMeta').innerHTML='by '+(s.displayName||s.author)+' &bull; '+new Date(s.submittedAt||Date.now()).toLocaleString();
+document.getElementById('detailBody').textContent=s.body||'';
+document.getElementById('detailNotes').value=s.internalNotes||'';
+const rEl=document.getElementById('detailRating');
+rEl.innerHTML='';for(let i=1;i<=5;i++){const b=document.createElement('button');b.className='btn secondary';b.textContent=i<=(s.rating||0)?'\u2605':'\u2606';b.style.padding='0.3rem 0.5rem';b.onclick=()=>{const l=loadSubmissions();const x=l.findIndex(z=>z.id==id);if(x>=0){l[x].rating=i;saveSubmissions(l)}openDetail(id)};rEl.appendChild(b);}
+document.getElementById('detailPublish').onclick=()=>{closeModal('detailModal');openPublish(id)};
+document.getElementById('detailQueue').onclick=()=>{closeModal('detailModal');openQueue(id)};
+document.getElementById('detailAddToIssue').onclick=()=>{closeModal('detailModal');openAddToIssue(id)};
+document.getElementById('detailReject').onclick=()=>{closeModal('detailModal');openReject(id)};
+document.getElementById('detailRevisions').onclick=()=>{closeModal('detailModal');openRevisions(id)};
+document.getElementById('detailSaveNotes').onclick=()=>{const l=loadSubmissions();const x=l.findIndex(z=>z.id==id);if(x>=0){l[x].internalNotes=document.getElementById('detailNotes').value;saveSubmissions(l);logActivity('Saved notes for "'+s.title+'"');alert('Notes saved.')}}
+openModal('detailModal');
 }
 
-/* Issue Builder - One Click Publish */
+/* Queue View */
+function renderQueueView(){
+const subs=loadSubmissions().filter(s=>s.status==='queued');
+const el=document.getElementById('queueList');
+if(!subs.length){el.innerHTML='<div style="color:var(--color-grey);padding:2rem;text-align:center;">No submissions in queue. Use "Add to Queue" on pending submissions.</div>';return;}
+subs.sort((a,b)=>new Date(a.scheduledDate||0)-new Date(b.scheduledDate||0));
+el.innerHTML=subs.map(s=>'<div class="queue-card"><div class="q-info"><div class="q-title">'+s.title+'</div><div class="q-meta">by '+(s.displayName||s.author)+' &bull; '+(CATEGORIES[s.publishedCategory]||'Unassigned')+'</div></div><div class="q-date">'+new Date(s.scheduledDate).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'})+'</div><div><button class="btn accent" style="margin-right:0.4rem;" onclick="publishNow(\''+s.id+'\')" >Publish Now</button><button class="btn secondary" onclick="removeFromQueue(\''+s.id+'\');renderQueueView();">Remove</button></div></div>').join('');
+}
+
+/* Issue Builder - uses in_issue status */
 function renderIssueBuilder(){
-  const subs=loadSubmissions();
-  const accepted=subs.filter(s=>s.status==='approved'||s.status==='pending');
-  const el=document.getElementById('acceptedList');
-  if(!accepted.length){el.innerHTML='<div style="color:var(--color-grey);padding:1rem;">No accepted submissions yet. Approve submissions first, or select pending ones to include.</div>';return}
-  el.innerHTML=accepted.map((s,idx)=>`
-    <div class="accepted-item" data-id="${s.id}">
-      <input type="checkbox" class="issue-check" data-id="${s.id}" ${s.status==='approved'?'checked':''}>
-      <span class="drag-handle">&#x2630;</span>
-      <span class="item-title">${s.title}</span>
-      <span class="item-author">${s.displayName||s.author}</span>
-      <select class="issue-cat" data-id="${s.id}" style="padding:0.3rem;border:1px solid rgba(0,0,0,0.1);font-size:0.8rem;">
-        ${Object.entries(CATEGORIES).map(([k,v])=>`<option value="${k}" ${s.room===k||s.publishedCategory===k?'selected':''}>${v}</option>`).join('')}
-      </select>
-    </div>
-  `).join('');
+const subs=loadSubmissions();
+const accepted=subs.filter(s=>s.status==='in_issue'||s.status==='approved'||s.status==='pending');
+const el=document.getElementById('acceptedList');
+if(!accepted.length){el.innerHTML='<div style="color:var(--color-grey);padding:1rem;">No submissions available. Use "Add to Issue" on pending submissions to add them here.</div>';return;}
+el.innerHTML=accepted.map(s=>'<div class="accepted-item" data-id="'+s.id+'"><input type="checkbox" class="issue-check" data-id="'+s.id+'" '+(s.status==='in_issue'?'checked':'')+'><span class="drag-handle">&#x2630;</span><span class="item-title">'+s.title+'</span><span class="item-author">'+(s.displayName||s.author)+'</span><select class="issue-cat" data-id="'+s.id+'" style="padding:0.3rem;border:1px solid rgba(0,0,0,0.1);font-size:0.8rem;">'+Object.entries(CATEGORIES).map(([k,v])=>'<option value="'+k+'" '+(s.publishedCategory===k?'selected':'')+'>'+v+'</option>').join('')+'</select></div>').join('');
 }
 
 document.getElementById('publishIssueBtn').addEventListener('click',()=>{
-  const checks=document.querySelectorAll('.issue-check:checked');
-  if(!checks.length){alert('Select at least one submission to include in the issue.');return}
-  const issueTitle=document.getElementById('issueTitle').value;
-  if(!confirm('Publish '+checks.length+' poems as "'+issueTitle+'" to the live gallery?'))return;
-  const status=document.getElementById('issueStatus');
-  status.textContent='Publishing...';
-  const list=loadSubmissions();
-  const pub=JSON.parse(localStorage.getItem('publishedPoems')||'[]');
-  let count=0;
-  checks.forEach(cb=>{
-    const id=cb.dataset.id;
-    const catSel=document.querySelector(`.issue-cat[data-id="${id}"]`);
-    const cat=catSel?catSel.value:'love';
-    const wn=getNextWall(cat);
-    const idx=list.findIndex(s=>s.id==id);
-    if(idx>=0){
-      list[idx].status='published';list[idx].publishedCategory=cat;list[idx].wallNumber=wn;
-      (list[idx].timeline=list[idx].timeline||[]).push({action:'published',ts:new Date().toISOString(),category:cat,wallNumber:wn,issue:issueTitle});
-      if(!pub.find(p=>p.id=='pub-'+id)){
-        pub.push({id:'pub-'+id,title:list[idx].title,author:list[idx].displayName||list[idx].author,collection:cat,text:list[idx].body,wallNumber:wn});
-      }
-      count++;
-    }
-  });
-  saveSubmissions(list);
-  localStorage.setItem('publishedPoems',JSON.stringify(pub));
-  logActivity('Published issue "'+issueTitle+'" with '+count+' poems');
-  renderStats();renderIssueBuilder();
-  status.textContent=count+' poems published successfully!';
-  setTimeout(()=>{status.textContent=''},4000);
+const checks=document.querySelectorAll('.issue-check:checked');
+if(!checks.length){alert('Select at least one submission.');return;}
+const issueTitle=document.getElementById('issueTitle').value;
+if(!confirm('Publish '+checks.length+' poems as "'+issueTitle+'"?')) return;
+const status=document.getElementById('issueStatus');
+status.textContent='Publishing...';
+const list=loadSubmissions();const pub=JSON.parse(localStorage.getItem('publishedPoems')||'[]');let count=0;
+checks.forEach(cb=>{
+const id=cb.dataset.id;
+const catSel=document.querySelector('.issue-cat[data-id="'+id+'"]');
+const cat=catSel?catSel.value:'love';const wn=getNextWall(cat);
+const idx=list.findIndex(s=>s.id==id);
+if(idx>=0){
+list[idx].status='published';list[idx].publishedCategory=cat;list[idx].wallNumber=wn;
+(list[idx].timeline=list[idx].timeline||[]).push({action:'published',ts:new Date().toISOString(),category:cat,wallNumber:wn,issue:issueTitle});
+if(!pub.find(p=>p.id=='pub-'+id)){pub.push({id:'pub-'+id,title:list[idx].title,author:list[idx].displayName||list[idx].author,collection:cat,text:list[idx].body,wallNumber:wn});}
+count++;
+}});
+saveSubmissions(list);localStorage.setItem('publishedPoems',JSON.stringify(pub));
+logActivity('Published issue "'+issueTitle+'" with '+count+' poems');
+renderStats();renderIssueBuilder();
+status.textContent=count+' poems published!';setTimeout(()=>{status.textContent=''},4000);
 });
 
 /* Activity feed */
 function renderActivityFeed(){
-  const feed=load('activityFeed');
-  const el=document.getElementById('activityFeed');
-  if(!feed.length){el.innerHTML='<div style="color:var(--color-grey);">No recent activity.</div>';return}
-  el.innerHTML=feed.map(a=>`<div class="activity-item"><span>${a.text}</span> <span class="time">${new Date(a.ts).toLocaleString()}</span></div>`).join('');
+const feed=load('activityFeed');
+const el=document.getElementById('activityFeed');
+if(!feed.length){el.innerHTML='<div style="color:var(--color-grey);">No recent activity.</div>';return;}
+el.innerHTML=feed.map(a=>'<div class="activity-item"><span>'+a.text+'</span> <span class="time">'+new Date(a.ts).toLocaleString()+'</span></div>').join('');
 }
 
 /* Session restore */
 (function init(){
-  const u=getUser();
-  if(u&&u.role==='editor'&&localStorage.getItem('authToken')){
-    showDashboard(u);
-  }
+const u=getUser();
+if(u&&u.role==='editor'&&localStorage.getItem('authToken')){
+showDashboard(u);
+}
 })();
 </script>
 </body>

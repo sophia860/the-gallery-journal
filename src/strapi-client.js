@@ -147,7 +147,7 @@ class StrapiClient {
       }
 
       const response = await this.request('/api/users/me?populate=*');
-      if (response && response.id !== null && response.id !== undefined) {
+      if (typeof response?.id === 'number') {
         this._meCache = response;
         this._meCacheTime = Date.now();
       } else {

@@ -18,7 +18,7 @@ The Gallery is a literary journal and submission platform for contemporary poetr
 ### Backend
 - **Node.js**: Runtime environment
 - **Express.js**: Web server framework (v5.2.1)
-- **Strapi Cloud**: Headless CMS at https://supportive-ducks-9506a8aa47.strapiapp.com
+- **Strapi Cloud**: Headless CMS (backend URL configured in application)
 - **JWT Authentication**: Token-based authentication system
 - **REST API**: RESTful endpoints for all operations
 
@@ -27,7 +27,7 @@ The Gallery is a literary journal and submission platform for contemporary poetr
 - **Strapi Cloud**: Backend and database hosting
 
 ### Additional Services
-- **PayPal**: Optional payment integration (sophiamaybea@gmail.com)
+- **PayPal**: Optional payment integration (account configured in PAYPAL_CONFIG.md)
 - **Monitoring**: Custom monitoring system with health checks and AI-powered incident analysis
 
 ## Coding Guidelines

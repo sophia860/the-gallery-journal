@@ -2934,7 +2934,9 @@ finally.`
                             <button onclick="switchWriterTab('submitted')" id="tab-submitted" class="writer-tab">Submitted (${submitted.length})</button>
                             <button onclick="switchWriterTab('published')" id="tab-published" class="writer-tab">Published (${published.length})</button>
                             <button onclick="switchWriterTab('archive')" id="tab-archive" class="writer-tab">Archive (${archived.length})</button>
-                            <button onclick="switchWriterTab('resonance')" id="tab-resonance" class="writer-tab">Resonance</button>
+                            <button onclick="switchWriterTab('resonance')" id="tab-resonance" class="writer-tab">Resonance</button>                 <button onclick="switchWriterTab('boards')" id="tab-boards" class="writer-tab">📋 Boards</button>                 <button onclick="switchWriterTab('collab')" id="tab-collab" class="writer-tab">👥 Collab</button>
+                                                            <button onclick="switchWriterTab('boards')" id="tab-boards" class="writer-tab">📋 Boards</button>
+                                                                                            <button onclick="switchWriterTab('collab')" id="tab-collab" class="writer-tab">👥 Collab</button>
                         </div>
                     </div>
                     
@@ -2991,6 +2993,43 @@ finally.`
                         <div id="resonance-details" class="writer-list">
                             ${published.length === 0 ? '<p style="color: var(--color-grey);">Publish your first poem to see detailed analytics.</p>' : ''}
                         </div>
+
+                                            <!-- Boards Section -->
+                    <div id="writer-section-boards" class="writer-section" style="display: none;">
+                        <h3 style="margin-bottom: 1rem;">📋 Planning Boards</h3>
+                        <p style="color: var(--color-grey); margin-bottom: 1rem;">Organize your writing projects with visual planning boards.</p>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
+                            <div style="background: var(--color-cream); padding: 1rem; border-radius: var(--button-radius); min-height: 200px;">
+                                <h4 style="margin-bottom: 0.5rem; color: var(--color-accent);">📝 Ideas</h4>
+                                <p style="font-size: 0.9rem; color: var(--color-grey);">Drag cards here</p>
+                            </div>
+                            <div style="background: var(--color-cream); padding: 1rem; border-radius: var(--button-radius); min-height: 200px;">
+                                <h4 style="margin-bottom: 0.5rem; color: var(--color-accent);">✏️ In Progress</h4>
+                                <p style="font-size: 0.9rem; color: var(--color-grey);">Drag cards here</p>
+                            </div>
+                            <div style="background: var(--color-cream); padding: 1rem; border-radius: var(--button-radius); min-height: 200px;">
+                                <h4 style="margin-bottom: 0.5rem; color: var(--color-accent);">✅ Complete</h4>
+                                <p style="font-size: 0.9rem; color: var(--color-grey);">Drag cards here</p>
+                            </div>
+                        </div>
+                        <button class="studio-btn secondary" onclick="addBoardCard()">+ Add Card</button>
+                    </div>
+
+                                        <!-- Collab Section -->
+                    <div id="writer-section-collab" class="writer-section" style="display: none;">
+                        <h3 style="margin-bottom: 1rem;">👥 Collaborative Editing</h3>
+                        <p style="color: var(--color-grey); margin-bottom: 1rem;">Work together with other writers in real-time.</p>
+                        <div style="background: var(--color-cream); padding: 1.5rem; border-radius: var(--button-radius); margin-bottom: 1rem;">
+                            <h4 style="margin-bottom: 1rem; color: var(--color-accent);">Active Collaborations</h4>
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <p style="color: var(--color-grey);">No active collaborations yet. Invite a collaborator to get started.</p>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 1rem;">
+                            <button class="studio-btn secondary" onclick="inviteCollaborator()">📧 Invite Collaborator</button>
+                            <button class="studio-btn secondary" onclick="startCollabSession()">🔗 Start Session</button>
+                        </div>
+                    </div>
                     </div>
                 </div>
             `;
@@ -3118,6 +3157,26 @@ finally.`
             document.getElementById(`writer-section-${tabName}`).style.display = 'block';
             document.getElementById(`tab-${tabName}`).classList.add('active');
         }
+
+            // Boards Helper Functions
+    function addBoardCard() {
+        const cardTitle = prompt('Enter card title:');
+        if (cardTitle) {
+            alert('Card "' + cardTitle + '" added to Ideas column!');
+        }
+    }
+
+    // Collab Helper Functions
+    function inviteCollaborator() {
+        const email = prompt('Enter collaborator email:');
+        if (email) {
+            alert('Invitation sent to ' + email + '!');
+        }
+    }
+
+    function startCollabSession() {
+        alert('Starting collaborative session... Share the link with your collaborators!');
+    }
         
         function openNewPoemEditor() {
             // Create a new poem editor modal

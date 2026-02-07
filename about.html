@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About - Green Nation</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="container nav">
+        <a class="brand" href="index.html">Green Nation</a>
+        <nav aria-label="Primary" class="nav-links">
+          <a href="index.html">Home</a>
+          <a href="shop.html">Gallery &amp; Shop</a>
+          <a href="about.html">About</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero hero--medium">
+        <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1600&q=80" alt="Forest river with stones" />
+        <div class="overlay" aria-hidden="true"></div>
+        <div class="container hero-content reveal">
+          <div class="eyebrow">About</div>
+          <h1>Rooted in the understory.</h1>
+          <p>We are designers, editors, and botanists crafting a calm visual language that honors the ecosystems we inhabit.</p>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container about-layout">
+          <div class="reveal content-stack">
+            <div>
+              <div class="label">Philosophy</div>
+              <h2>Editorial calm, living systems.</h2>
+              <p>Green Nation began as a field journal between trail markers—notes on lichen, shadow, and the way river stones catch the light. The journal has since evolved into an anthology of objects and stories that keep the outdoors within reach.</p>
+              <p>Our layouts stretch and breathe with generous whitespace. Playfair Display headlines anchor each narrative; Inter moves the body text forward without distraction. Every label remains uppercase—a quiet nod to archival notes in the margins.</p>
+            </div>
+            <blockquote class="pull-quote">“We edit like botanists: carefully, slowly, with reverence for the canopy above.”</blockquote>
+            <p>From soft sage palettes to charcoal lines, we choose materials that mirror the palette of riverbanks and moss-dressed bark. Responsive grids ensure the experience remains refined at 640px, 768px, and 1024px breakpoints.</p>
+          </div>
+          <figure class="floating-photo reveal">
+            <img src="https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80" alt="Botanical study with leaves and paper" />
+            <figcaption class="label caption-spaced">Field notes</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="connect">
+        <div class="container feature-grid feature-grid--narrow">
+          <div class="feature reveal">
+            <div class="label">Our practice</div>
+            <h3 id="connect">Stay connected</h3>
+            <p>We share monthly dispatches on material research, new works in the gallery, and studio playlists. Join us or write directly—every note is read by a real human on the team.</p>
+            <form aria-label="Contact form" action="#" data-demo="true">
+              <div>
+                <label for="name">Name</label>
+                <input id="name" name="name" type="text" placeholder="Your name" required />
+              </div>
+              <div>
+                <label for="email">Email</label>
+                <input id="email" name="email" type="email" placeholder="you@example.com" required />
+              </div>
+              <div>
+                <label for="message">Message</label>
+                <textarea id="message" name="message" rows="4" placeholder="Tell us about your project"></textarea>
+              </div>
+              <button class="btn btn-primary" type="submit">Send note</button>
+              <p class="form-status" aria-live="polite" role="status"></p>
+            </form>
+          </div>
+          <div class="story reveal">
+            <p>For collaborations, email <a href="mailto:hello@greennation.studio">hello@greennation.studio</a> or visit our studio by appointment. We design with accessibility in mind: semantic HTML5, keyboard-friendly navigation, and thoughtful contrast ratios.</p>
+            <p>Beyond the pages, we tend rooftop planters and community greenways. The gallery is a living archive—rotating prints, ceramics, and texts that honor the seasons.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer-links">
+        <a href="index.html">Home</a>
+        <a href="shop.html">Shop</a>
+        <a href="mailto:hello@greennation.studio">hello@greennation.studio</a>
+      </div>
+    </footer>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

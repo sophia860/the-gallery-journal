@@ -5,10 +5,14 @@
  */
 
 const STRAPI_URL = 'https://supportive-ducks-9506a8aa47.strapiapp.com';
+/** Cache duration for getMe results in milliseconds */
+const ME_CACHE_TTL_MS = 60 * 1000;
 
 class StrapiClient {
   constructor() {
     this.baseURL = STRAPI_URL;
+    this._meCache = null;
+    this._meCacheTime = 0;
     this.token = this.getToken();
   }
 
@@ -30,6 +34,7 @@ class StrapiClient {
       localStorage.removeItem('strapi_jwt');
       this.token = null;
     }
+    this.clearMeCache();
   }
 
   /**
@@ -131,14 +136,37 @@ class StrapiClient {
 
   /**
    * Get current user profile
+   * @param {boolean} [useCache=true] - Set to false to force a fresh request
    */
-  async getMe() {
+  async getMe(useCache = true) {
     try {
+      if (
+        useCache &&
+        this._meCache &&
+        Date.now() - this._meCacheTime < ME_CACHE_TTL_MS
+      ) {
+        return this._meCache;
+      }
+
       const response = await this.request('/api/users/me?populate=*');
+      if (response?.id) {
+        this._meCache = response;
+        this._meCacheTime = Date.now();
+      } else {
+        this.clearMeCache();
+      }
       return response;
     } catch (error) {
       throw new Error(`Failed to fetch user profile: ${error.message}`);
     }
+  }
+
+  /**
+   * Reset cached user profile data and timestamps
+   */
+  clearMeCache() {
+    this._meCache = null;
+    this._meCacheTime = 0;
   }
 
   /**
@@ -288,7 +316,7 @@ class StrapiClient {
     }
 
     try {
-      await this.getMe();
+      await this.getMe(false);
       return true;
     } catch (error) {
       this.logout();

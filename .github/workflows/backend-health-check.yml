@@ -41,7 +41,7 @@ jobs:
           echo "Checking health endpoint: $ENDPOINT"
 
           BODY_FILE=$(mktemp)
-          RESULT=$(curl -s -w "%{http_code} %{time_total}" --max-time 5 -o "$BODY_FILE" "$ENDPOINT")
+          RESULT=$(curl -s -L -w "%{http_code} %{time_total}" --max-time 5 -o "$BODY_FILE" "$ENDPOINT")
           CURL_EXIT=$?
           BODY=$(cat "$BODY_FILE" 2>/dev/null || true)
 
@@ -62,6 +62,7 @@ jobs:
             *) HTTP_CODE=$RAW_HTTP_CODE ;;
           esac
 
+          # Optional body validation; recorded for reporting only
           if echo "$BODY" | jq -e '.status == "ok"' >/dev/null 2>&1; then
             BODY_OK=true
           else
@@ -75,7 +76,7 @@ jobs:
 
           rm -f "$BODY_FILE"
 
-          # Pass only when HTTP 200 and latency under 5 seconds
+          # Pass only when HTTP 200 and latency strictly under 5 seconds
           if [ "$HTTP_CODE" -eq 200 ] && [ "$RESPONSE_MS" -lt 5000 ]; then
             echo "health_state=pass" >> $GITHUB_OUTPUT
           else

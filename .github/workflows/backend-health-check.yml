@@ -37,6 +37,19 @@ jobs:
             exit 0
           fi
 
+          case "$BACKEND_URL" in
+            http://*|https://*) ;;
+            *)
+              echo "::error::BACKEND_URL must start with http:// or https://"
+              echo "endpoint=Invalid BACKEND_URL value" >> $GITHUB_OUTPUT
+              echo "status_code=0" >> $GITHUB_OUTPUT
+              echo "response_time_ms=0" >> $GITHUB_OUTPUT
+              echo "body_ok=false" >> $GITHUB_OUTPUT
+              echo "health_state=fail" >> $GITHUB_OUTPUT
+              exit 0
+              ;;
+          esac
+
           ENDPOINT="${BACKEND_URL%/}/api/health"
           echo "Checking health endpoint: $ENDPOINT"
 
@@ -74,7 +87,7 @@ jobs:
           rm -f "$BODY_FILE"
 
           # Pass only when HTTP 200 and latency strictly under 5 seconds
-          if [ "$HTTP_CODE" -eq 200 ] && [ "$RESPONSE_MS" -lt 5000 ]; then
+          if [ "$HTTP_CODE" -gt 0 ] && [ "$HTTP_CODE" -eq 200 ] && [ "$RESPONSE_MS" -lt 5000 ]; then
             echo "health_state=pass" >> $GITHUB_OUTPUT
           else
             echo "health_state=fail" >> $GITHUB_OUTPUT

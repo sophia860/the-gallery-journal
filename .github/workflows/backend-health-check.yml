@@ -40,11 +40,15 @@ jobs:
           ENDPOINT="${BACKEND_URL%/}/api/health"
           echo "Checking health endpoint: $ENDPOINT"
 
-          START_TIME=$(($(date +%s)*1000))
-          HTTP_CODE=$(curl -o /tmp/health-body -s -w "%{http_code}" --max-time 10 "$ENDPOINT" || echo 000)
-          END_TIME=$(($(date +%s)*1000))
+          RESULT=$(curl -s -w "%{http_code} %{time_total}" --max-time 5 -o /tmp/health-body "$ENDPOINT" || echo "000 0")
           BODY=$(cat /tmp/health-body 2>/dev/null || true)
-          DURATION_MS=$((END_TIME-START_TIME))
+          HTTP_CODE=$(echo "$RESULT" | awk '{print $1}')
+          TIME_TOTAL=$(echo "$RESULT" | awk '{print $2}')
+          RESPONSE_MS=$(TIME_TOTAL="$TIME_TOTAL" python - <<'PY'
+import os, math
+print(int(math.floor(float(os.environ.get("TIME_TOTAL", "0")) * 1000)))
+PY
+)
 
           case $HTTP_CODE in
             ''|*[!0-9]*) HTTP_CODE=0 ;;
@@ -58,11 +62,11 @@ jobs:
 
           echo "endpoint=$ENDPOINT" >> $GITHUB_OUTPUT
           echo "status_code=$HTTP_CODE" >> $GITHUB_OUTPUT
-          echo "response_time_ms=$DURATION_MS" >> $GITHUB_OUTPUT
+          echo "response_time_ms=$RESPONSE_MS" >> $GITHUB_OUTPUT
           echo "body_ok=$BODY_OK" >> $GITHUB_OUTPUT
 
           # Pass only when HTTP 200 and latency under 5 seconds
-          if [ "$HTTP_CODE" -eq 200 ] && [ "$DURATION_MS" -lt 5000 ]; then
+          if [ "$HTTP_CODE" -eq 200 ] && [ "$RESPONSE_MS" -lt 5000 ]; then
             echo "health_state=pass" >> $GITHUB_OUTPUT
           else
             echo "health_state=fail" >> $GITHUB_OUTPUT
@@ -78,8 +82,6 @@ jobs:
           BODY_OK: ${{ steps.health.outputs.body_ok }}
         with:
           script: |
-            const {context, github} = require('@actions/github');
-
             const labels = ['bug', 'backend'];
             for (const name of labels) {
               try {
@@ -107,7 +109,8 @@ jobs:
             const statusCode = process.env.STATUS_CODE || 'Unknown';
             const responseTime = process.env.RESPONSE_TIME || 'Unknown';
             const bodyOk = process.env.BODY_OK || 'false';
-            const timestamp = new Date().toISOString().replace('T', ' ').replace('Z', ' UTC');
+            const isoTimestamp = new Date().toISOString();
+            const timestamp = `${isoTimestamp.slice(0, 19).replace('T', ' ')} UTC`;
 
             const title = `🚨 Backend Health Check Failed — ${timestamp}`;
             const body = [

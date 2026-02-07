@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Editor's Studio — The Gallery</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lora:wght@400;500&family=Playfair+Display:wght@600;700&family=Rockwell:wght@300&display=swap');
+:root{
+--color-paper:#FAF8F5;--color-ink:#0D0D0D;--color-accent:#C41E3A;
+--color-grey:#6B6B6B;--color-cream:#F5F1EB;--color-dark:#1a1a1a;
+--font-serif:'Lora','Source Serif Pro',serif;
+--font-display:'Playfair Display','Georgia',serif;
+--font-slab:'Rockwell','Courier New',serif;
+--font-sans:'Inter','Helvetica Neue',Arial,sans-serif;
+--transition-soft:all 240ms ease;--radius:12px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--font-sans);font-size:16px;background:var(--color-paper);color:var(--color-ink);line-height:1.6;min-height:100vh;}
+/* Auth gate */
+#authGate{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:2rem;}
+.auth-card{background:var(--color-cream);padding:3rem;max-width:420px;width:100%;box-shadow:0 8px 24px rgba(0,0,0,0.08);}
+.auth-card h1{font-family:var(--font-slab);font-weight:300;font-size:2rem;margin-bottom:0.25rem;}
+.auth-card .subtitle{color:var(--color-accent);font-style:italic;margin-bottom:2rem;font-family:var(--font-serif);}
+.field{margin-bottom:1.25rem;}
+.field label{display:block;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--color-accent);margin-bottom:0.4rem;}
+.field input{width:100%;padding:0.75rem 1rem;border:1px solid rgba(0,0,0,0.12);background:var(--color-cream);font-family:var(--font-serif);font-size:1rem;transition:border .3s;}
+.field input:focus{outline:none;border-color:var(--color-accent);}
+.btn-primary{width:100%;padding:0.9rem;font-family:var(--font-sans);font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;background:var(--color-ink);color:var(--color-paper);border:none;cursor:pointer;transition:background .3s;}
+.btn-primary:hover{background:#333;}
+.auth-footer{text-align:center;margin-top:1.5rem;font-size:0.9rem;color:var(--color-grey);}
+.auth-footer a{color:var(--color-accent);text-decoration:none;}
+/* Dashboard layout */
+#dashboard{display:none;}
+.top-bar{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:0.8rem 2rem;background:rgba(245,241,235,0.96);backdrop-filter:blur(10px);z-index:100;border-bottom:1px solid rgba(0,0,0,0.06);}
+.top-bar .logo{font-family:var(--font-slab);font-weight:300;font-size:1.2rem;}
+.top-bar .logo span{color:var(--color-accent);}
+.top-bar nav{display:flex;gap:1.5rem;align-items:center;}
+.nav-link{font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-grey);background:none;border:none;cursor:pointer;padding:0.4rem 0;position:relative;transition:color .2s;}
+.nav-link:hover,.nav-link.active{color:var(--color-ink);}
+.nav-link.active::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:2px;background:var(--color-accent);}
+.nav-link.accent{color:var(--color-accent);}
+.main{padding:4.5rem 2rem 2rem;max-width:1200px;margin:0 auto;}
+/* Stats row */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:0.75rem;margin-bottom:1.5rem;}
+.stat-card{background:var(--color-cream);border:1px solid rgba(0,0,0,0.06);padding:1rem;transition:var(--transition-soft);}
+.stat-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.04);}
+.stat-card .num{font-size:1.8rem;font-weight:600;color:var(--color-accent);}
+.stat-card .lbl{font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-grey);}
+/* Section header */
+.section-hdr{display:flex;align-items:center;gap:1rem;margin:2rem 0 1rem;font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--color-accent);}
+.section-hdr::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(196,30,58,0.3),transparent);}
+/* Filters */
+.filters{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;}
+.filter-btn{padding:0.5rem 0.9rem;border:1px solid rgba(0,0,0,0.12);background:transparent;font-size:0.78rem;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;transition:var(--transition-soft);}
+.filter-btn:hover{border-color:var(--color-ink);}
+.filter-btn.active{background:var(--color-ink);color:var(--color-paper);border-color:var(--color-ink);}
+/* Toolbar */
+.toolbar{display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem;}
+.toolbar input,.toolbar select{padding:0.45rem 0.7rem;border:1px solid rgba(0,0,0,0.1);background:var(--color-cream);font-size:0.85rem;}
+.toolbar input:focus,.toolbar select:focus{outline:none;border-color:var(--color-accent);}
+/* Submission cards */
+.sub-list{display:grid;gap:0.75rem;}
+.sub-card{background:var(--color-cream);border:1px solid rgba(0,0,0,0.06);padding:1.25rem;transition:var(--transition-soft);position:relative;}
+.sub-card:hover{box-shadow:0 4px 16px rgba(0,0,0,0.05);transform:translateY(-1px);}
+.sub-card .head{display:flex;justify-content:space-between;align-items:center;gap:0.5rem;margin-bottom:0.35rem;}
+.sub-card .title-text{font-family:var(--font-serif);font-size:1.15rem;font-weight:500;}
+.badge{display:inline-block;padding:0.2rem 0.55rem;font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;border-radius:999px;border:1px solid;}
+.badge.pending{border-color:#8b7355;color:#8b7355;background:rgba(139,115,85,0.08);}
+.badge.approved{border-color:#2e8b57;color:#2e8b57;background:rgba(46,139,87,0.08);}
+.badge.rejected{border-color:#b22222;color:#b22222;background:rgba(178,34,34,0.08);}
+.badge.published{border-color:#4169E1;color:#4169E1;background:rgba(65,105,225,0.08);}
+.badge.revisions_requested{border-color:#D2691E;color:#D2691E;background:rgba(210,105,30,0.08);}
+.sub-card .meta{font-size:0.82rem;color:var(--color-grey);margin-bottom:0.5rem;}
+.sub-card .preview{background:var(--color-paper);border:1px solid rgba(0,0,0,0.04);padding:0.75rem;font-family:var(--font-serif);font-size:0.95rem;line-height:1.8;max-height:120px;overflow:hidden;transition:max-height .3s;white-space:pre-wrap;}
+.sub-card .preview.expanded{max-height:none;}
+.sub-card .actions{display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.75rem;}
+.btn{padding:0.45rem 0.8rem;font-family:var(--font-sans);font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid var(--color-ink);background:var(--color-ink);color:var(--color-paper);cursor:pointer;transition:var(--transition-soft);}
+.btn:hover{background:#333;}
+.btn.secondary{background:transparent;color:var(--color-ink);}
+.btn.secondary:hover{background:var(--color-ink);color:var(--color-paper);}
+.btn.accent{background:var(--color-accent);border-color:var(--color-accent);}
+.btn.accent:hover{background:#a01830;}
+/* Modal overlay */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;justify-content:center;align-items:center;}
+.modal-overlay.active{display:flex;}
+.modal-box{background:var(--color-cream);padding:2rem;max-width:640px;width:92%;max-height:85vh;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,0.12);animation:slideUp .3s ease;}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-box h3{font-family:var(--font-slab);font-weight:300;font-size:1.5rem;margin-bottom:1rem;}
+.modal-box .close{position:absolute;top:1rem;right:1.5rem;font-size:1.8rem;background:none;border:none;cursor:pointer;color:var(--color-accent);}
+/* Issue Builder */
+.issue-builder{background:var(--color-cream);border:1px solid rgba(0,0,0,0.06);padding:1.5rem;margin-bottom:2rem;}
+.issue-builder h3{font-family:var(--font-slab);font-weight:300;font-size:1.4rem;margin-bottom:0.5rem;}
+.issue-builder .desc{color:var(--color-grey);font-size:0.9rem;margin-bottom:1rem;}
+.issue-builder .issue-meta{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:1rem;}
+.issue-builder .issue-meta label{display:block;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-grey);margin-bottom:0.3rem;}
+.issue-builder .issue-meta input,.issue-builder .issue-meta select{width:100%;padding:0.6rem;border:1px solid rgba(0,0,0,0.1);background:var(--color-paper);}
+.accepted-list{display:grid;gap:0.5rem;margin:1rem 0;max-height:300px;overflow-y:auto;}
+.accepted-item{display:flex;align-items:center;gap:0.75rem;padding:0.6rem 0.75rem;background:var(--color-paper);border:1px solid rgba(0,0,0,0.06);cursor:grab;}
+.accepted-item input[type=checkbox]{width:16px;height:16px;}
+.accepted-item .drag-handle{color:var(--color-grey);cursor:grab;}
+.accepted-item .item-title{font-family:var(--font-serif);flex:1;}
+.accepted-item .item-author{color:var(--color-grey);font-size:0.85rem;}
+/* One-click publish button */
+.publish-issue-btn{display:flex;align-items:center;gap:0.5rem;padding:0.9rem 1.6rem;background:var(--color-accent);color:#fff;border:none;font-family:var(--font-sans);font-size:0.82rem;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;transition:var(--transition-soft);}
+.publish-issue-btn:hover{background:#a01830;transform:translateY(-1px);box-shadow:0 4px 12px rgba(196,30,58,0.3);}
+/* Activity feed */
+.activity-feed{max-height:200px;overflow-y:auto;}
+.activity-item{padding:0.4rem 0;font-size:0.85rem;color:var(--color-grey);border-bottom:1px solid rgba(0,0,0,0.04);}
+.activity-item .time{font-size:0.75rem;color:var(--color-grey);}
+/* Labels */
+.label-pill{display:inline-flex;align-items:center;gap:0.25rem;padding:0.15rem 0.5rem;border-radius:999px;border:1px solid;font-size:0.72rem;}
+/* Responsive */
+@media(max-width:768px){
+.top-bar{padding:0.8rem 1rem;}
+.top-bar nav{gap:0.75rem;}
+.stats{grid-template-columns:repeat(2,1fr);}
+.issue-builder .issue-meta{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<!-- AUTH GATE -->
+<div id="authGate">
+<div class="auth-card">
+<h1>Editor's Studio</h1>
+<p class="subtitle">Access the editorial dashboard</p>
+<form id="loginForm">
+<div class="field"><label>Email</label><input type="email" id="email" required></div>
+<div class="field"><label>Password</label><input type="password" id="password" required></div>
+<button type="submit" class="btn-primary" id="loginBtn">Enter</button>
+</form>
+<div class="auth-footer"><a href="index.html">&larr; Back to The Gallery</a></div>
+</div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+<!-- Top bar -->
+<div class="top-bar">
+<div class="logo">The <span>Gallery</span> &mdash; Editor's Studio</div>
+<nav>
+<button class="nav-link active" data-view="submissions">Submissions</button>
+<button class="nav-link" data-view="issue">Issue Builder</button>
+<button class="nav-link" data-view="activity">Activity</button>
+<a href="index.html" class="nav-link accent" target="_blank">Writers Studio &rarr;</a>
+<button class="nav-link" id="logoutBtn">Logout</button>
+</nav>
+</div>
+
+<div class="main">
+<!-- Welcome -->
+<div style="margin-bottom:1.5rem;">
+<h2 style="font-family:var(--font-slab);font-weight:300;font-size:1.6rem;">Welcome back, <span id="editorName">Editor</span></h2>
+<p style="color:var(--color-grey);font-size:0.9rem;">Manage submissions, curate issues, and publish to the gallery.</p>
+</div>
+
+<!-- Stats -->
+<div class="stats" id="statsRow"></div>
+
+<!-- SUBMISSIONS VIEW -->
+<div id="submissionsView">
+<div class="section-hdr">Submissions</div>
+<div class="toolbar">
+<input type="search" id="searchInput" placeholder="Search title, author, content..." style="flex:1 1 220px;">
+<select id="sortSelect"><option value="date">Sort by date</option><option value="title">Sort by title</option><option value="rating">Sort by rating</option></select>
+</div>
+<div class="filters" id="filterRow"></div>
+<div class="sub-list" id="subList"></div>
+</div>
+
+<!-- ISSUE BUILDER VIEW -->
+<div id="issueView" style="display:none;">
+<div class="section-hdr">Issue Builder</div>
+<div class="issue-builder">
+<h3>Assemble New Issue</h3>
+<p class="desc">Select accepted works, arrange them in order, and publish the entire issue to the live gallery in one click.</p>
+<div class="issue-meta">
+<div><label>Issue Title</label><input type="text" id="issueTitle" value="Winter 2026 - Issue 02"></div>
+<div><label>Season / Theme</label><select id="issueSeason"><option>Winter 2026</option><option>Spring 2026</option><option>Summer 2026</option></select></div>
+</div>
+<div style="font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-grey);margin-bottom:0.5rem;">Select works to include (drag to reorder)</div>
+<div class="accepted-list" id="acceptedList"></div>
+<div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;margin-top:1rem;">
+<button class="publish-issue-btn" id="publishIssueBtn">
+<span>&#9656;</span> Publish Issue to Gallery
+</button>
+<span style="font-size:0.82rem;color:var(--color-grey);" id="issueStatus"></span>
+</div>
+</div>
+</div>
+
+<!-- ACTIVITY VIEW -->
+<div id="activityView" style="display:none;">
+<div class="section-hdr">Recent Activity</div>
+<div class="activity-feed" id="activityFeed" style="max-height:none;"></div>
+</div>
+
+</div><!-- .main -->
+</div><!-- #dashboard -->
+
+<!-- Publish Modal -->
+<div class="modal-overlay" id="publishModal">
+<div class="modal-box" style="position:relative;">
+<button class="close" onclick="closeModal('publishModal')">&times;</button>
+<h3>Publish to Gallery</h3>
+<div id="publishInfo"></div>
+<div style="margin:1rem 0;"><label style="display:block;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-grey);margin-bottom:0.3rem;">Category</label>
+<select id="publishCat" style="width:100%;padding:0.6rem;border:1px solid rgba(0,0,0,0.1);"><option value="love">Love & Relationships</option><option value="nature">Nature & The Natural World</option><option value="grief">Grief, Loss & Memory</option><option value="family">Family & Identity</option></select></div>
+<div style="margin-bottom:1rem;"><label style="display:block;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-grey);margin-bottom:0.3rem;">Wall Number (optional)</label>
+<input type="number" id="publishWall" min="1" placeholder="Auto-assign" style="width:100%;padding:0.6rem;border:1px solid rgba(0,0,0,0.1);"></div>
+<div style="display:flex;gap:0.5rem;"><button class="btn secondary" onclick="closeModal('publishModal')">Cancel</button><button class="btn accent" id="confirmPublish">Publish to Gallery</button></div>
+</div>
+</div>
+
+<!-- Reject Modal -->
+<div class="modal-overlay" id="rejectModal">
+<div class="modal-box" style="position:relative;">
+<button class="close" onclick="closeModal('rejectModal')">&times;</button>
+<h3>Reject Submission</h3>
+<div id="rejectInfo"></div>
+<div style="margin:1rem 0;"><label style="display:block;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-grey);margin-bottom:0.3rem;">Feedback (optional)</label>
+<textarea id="rejectFeedback" rows="4" style="width:100%;padding:0.6rem;border:1px solid rgba(0,0,0,0.1);font-family:var(--font-serif);"></textarea></div>
+<div style="display:flex;gap:0.5rem;"><button class="btn secondary" onclick="closeModal('rejectModal')">Cancel</button><button class="btn" id="confirmReject">Reject</button></div>
+</div>
+</div>
+
+<!-- Revisions Modal -->
+<div class="modal-overlay" id="revisionsModal">
+<div class="modal-box" style="position:relative;">
+<button class="close" onclick="closeModal('revisionsModal')">&times;</button>
+<h3>Request Revisions</h3>
+<div id="revisionsInfo"></div>
+<div style="margin:1rem 0;"><label style="display:block;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-grey);margin-bottom:0.3rem;">Revision Feedback</label>
+<textarea id="revisionsFeedback" rows="4" style="width:100%;padding:0.6rem;border:1px solid rgba(0,0,0,0.1);font-family:var(--font-serif);" placeholder="Describe what changes you'd like the writer to make..."></textarea></div>
+<div style="display:flex;gap:0.5rem;"><button class="btn secondary" onclick="closeModal('revisionsModal')">Cancel</button><button class="btn" id="confirmRevisions">Send Revision Request</button></div>
+</div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal-overlay" id="detailModal">
+<div class="modal-box" style="position:relative;max-width:800px;">
+<button class="close" onclick="closeModal('detailModal')">&times;</button>
+<h3 id="detailTitle"></h3>
+<div id="detailMeta" class="meta"></div>
+<div id="detailBody" style="margin:1rem 0;padding:1rem;background:var(--color-paper);border:1px solid rgba(0,0,0,0.04);font-family:var(--font-serif);line-height:1.9;white-space:pre-wrap;"></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0;">
+<div><div style="font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-grey);margin-bottom:0.3rem;">Rating</div><div id="detailRating"></div></div>
+<div><div style="font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-grey);margin-bottom:0.3rem;">Internal Notes</div><textarea id="detailNotes" rows="3" style="width:100%;padding:0.5rem;border:1px solid rgba(0,0,0,0.1);font-size:0.9rem;"></textarea></div>
+</div>
+<div style="display:flex;gap:0.4rem;flex-wrap:wrap;"><button class="btn accent" id="detailPublish">Accept & Publish</button><button class="btn" id="detailReject">Reject</button><button class="btn secondary" id="detailRevisions">Request Revisions</button><button class="btn secondary" id="detailSaveNotes">Save Notes</button></div>
+</div>
+</div>
+
+<script src="src/strapi-client.js"></script>
+<script>
+const STRAPI_URL='https://supportive-ducks-9506a8aa47.strapiapp.com';
+const MOCK_USERS={'editor@example.com':{password:'password',role:'editor'}};
+const CATEGORIES={love:'Love & Relationships',nature:'Nature & The Natural World',grief:'Grief, Loss & Memory',family:'Family & Identity',time:'Time & Mortality',self:'Self & Introspection'};
+
+/* LocalStorage helpers */
+function load(k){try{return JSON.parse(localStorage.getItem(k)||'[]')}catch{return []}}
+function save(k,v){localStorage.setItem(k,JSON.stringify(v))}
+function loadSubmissions(){return load('submissions')}
+function saveSubmissions(l){save('submissions',l)}
+function loadLabels(){return load('labels')}
+function logActivity(t){const f=load('activityFeed');f.unshift({text:t,ts:new Date().toISOString()});save('activityFeed',f.slice(0,50))}
+function getUser(){try{return JSON.parse(localStorage.getItem('user')||'null')}catch{return null}}
+
+/* Modal helpers */
+function closeModal(id){document.getElementById(id).classList.remove('active')}
+function openModal(id){document.getElementById(id).classList.add('active')}
+
+/* Auth */
+const authGate=document.getElementById('authGate');
+const dashboard=document.getElementById('dashboard');
+
+function showDashboard(user){
+  authGate.style.display='none';
+  dashboard.style.display='block';
+  document.getElementById('editorName').textContent=user.displayName||user.username||user.email;
+  renderStats();
+  renderSubmissions('all');
+}
+
+document.getElementById('loginForm').addEventListener('submit',async(e)=>{
+  e.preventDefault();
+  const email=document.getElementById('email').value.trim().toLowerCase();
+  const pw=document.getElementById('password').value;
+  const btn=document.getElementById('loginBtn');
+  btn.textContent='Signing in...';btn.disabled=true;
+  try{
+    if(window.strapiClient){
+      try{
+        const r=await window.strapiClient.login({identifier:email,password:pw});
+        const me=await window.strapiClient.getMe();
+        const u={id:me.id,email:me.email,username:me.username,displayName:me.displayName||me.username,role:me.role||'editor',loggedInAt:new Date().toISOString()};
+        localStorage.setItem('authToken',r.jwt);
+        localStorage.setItem('user',JSON.stringify(u));
+        showDashboard(u);return;
+      }catch(se){console.warn('Strapi login failed, trying mock:',se.message)}
+    }
+    const mock=MOCK_USERS[email];
+    if(!mock||mock.password!==pw)throw new Error('Invalid credentials. Try editor@example.com / password');
+    const u={email,role:'editor',loggedInAt:new Date().toISOString()};
+    localStorage.setItem('authToken',btoa(email+Date.now()));
+    localStorage.setItem('user',JSON.stringify(u));
+    showDashboard(u);
+  }catch(err){alert(err.message)}
+  finally{btn.textContent='Enter';btn.disabled=false}
+});
+
+document.getElementById('logoutBtn').addEventListener('click',()=>{
+  localStorage.removeItem('user');localStorage.removeItem('authToken');localStorage.removeItem('strapi_jwt');
+  dashboard.style.display='none';authGate.style.display='flex';
+});
+
+/* Nav */
+document.querySelectorAll('.nav-link[data-view]').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.nav-link').forEach(n=>n.classList.remove('active'));
+    b.classList.add('active');
+    const v=b.dataset.view;
+    document.getElementById('submissionsView').style.display=v==='submissions'?'':'none';
+    document.getElementById('issueView').style.display=v==='issue'?'':'none';
+    document.getElementById('activityView').style.display=v==='activity'?'':'none';
+    if(v==='issue')renderIssueBuilder();
+    if(v==='activity')renderActivityFeed();
+  });
+});
+
+/* Stats */
+function renderStats(){
+  const subs=loadSubmissions();
+  const s={total:subs.length,pending:subs.filter(x=>x.status==='pending').length,approved:subs.filter(x=>x.status==='approved').length,published:subs.filter(x=>x.status==='published').length,revisions:subs.filter(x=>x.status==='revisions_requested').length,rejected:subs.filter(x=>x.status==='rejected').length};
+  document.getElementById('statsRow').innerHTML=Object.entries(s).map(([k,v])=>`<div class="stat-card"><div class="num">${v}</div><div class="lbl">${k}</div></div>`).join('');
+}
+
+/* Render submissions */
+let currentFilter='all';
+function renderSubmissions(filter){
+  currentFilter=filter;
+  const subs=loadSubmissions();
+  const search=document.getElementById('searchInput').value.toLowerCase();
+  const sort=document.getElementById('sortSelect').value;
+  let list=subs.filter(s=>filter==='all'||s.status===filter);
+  if(search)list=list.filter(s=>`${s.title} ${s.body} ${s.author} ${s.displayName||''}`.toLowerCase().includes(search));
+  if(sort==='title')list.sort((a,b)=>a.title.localeCompare(b.title));
+  else if(sort==='rating')list.sort((a,b)=>(b.rating||0)-(a.rating||0));
+  else list.sort((a,b)=>new Date(b.submittedAt||0)-new Date(a.submittedAt||0));
+  
+  /* Filters */
+  const filters=['all','pending','approved','revisions_requested','published','rejected'];
+  document.getElementById('filterRow').innerHTML=filters.map(f=>`<button class="filter-btn ${f===filter?'active':''}" data-f="${f}">${f==='revisions_requested'?'Revisions':f.charAt(0).toUpperCase()+f.slice(1)} (${f==='all'?subs.length:subs.filter(s=>s.status===f).length})</button>`).join('');
+  document.querySelectorAll('.filter-btn').forEach(b=>b.addEventListener('click',()=>renderSubmissions(b.dataset.f)));
+  
+  const el=document.getElementById('subList');
+  if(!list.length){el.innerHTML='<div style="color:var(--color-grey);padding:2rem;text-align:center;">No submissions found.</div>';return}
+  el.innerHTML=list.map(s=>`
+    <div class="sub-card">
+      <div class="head"><span class="title-text">${s.title}</span><span class="badge ${s.status}">${s.status.replace('_',' ')}</span></div>
+      <div class="meta">by ${s.displayName||s.author} &bull; ${new Date(s.submittedAt||Date.now()).toLocaleDateString()}</div>
+      <div class="preview" id="prev-${s.id}">${(s.body||'').replace(/\n/g,'<br>')}</div>
+      <div class="actions">
+        <button class="btn accent" onclick="openPublish('${s.id}')">Accept & Publish</button>
+        <button class="btn" onclick="openReject('${s.id}')">Reject</button>
+        <button class="btn secondary" onclick="openRevisions('${s.id}')">Revisions</button>
+        <button class="btn secondary" onclick="document.getElementById('prev-${s.id}').classList.toggle('expanded')">Toggle</button>
+        <button class="btn secondary" onclick="openDetail('${s.id}')">Details</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+document.getElementById('searchInput').addEventListener('input',()=>renderSubmissions(currentFilter));
+document.getElementById('sortSelect').addEventListener('change',()=>renderSubmissions(currentFilter));
+
+/* Publish */
+let publishId=null;
+function openPublish(id){
+  publishId=id;
+  const s=loadSubmissions().find(x=>x.id==id);if(!s)return;
+  document.getElementById('publishInfo').innerHTML=`<strong>"${s.title}"</strong> by ${s.displayName||s.author}`;
+  openModal('publishModal');
+}
+document.getElementById('confirmPublish').addEventListener('click',()=>{
+  if(!publishId)return;
+  const cat=document.getElementById('publishCat').value;
+  const wn=parseInt(document.getElementById('publishWall').value)||getNextWall(cat);
+  const list=loadSubmissions();const i=list.findIndex(s=>s.id==publishId);
+  if(i>=0){
+    list[i].status='published';list[i].publishedCategory=cat;list[i].wallNumber=wn;
+    (list[i].timeline=list[i].timeline||[]).push({action:'published',ts:new Date().toISOString(),category:cat,wallNumber:wn});
+    saveSubmissions(list);
+    const pub=JSON.parse(localStorage.getItem('publishedPoems')||'[]');
+    if(!pub.find(p=>p.id=='pub-'+publishId)){
+      pub.push({id:'pub-'+publishId,title:list[i].title,author:list[i].displayName||list[i].author,collection:cat,text:list[i].body,wallNumber:wn});
+      localStorage.setItem('publishedPoems',JSON.stringify(pub));
+    }
+    logActivity('Published "'+list[i].title+'" to '+cat+' gallery');
+  }
+  closeModal('publishModal');renderStats();renderSubmissions(currentFilter);
+  alert('Published to gallery!');
+});
+function getNextWall(cat){
+  const pub=JSON.parse(localStorage.getItem('publishedPoems')||'[]');
+  const mx=Math.max(0,...pub.filter(p=>p.collection===cat).map(p=>p.wallNumber||0));
+  return mx+1;
+}
+
+/* Reject */
+let rejectId=null;
+function openReject(id){
+  rejectId=id;
+  const s=loadSubmissions().find(x=>x.id==id);if(!s)return;
+  document.getElementById('rejectInfo').innerHTML=`<strong>"${s.title}"</strong> by ${s.displayName||s.author}`;
+  document.getElementById('rejectFeedback').value='';
+  openModal('rejectModal');
+}
+document.getElementById('confirmReject').addEventListener('click',()=>{
+  if(!rejectId)return;
+  const fb=document.getElementById('rejectFeedback').value.trim();
+  const list=loadSubmissions();const i=list.findIndex(s=>s.id==rejectId);
+  if(i>=0){list[i].status='rejected';list[i].rejectionFeedback=fb;(list[i].timeline=list[i].timeline||[]).push({action:'rejected',ts:new Date().toISOString(),feedback:fb});saveSubmissions(list);logActivity('Rejected "'+list[i].title+'"');}
+  closeModal('rejectModal');renderStats();renderSubmissions(currentFilter);
+});
+
+/* Revisions */
+let revId=null;
+function openRevisions(id){
+  revId=id;
+  const s=loadSubmissions().find(x=>x.id==id);if(!s)return;
+  document.getElementById('revisionsInfo').innerHTML=`<strong>"${s.title}"</strong> by ${s.displayName||s.author}`;
+  document.getElementById('revisionsFeedback').value='';
+  openModal('revisionsModal');
+}
+document.getElementById('confirmRevisions').addEventListener('click',()=>{
+  if(!revId)return;
+  const fb=document.getElementById('revisionsFeedback').value.trim();
+  if(!fb){alert('Please provide feedback.');return}
+  const list=loadSubmissions();const i=list.findIndex(s=>s.id==revId);
+  if(i>=0){list[i].status='revisions_requested';list[i].revisionFeedback=fb;(list[i].timeline=list[i].timeline||[]).push({action:'revisions_requested',ts:new Date().toISOString(),feedback:fb});saveSubmissions(list);logActivity('Requested revisions for "'+list[i].title+'"');}
+  closeModal('revisionsModal');renderStats();renderSubmissions(currentFilter);
+  alert('Revision request sent.');
+});
+
+/* Detail */
+function openDetail(id){
+  const s=loadSubmissions().find(x=>x.id==id);if(!s)return;
+  document.getElementById('detailTitle').textContent=s.title;
+  document.getElementById('detailMeta').innerHTML=`by ${s.displayName||s.author} &bull; ${new Date(s.submittedAt||Date.now()).toLocaleString()}`;
+  document.getElementById('detailBody').textContent=s.body||'';
+  document.getElementById('detailNotes').value=s.internalNotes||'';
+  /* Rating */
+  const rEl=document.getElementById('detailRating');
+  rEl.innerHTML='';for(let i=1;i<=5;i++){const b=document.createElement('button');b.className='btn secondary';b.textContent=i<=(s.rating||0)?'\u2605':'\u2606';b.style.padding='0.3rem 0.5rem';b.onclick=()=>{const l=loadSubmissions();const x=l.findIndex(z=>z.id==id);if(x>=0){l[x].rating=i;saveSubmissions(l)}openDetail(id)};rEl.appendChild(b)}
+  document.getElementById('detailPublish').onclick=()=>{closeModal('detailModal');openPublish(id)};
+  document.getElementById('detailReject').onclick=()=>{closeModal('detailModal');openReject(id)};
+  document.getElementById('detailRevisions').onclick=()=>{closeModal('detailModal');openRevisions(id)};
+  document.getElementById('detailSaveNotes').onclick=()=>{const l=loadSubmissions();const x=l.findIndex(z=>z.id==id);if(x>=0){l[x].internalNotes=document.getElementById('detailNotes').value;saveSubmissions(l);logActivity('Saved notes for "'+s.title+'"');alert('Notes saved.')}}
+  openModal('detailModal');
+}
+
+/* Issue Builder - One Click Publish */
+function renderIssueBuilder(){
+  const subs=loadSubmissions();
+  const accepted=subs.filter(s=>s.status==='approved'||s.status==='pending');
+  const el=document.getElementById('acceptedList');
+  if(!accepted.length){el.innerHTML='<div style="color:var(--color-grey);padding:1rem;">No accepted submissions yet. Approve submissions first, or select pending ones to include.</div>';return}
+  el.innerHTML=accepted.map((s,idx)=>`
+    <div class="accepted-item" data-id="${s.id}">
+      <input type="checkbox" class="issue-check" data-id="${s.id}" ${s.status==='approved'?'checked':''}>
+      <span class="drag-handle">&#x2630;</span>
+      <span class="item-title">${s.title}</span>
+      <span class="item-author">${s.displayName||s.author}</span>
+      <select class="issue-cat" data-id="${s.id}" style="padding:0.3rem;border:1px solid rgba(0,0,0,0.1);font-size:0.8rem;">
+        ${Object.entries(CATEGORIES).map(([k,v])=>`<option value="${k}" ${s.room===k||s.publishedCategory===k?'selected':''}>${v}</option>`).join('')}
+      </select>
+    </div>
+  `).join('');
+}
+
+document.getElementById('publishIssueBtn').addEventListener('click',()=>{
+  const checks=document.querySelectorAll('.issue-check:checked');
+  if(!checks.length){alert('Select at least one submission to include in the issue.');return}
+  const issueTitle=document.getElementById('issueTitle').value;
+  if(!confirm('Publish '+checks.length+' poems as "'+issueTitle+'" to the live gallery?'))return;
+  const status=document.getElementById('issueStatus');
+  status.textContent='Publishing...';
+  const list=loadSubmissions();
+  const pub=JSON.parse(localStorage.getItem('publishedPoems')||'[]');
+  let count=0;
+  checks.forEach(cb=>{
+    const id=cb.dataset.id;
+    const catSel=document.querySelector(`.issue-cat[data-id="${id}"]`);
+    const cat=catSel?catSel.value:'love';
+    const wn=getNextWall(cat);
+    const idx=list.findIndex(s=>s.id==id);
+    if(idx>=0){
+      list[idx].status='published';list[idx].publishedCategory=cat;list[idx].wallNumber=wn;
+      (list[idx].timeline=list[idx].timeline||[]).push({action:'published',ts:new Date().toISOString(),category:cat,wallNumber:wn,issue:issueTitle});
+      if(!pub.find(p=>p.id=='pub-'+id)){
+        pub.push({id:'pub-'+id,title:list[idx].title,author:list[idx].displayName||list[idx].author,collection:cat,text:list[idx].body,wallNumber:wn});
+      }
+      count++;
+    }
+  });
+  saveSubmissions(list);
+  localStorage.setItem('publishedPoems',JSON.stringify(pub));
+  logActivity('Published issue "'+issueTitle+'" with '+count+' poems');
+  renderStats();renderIssueBuilder();
+  status.textContent=count+' poems published successfully!';
+  setTimeout(()=>{status.textContent=''},4000);
+});
+
+/* Activity feed */
+function renderActivityFeed(){
+  const feed=load('activityFeed');
+  const el=document.getElementById('activityFeed');
+  if(!feed.length){el.innerHTML='<div style="color:var(--color-grey);">No recent activity.</div>';return}
+  el.innerHTML=feed.map(a=>`<div class="activity-item"><span>${a.text}</span> <span class="time">${new Date(a.ts).toLocaleString()}</span></div>`).join('');
+}
+
+/* Session restore */
+(function init(){
+  const u=getUser();
+  if(u&&u.role==='editor'&&localStorage.getItem('authToken')){
+    showDashboard(u);
+  }
+})();
+</script>
+</body>
+</html>

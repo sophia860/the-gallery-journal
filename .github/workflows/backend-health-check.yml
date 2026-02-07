@@ -41,7 +41,7 @@ jobs:
           echo "Checking health endpoint: $ENDPOINT"
 
           BODY_FILE=$(mktemp)
-          RESULT=$(curl -s -L -w "%{http_code} %{time_total}" --max-time 5 -o "$BODY_FILE" "$ENDPOINT")
+          RESULT=$(curl -s -L --max-redirs 3 -w "%{http_code} %{time_total}" --max-time 5 -o "$BODY_FILE" "$ENDPOINT")
           CURL_EXIT=$?
           BODY=$(cat "$BODY_FILE" 2>/dev/null || true)
 
@@ -53,9 +53,6 @@ jobs:
           fi
 
           RESPONSE_MS=$(echo "$TIME_TOTAL" | awk '{printf "%d", $1 * 1000}')
-          case $RESPONSE_MS in
-            ''|*[!0-9]*) RESPONSE_MS=0 ;;
-          esac
 
           case $RAW_HTTP_CODE in
             ''|*[!0-9]*) HTTP_CODE=0 ;;

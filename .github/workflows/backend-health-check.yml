@@ -40,11 +40,21 @@ jobs:
           ENDPOINT="${BACKEND_URL%/}/api/health"
           echo "Checking health endpoint: $ENDPOINT"
 
-          RESULT=$(curl -s -w "%{http_code} %{time_total}" --max-time 5 -o /tmp/health-body "$ENDPOINT" || echo "ERROR 0")
+          RESULT=$(curl -s -w "%{http_code} %{time_total}" --max-time 5 -o /tmp/health-body "$ENDPOINT")
+          CURL_EXIT=$?
           BODY=$(cat /tmp/health-body 2>/dev/null || true)
-          RAW_HTTP_CODE=$(echo "$RESULT" | awk '{print $1}')
-          TIME_TOTAL=$(echo "$RESULT" | awk '{print $2}')
+
+          RAW_HTTP_CODE=0
+          TIME_TOTAL=0
+          if [ $CURL_EXIT -eq 0 ] && [ -n "$RESULT" ]; then
+            RAW_HTTP_CODE=$(echo "$RESULT" | awk '{print $1}')
+            TIME_TOTAL=$(echo "$RESULT" | awk '{print $2}')
+          fi
+
           RESPONSE_MS=$(echo "$TIME_TOTAL" | awk '{printf "%d", $1 * 1000}')
+          case $RESPONSE_MS in
+            ''|*[!0-9]*) RESPONSE_MS=0 ;;
+          esac
 
           case $RAW_HTTP_CODE in
             ''|*[!0-9]*) HTTP_CODE=0 ;;
@@ -60,7 +70,7 @@ jobs:
           fi
 
           echo "endpoint=$ENDPOINT" >> $GITHUB_OUTPUT
-          echo "status_code=${RAW_HTTP_CODE:-0}" >> $GITHUB_OUTPUT
+          echo "status_code=$HTTP_CODE" >> $GITHUB_OUTPUT
           echo "response_time_ms=$RESPONSE_MS" >> $GITHUB_OUTPUT
           echo "body_ok=$BODY_OK" >> $GITHUB_OUTPUT
 

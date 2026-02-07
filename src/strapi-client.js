@@ -136,20 +136,22 @@ class StrapiClient {
 
   /**
    * Get current user profile
+   * @param {boolean} [useCache=true] - Set to false to force a fresh request
    */
   async getMe(useCache = true) {
     try {
       if (
         useCache &&
         this._meCache &&
-        this._meCache.id != null &&
+        this._meCache.id !== null &&
+        this._meCache.id !== undefined &&
         Date.now() - this._meCacheTime < ME_CACHE_TTL_MS
       ) {
         return this._meCache;
       }
 
       const response = await this.request('/api/users/me?populate=*');
-      if (response?.id != null) {
+      if (response?.id !== null && response?.id !== undefined) {
         this._meCache = response;
         this._meCacheTime = Date.now();
       } else {

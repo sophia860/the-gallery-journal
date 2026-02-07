@@ -314,6 +314,12 @@ Add these secrets in your repository settings:
 - `SLACK_WEBHOOK_URL` - Slack incoming webhook URL
 - `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` - For AI analysis
 
+### Configure BACKEND_URL for automated health checks
+
+1. Go to **Settings → Secrets and variables → Actions → New repository secret**.
+2. Name the secret `BACKEND_URL` and set it to your production base URL (for example, `https://api.your-domain.com`).
+3. The hourly workflow at `.github/workflows/backend-health-check.yml` will call `${BACKEND_URL}/api/health` and open an issue if the check fails.
+
 *"Where poetry passes through like light through glass"*
 
 © 2026 The Gallery

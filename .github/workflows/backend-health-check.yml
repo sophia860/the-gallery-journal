@@ -1,0 +1,165 @@
+name: Backend Health Check
+
+on:
+  # Every hour on the hour
+  schedule:
+    - cron: "0 * * * *"
+  # Allow manual triggering from the Actions tab
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  health-check:
+    name: Hourly backend health check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BACKEND_URL: ${{ secrets.BACKEND_URL }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Perform backend health check (expects 200 under 5s)
+        id: health
+        continue-on-error: true
+        run: |
+          EXIT_CODE=0
+          if [ -z "$BACKEND_URL" ]; then
+            echo "::error::BACKEND_URL secret is not configured."
+            echo "endpoint=BACKEND_URL not configured" >> $GITHUB_OUTPUT
+            echo "status_code=0" >> $GITHUB_OUTPUT
+            echo "response_time_ms=0" >> $GITHUB_OUTPUT
+            echo "body_ok=false" >> $GITHUB_OUTPUT
+            echo "health_state=fail" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+          case "$BACKEND_URL" in
+            http://*|https://*) ;;
+            *)
+              echo "::error::BACKEND_URL must start with http:// or https://"
+              echo "endpoint=Invalid BACKEND_URL value" >> $GITHUB_OUTPUT
+              echo "status_code=0" >> $GITHUB_OUTPUT
+              echo "response_time_ms=0" >> $GITHUB_OUTPUT
+              echo "body_ok=false" >> $GITHUB_OUTPUT
+              echo "health_state=fail" >> $GITHUB_OUTPUT
+              exit 1
+              ;;
+          esac
+
+          ENDPOINT="${BACKEND_URL%/}/api/health"
+          echo "Checking health endpoint: $ENDPOINT"
+
+          BODY_FILE=$(mktemp)
+          # Cap redirects and abort requests taking 5s or longer to enforce the <5s requirement
+          RESULT=$(curl -s -L --max-redirs 3 -w "%{http_code} %{time_total}" --max-time 5 -o "$BODY_FILE" "$ENDPOINT")
+          CURL_EXIT=$?
+          BODY=$(cat "$BODY_FILE" 2>/dev/null || true)
+
+          RAW_HTTP_CODE=0
+          TIME_TOTAL=0
+          if [ $CURL_EXIT -eq 0 ] && [ -n "$RESULT" ]; then
+            RAW_HTTP_CODE=$(echo "$RESULT" | awk '{print $1}')
+            TIME_TOTAL=$(echo "$RESULT" | awk '{print $2}')
+          fi
+
+          RESPONSE_MS=$(echo "$TIME_TOTAL" | awk '{printf "%d", $1 * 1000}')
+
+          case $RAW_HTTP_CODE in
+            ''|*[!0-9]*) HTTP_CODE=0 ;;
+            *) HTTP_CODE=$RAW_HTTP_CODE ;;
+          esac
+
+          # Optional body validation; recorded for reporting only
+          if echo "$BODY" | jq -e '.status == "ok"' >/dev/null 2>&1; then
+            BODY_OK=true
+          else
+            BODY_OK=false
+          fi
+
+          echo "endpoint=$ENDPOINT" >> $GITHUB_OUTPUT
+          echo "status_code=$HTTP_CODE" >> $GITHUB_OUTPUT
+          echo "response_time_ms=$RESPONSE_MS" >> $GITHUB_OUTPUT
+          echo "body_ok=$BODY_OK" >> $GITHUB_OUTPUT
+
+          rm -f "$BODY_FILE"
+
+          # Pass only when HTTP 200 and latency strictly under 5 seconds
+          if [ "$HTTP_CODE" -gt 0 ] && [ "$HTTP_CODE" -eq 200 ] && [ "$RESPONSE_MS" -lt 5000 ]; then
+            echo "health_state=pass" >> $GITHUB_OUTPUT
+          else
+            echo "health_state=fail" >> $GITHUB_OUTPUT
+            EXIT_CODE=1
+          fi
+
+          exit $EXIT_CODE
+
+      - name: Create issue on failure
+        if: steps.health.outputs.health_state == 'fail'
+        uses: actions/github-script@v7
+        env:
+          ENDPOINT: ${{ steps.health.outputs.endpoint }}
+          STATUS_CODE: ${{ steps.health.outputs.status_code }}
+          RESPONSE_TIME: ${{ steps.health.outputs.response_time_ms }}
+          BODY_OK: ${{ steps.health.outputs.body_ok }}
+        with:
+          script: |
+            const labels = ['bug', 'backend'];
+            for (const name of labels) {
+              try {
+                await github.rest.issues.getLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name,
+                });
+              } catch (error) {
+                if (error.status === 404) {
+                  await github.rest.issues.createLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    name,
+                    color: name === 'bug' ? 'd73a4a' : '5b8def',
+                    description: name === 'bug' ? 'Something is not working' : 'Backend-related issue',
+                  });
+                } else {
+                  throw error;
+                }
+              }
+            }
+
+            const endpoint = process.env.ENDPOINT || 'Unknown endpoint';
+            const statusCode = process.env.STATUS_CODE || 'Unknown';
+            const responseTime = process.env.RESPONSE_TIME || 'Unknown';
+            const bodyOk = process.env.BODY_OK || 'false';
+            const timestamp = new Date().toUTCString();
+
+            const title = `🚨 Backend Health Check Failed — ${timestamp}`;
+            const body = [
+              'An automated backend health check failed.',
+              '',
+              `- **Endpoint:** ${endpoint}`,
+              `- **HTTP Status:** ${statusCode}`,
+              `- **Response Time:** ${responseTime} ms`,
+              `- **Body Contains "status: ok":** ${bodyOk}`,
+              `- **Timestamp (UTC):** ${timestamp}`,
+              '',
+              `Triggered by: ${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+            ].join('\n');
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              body,
+              labels,
+            });
+
+      - name: Fail workflow when unhealthy
+        if: steps.health.outputs.health_state == 'fail'
+        run: |
+          echo "::error::Backend health check failed (HTTP ${{ steps.health.outputs.status_code }}, ${{ steps.health.outputs.response_time_ms }} ms)."
+          exit 1

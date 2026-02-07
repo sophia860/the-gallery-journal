@@ -5,6 +5,7 @@
  */
 
 const STRAPI_URL = 'https://supportive-ducks-9506a8aa47.strapiapp.com';
+/** Cache duration for getMe results in milliseconds */
 const ME_CACHE_TTL_MS = 60 * 1000;
 
 class StrapiClient {
@@ -148,7 +149,7 @@ class StrapiClient {
       }
 
       const response = await this.request('/api/users/me?populate=*');
-      if (response && response.id) {
+      if (response && response.id != null) {
         this._meCache = response;
         this._meCacheTime = Date.now();
       } else {

@@ -125,7 +125,7 @@ body{font-family:var(--font-sans);font-size:16px;background:var(--color-paper);c
 <div class="auth-card">
 <h1>Editor's Studio</h1>
 <p class="subtitle">Access the editorial dashboard</p>
-<form id="loginForm">
+<form id="loginForm" onsubmit="return false;">
 <div class="field"><label>Email</label><input type="email" id="email" required></div>
 <div class="field"><label>Password</label><input type="password" id="password" required></div>
 <button type="submit" class="btn-primary" id="loginBtn">Enter</button>
@@ -254,7 +254,7 @@ body{font-family:var(--font-sans);font-size:16px;background:var(--color-paper);c
 
 <script src="src/strapi-client.js"></script>
 <script>
-const STRAPI_URL='https://supportive-ducks-9506a8aa47.strapiapp.com';
+  /* STRAPI_URL defined in strapi-client.js */
 const MOCK_USERS={'editor@example.com':{password:'password',role:'editor'}};
 const CATEGORIES={love:'Love & Relationships',nature:'Nature & The Natural World',grief:'Grief, Loss & Memory',family:'Family & Identity',time:'Time & Mortality',self:'Self & Introspection'};
 

@@ -27,6 +27,7 @@ jobs:
         id: health
         continue-on-error: true
         run: |
+          EXIT_CODE=0
           if [ -z "$BACKEND_URL" ]; then
             echo "::error::BACKEND_URL secret is not configured."
             echo "endpoint=BACKEND_URL not configured" >> $GITHUB_OUTPUT
@@ -34,7 +35,7 @@ jobs:
             echo "response_time_ms=0" >> $GITHUB_OUTPUT
             echo "body_ok=false" >> $GITHUB_OUTPUT
             echo "health_state=fail" >> $GITHUB_OUTPUT
-            exit 0
+            exit 1
           fi
 
           case "$BACKEND_URL" in
@@ -46,7 +47,7 @@ jobs:
               echo "response_time_ms=0" >> $GITHUB_OUTPUT
               echo "body_ok=false" >> $GITHUB_OUTPUT
               echo "health_state=fail" >> $GITHUB_OUTPUT
-              exit 0
+              exit 1
               ;;
           esac
 
@@ -54,6 +55,7 @@ jobs:
           echo "Checking health endpoint: $ENDPOINT"
 
           BODY_FILE=$(mktemp)
+          # Cap redirects and abort requests taking 5s or longer to enforce the <5s requirement
           RESULT=$(curl -s -L --max-redirs 3 -w "%{http_code} %{time_total}" --max-time 5 -o "$BODY_FILE" "$ENDPOINT")
           CURL_EXIT=$?
           BODY=$(cat "$BODY_FILE" 2>/dev/null || true)
@@ -91,7 +93,10 @@ jobs:
             echo "health_state=pass" >> $GITHUB_OUTPUT
           else
             echo "health_state=fail" >> $GITHUB_OUTPUT
+            EXIT_CODE=1
           fi
+
+          exit $EXIT_CODE
 
       - name: Create issue on failure
         if: steps.health.outputs.health_state == 'fail'

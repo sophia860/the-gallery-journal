@@ -3124,13 +3124,31 @@ finally.`
                 const card = document.createElement('div');
                 card.className = 'writer-card';
                 card.innerHTML = `
-                    <div>
-                        <h4 style="margin-bottom: 0.5rem;">${sub.title}</h4>
-                        <div class="badge ${sub.status}" style="display: inline-block; margin-bottom: 0.5rem;">${sub.status}</div>
-                        <div style="font-size: 0.9rem; color: var(--color-grey); margin-bottom: 0.5rem;">Submitted: ${sub.submittedAt ? new Date(sub.submittedAt).toLocaleDateString() : 'Unknown'}</div>
-                        ${sub.editorFeedback ? `<div style="padding: 0.75rem; background: var(--color-cream); border-radius: 4px; margin-top: 0.5rem;"><strong>Editor Feedback:</strong><br>${sub.editorFeedback}</div>` : ''}
+            <div>
+                <h4 style="margin-bottom: 0.5rem;">${sub.title}</h4>
+                <div class="badge ${sub.status}" style="display: inline-block; margin-bottom: 0.5rem;">${sub.status.replace('_', ' ')}</div>
+                <div style="font-size: 0.9rem; color: var(--color-grey); margin-bottom: 0.5rem;">Submitted: ${sub.submittedAt ? new Date(sub.submittedAt).toLocaleDateString() : 'Unknown'}</div>
+                ${sub.editorFeedback ? `<div style="padding: 0.75rem; background: var(--color-cream); border-radius: 4px; margin-top: 0.5rem;"><strong>Editor Feedback:</strong><br>${sub.editorFeedback}</div>` : ''}
+                ${sub.revisionFeedback ? `<div style="padding: 0.75rem; background: var(--color-cream); border-radius: 4px; margin-top: 0.5rem; border-left: 3px solid var(--color-accent);"><strong>Revision Feedback:</strong><br>${sub.revisionFeedback}</div>` : ''}
+                ${sub.lineFeedbacks && Object.keys(sub.lineFeedbacks).length > 0 ? `
+                <div style="padding: 0.75rem; background: var(--color-cream); border-radius: 4px; margin-top: 0.75rem;">
+                    <strong style="display: block; margin-bottom: 0.5rem;">Line-by-Line Feedback:</strong>
+                    <div style="font-family: var(--font-serif); font-size: 0.95rem; line-height: 1.8; white-space: pre-wrap;">
+                    ${sub.body.split('\n').map((line, i) => {
+                        const fb = sub.lineFeedbacks[i];
+                        if (fb) {
+                            return `<div style="padding: 0.4rem 0.5rem; margin-bottom: 0.3rem; background: rgba(196,30,58,0.08); border-left: 3px solid var(--color-accent); border-radius: 2px;"><div>${line || '&nbsp;'}</div><div style="font-size: 0.85rem; color: var(--color-accent); font-style: italic; margin-top: 0.25rem;">↳ ${fb}</div></div>`;
+                        }
+                        return `<div style="padding: 0.2rem 0.5rem;">${line || '&nbsp;'}</div>`;
+                    }).join('')}
                     </div>
-                `;
+                </div>` : ''}
+                ${sub.status === 'revisions_requested' ? `
+                <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                    <button class="studio-btn" onclick="openResubmitEditor('${sub.id}')">Resubmit Revised Poem</button>
+                </div>` : ''}
+            </div>
+            `;
                 submittedListEl.appendChild(card);
             });
             
@@ -3457,6 +3475,55 @@ Line breaks will be preserved exactly as you type them." style="width: 100%; pad
             showPayPalModal(newSubmission);
         }
         
+    function openResubmitEditor(subId) {
+        const subs = loadSubmissions();
+        const sub = subs.find(s => s.id === subId || s.id === Number(subId));
+        if (!sub) { alert('Submission not found.'); return; }
+        const modal = document.createElement('div');
+        modal.className = 'modal active';
+        modal.innerHTML = `
+        <div class="modal-content" style="max-width: 900px;">
+            <button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
+            <h2 style="margin-bottom: 0.5rem; font-family: var(--font-slab); font-weight: 300;">Revise & Resubmit</h2>
+            <p style="color: var(--color-grey); margin-bottom: 1.5rem;">Edit your poem based on the editor's feedback, then resubmit.</p>
+            ${sub.revisionFeedback ? `<div style="padding: 0.75rem; background: var(--color-cream); border-radius: 4px; margin-bottom: 1rem; border-left: 3px solid var(--color-accent);"><strong>Editor's Feedback:</strong><br>${sub.revisionFeedback}</div>` : ''}
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--color-grey);">Title</label>
+                <input type="text" id="resubmit-title" value="${sub.title}" style="width: 100%; padding: 0.75rem; border: 1px solid rgba(0,0,0,0.12); border-radius: 4px; font-family: var(--font-serif); font-size: 1rem; margin-bottom: 1rem;">
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--color-grey);">Poem Text</label>
+                <textarea id="resubmit-body" rows="14" style="width: 100%; padding: 0.75rem; border: 1px solid rgba(0,0,0,0.12); border-radius: 4px; font-family: var(--font-serif); font-size: 1rem; line-height: 1.8;">${sub.body}</textarea>
+            </div>
+            <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem;">
+                <button class="studio-btn secondary" onclick="this.closest('.modal').remove()">Cancel</button>
+                <button class="studio-btn" onclick="submitRevisedPoem('${sub.id}')">Resubmit</button>
+            </div>
+        </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    function submitRevisedPoem(subId) {
+        const title = document.getElementById('resubmit-title').value.trim();
+        const body = document.getElementById('resubmit-body').value.trim();
+        if (!title || !body) { alert('Please provide a title and poem text.'); return; }
+        const subs = loadSubmissions();
+        const idx = subs.findIndex(s => s.id === subId || s.id === Number(subId));
+        if (idx < 0) { alert('Submission not found.'); return; }
+        subs[idx].title = title;
+        subs[idx].body = body;
+        subs[idx].status = 'pending';
+        subs[idx].revisionFeedback = '';
+        subs[idx].lineFeedbacks = {};
+        (subs[idx].timeline = subs[idx].timeline || []).push({ action: 'resubmitted', ts: new Date().toISOString() });
+        saveSubmissions(subs);
+        document.querySelector('.modal').remove();
+        alert('Poem resubmitted for review!');
+        const user = getCurrentUser();
+        if (user) renderWriterStudio(user);
+    }
+
         function editDraft(draftId) {
             // Not yet implemented - would open poem editor with draft content
             const drafts = loadDrafts();

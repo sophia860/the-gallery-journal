@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poetry Exhibits - The Gallery</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@500;600&family=Lora:wght@400;500&family=Playfair+Display:wght@600;700&family=Rockwell:wght@300&display=swap');
+        
+        :root {
+            --color-paper: #FAF8F5;
+            --color-ink: #0D0D0D;
+            --color-accent: #C41E3A;
+            --color-grey: #6B6B6B;
+            --color-cream: #F5F1EB;
+            --color-dark-mode: #1a1a1a;
+            --font-serif: 'Lora', 'Source Serif Pro', serif;
+            --font-display: 'Playfair Display', 'Georgia', serif;
+            --font-slab: 'Rockwell', 'Courier New', serif;
+            --font-sans: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+            --max-width: 680px;
+            --transition-soft: all 240ms ease;
+            --button-radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-serif);
+            font-size: 18px;
+            background: var(--color-paper);
+            color: var(--color-ink);
+            line-height: 1.65;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 3rem;
+            background-color: rgba(245, 241, 232, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(139, 115, 85, 0.1);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            font-family: var(--font-sans);
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--color-accent);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: var(--color-ink);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            width: 0;
+            height: 1px;
+            background-color: var(--color-ink);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .nav-link:hover::after {
+            width: 80%;
+        }
+
+        .hero {
+            min-height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 10rem 2rem 5rem;
+            background: var(--color-paper);
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 3rem 6vw 2rem 6vw;
+            border: 1px solid rgba(13, 13, 13, 0.08);
+            pointer-events: none;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .issue-label {
+            font-family: var(--font-sans);
+            font-size: 0.78rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--color-grey);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        h1 {
+            font-family: var(--font-slab);
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 300;
+            letter-spacing: -0.025em;
+            margin-bottom: 1.2rem;
+            color: var(--color-ink);
+        }
+
+        .tagline {
+            font-family: var(--font-serif);
+            font-size: 1.1rem;
+            font-style: italic;
+            color: var(--color-grey);
+            max-width: var(--max-width);
+            margin: 0 auto 2rem;
+            line-height: 1.7;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 2rem 5rem;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-family: var(--font-sans);
+            font-size: 0.7rem;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--color-accent);
+            margin: 3rem 0 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(139, 115, 85, 0.25);
+        }
+
+        .section-header::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(139, 115, 85, 0.25), transparent);
+        }
+
+        .exhibits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2.5rem;
+            margin-top: 3rem;
+        }
+
+        .exhibit-card {
+            background: #f5f0e8;
+            border: 12px solid var(--color-cream);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04), inset 0 0 0 1px rgba(13,13,13,0.05);
+            padding: 2rem;
+            transition: var(--transition-soft);
+            position: relative;
+        }
+
+        .exhibit-card::after {
+            content: '';
+            position: absolute;
+            top: -12px;
+            left: 40px;
+            width: 48px;
+            height: 6px;
+            background: radial-gradient(circle at 30% 50%, rgba(0,0,0,0.08), transparent 55%);
+            filter: blur(2px);
+            transform: rotate(-2deg);
+        }
+
+        .exhibit-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08), inset 0 0 0 1px rgba(13,13,13,0.05);
+        }
+
+        .exhibit-title {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            color: var(--color-ink);
+        }
+
+        .exhibit-author {
+            font-family: var(--font-sans);
+            font-size: 0.9rem;
+            color: var(--color-accent);
+            margin-bottom: 1rem;
+        }
+
+        .exhibit-description {
+            font-size: 1rem;
+            line-height: 1.8;
+            color: var(--color-grey);
+            margin-bottom: 1.5rem;
+        }
+
+        .exhibit-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.85rem 1.4rem;
+            font-family: var(--font-sans);
+            font-size: 0.8rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            background: var(--color-ink);
+            color: var(--color-paper);
+            text-decoration: none;
+            border-radius: var(--button-radius);
+            transition: var(--transition-soft);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .exhibit-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+            background: #161616;
+        }
+
+        footer {
+            text-align: center;
+            padding: 4rem 2rem;
+            font-family: var(--font-sans);
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--color-grey);
+        }
+
+        @media (max-width: 768px) {
+            .top-nav {
+                padding: 1rem 1.5rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .hero {
+                min-height: 50vh;
+                padding: 8rem 1.5rem 3rem;
+            }
+
+            h1 {
+                font-size: 2.2rem;
+            }
+
+            .exhibits-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="top-nav">
+        <div class="nav-links">
+            <a href="/index.html" class="nav-link">← Back to Gallery</a>
+        </div>
+        <div class="nav-links">
+            <a href="#current" class="nav-link">Current Exhibits</a>
+            <a href="#past" class="nav-link">Past Exhibits</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <div class="issue-label">Special Collections</div>
+            <h1>Poetry Exhibits</h1>
+            <p class="tagline">
+                Immersive digital experiences that bring poetry to life. Each exhibit is a curated journey 
+                through words, illustrations, and interactive storytelling.
+            </p>
+        </div>
+    </section>
+
+    <div class="container">
+        <div class="section-header" id="current">Current Exhibits</div>
+        
+        <div class="exhibits-grid">
+            <div class="exhibit-card">
+                <h2 class="exhibit-title">Along the Oxbow</h2>
+                <div class="exhibit-author">Written by Bri Gearhart Staton • Illustrated by Sophia Sharkey</div>
+                <p class="exhibit-description">
+                    An interactive poetry experience that explores themes of nature, memory, and the passage of time. 
+                    Swipe through illuminated verses set against a backdrop of stunning blue-toned illustrations.
+                </p>
+                <a href="https://pagegalleryjournal.com/brigearhartstaton" target="_blank" rel="noopener" class="exhibit-link">
+                    Enter Exhibit →
+                </a>
+            </div>
+        </div>
+
+        <div class="section-header" id="past">Past Exhibits</div>
+        
+        <div class="exhibits-grid">
+            <div class="exhibit-card" style="opacity: 0.7;">
+                <h2 class="exhibit-title">Coming Soon</h2>
+                <div class="exhibit-author">Future Exhibitions</div>
+                <p class="exhibit-description">
+                    More immersive poetry experiences are on the way. Check back soon to explore new exhibits from 
+                    emerging and established voices.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        The Gallery © 2026 · a room of ones own
+    </footer>
+</body>
+</html>

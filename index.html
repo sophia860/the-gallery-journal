@@ -3224,6 +3224,8 @@ finally.`
     function addBoardCard() {
         const cardTitle = prompt('Enter card title:');
         if (cardTitle) {
+                        const modal = document.createElement('div');
+            modal.className = 'modal active';
             modal.innerHTML = `
                 <div class="modal-content" style="max-width: 900px;">
                     <button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
@@ -3271,6 +3273,130 @@ Line breaks will be preserved exactly as you type them." style="width: 100%; pad
             `;
             document.body.appendChild(modal);
         }
+            }
+
+    // Collab Helper Functions
+    function inviteCollaborator() {
+        const email = prompt('Enter collaborator email:');
+        if (email) {
+            alert('Invitation sent to ' + email + '!');
+        }
+    }
+
+    function startCollabSession() {
+        alert('Starting collaborative session... Share the link with your collaborators!');
+    }
+
+    function startNewSession() {
+        const sessionId = 'session-' + Date.now().toString(36);
+        document.getElementById('session-id').textContent = sessionId;
+        const shareLink = window.location.origin + '?session=' + sessionId;
+        document.getElementById('share-link').value = shareLink;
+        alert('New session started! Share the link with collaborators.');
+    }
+
+    function endSession() {
+        document.getElementById('session-id').textContent = '--';
+        document.getElementById('share-link').value = 'No active session';
+        alert('Session ended.');
+    }
+
+    function copyShareLink() {
+        const link = document.getElementById('share-link');
+        navigator.clipboard.writeText(link.value).then(() => alert('Link copied!')).catch(() => alert('Failed to copy.'));
+    }
+
+    function showCommentsPanel() { alert('Comments panel coming soon!'); }
+    function showSuggestionsPanel() { alert('Suggestions panel coming soon!'); }
+    function showVersionHistory() { alert('Version history coming soon!'); }
+    function showChatPanel() { alert('Live chat coming soon!'); }
+
+    // Boards drag-and-drop helpers
+    function allowDrop(event) { event.preventDefault(); }
+    function dropCard(event) {
+        event.preventDefault();
+        const cardId = event.dataTransfer.getData('text/plain');
+        const card = document.getElementById(cardId);
+        if (card) {
+            const column = event.currentTarget.querySelector('[id^="cards-"]');
+            if (column) column.appendChild(card);
+            updateBoardCounts();
+        }
+    }
+
+    function updateBoardCounts() {
+        const cols = ['ideas', 'progress', 'complete'];
+        cols.forEach(col => {
+            const container = document.getElementById('cards-' + col);
+            const counter = document.getElementById(col + '-count');
+            if (container && counter) counter.textContent = container.children.length;
+        });
+    }
+
+    function showAddCardModal() {
+        const title = prompt('Enter card title:');
+        if (title) {
+            const card = document.createElement('div');
+            card.id = 'card-' + Date.now();
+            card.draggable = true;
+            card.ondragstart = function(e) { e.dataTransfer.setData('text/plain', this.id); };
+            card.style.cssText = 'padding: 0.75rem; background: white; border: 1px solid rgba(0,0,0,0.1); border-radius: 4px; margin-bottom: 0.5rem; cursor: grab;';
+            card.textContent = title;
+            document.getElementById('cards-ideas').appendChild(card);
+            updateBoardCounts();
+        }
+    }
+
+    function clearAllCards() {
+        if (confirm('Clear all cards from all columns?')) {
+            ['ideas', 'progress', 'complete'].forEach(col => {
+                document.getElementById('cards-' + col).innerHTML = '';
+            });
+            updateBoardCounts();
+        }
+    }
+
+    function loadSampleCards() {
+        const samples = ['Brainstorm poem themes', 'Draft opening stanza', 'Revise metaphors'];
+        const container = document.getElementById('cards-ideas');
+        samples.forEach(title => {
+            const card = document.createElement('div');
+            card.id = 'card-' + Date.now() + Math.random().toString(36).slice(2,5);
+            card.draggable = true;
+            card.ondragstart = function(e) { e.dataTransfer.setData('text/plain', this.id); };
+            card.style.cssText = 'padding: 0.75rem; background: white; border: 1px solid rgba(0,0,0,0.1); border-radius: 4px; margin-bottom: 0.5rem; cursor: grab;';
+            card.textContent = title;
+            container.appendChild(card);
+        });
+        updateBoardCounts();
+    }
+
+    function openNewPoemEditor() {
+        const modal = document.createElement('div');
+        modal.className = 'modal active';
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width: 900px;">
+                <button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
+                <h2>New Poem</h2>
+                <div style="display: grid; gap: 1rem;">
+                    <div>
+                        <label>Title</label>
+                        <input type="text" id="new-poem-title" style="width:100%;padding:0.75rem;border:1px solid rgba(0,0,0,0.12);">
+                    </div>
+                    <div>
+                        <label>Poem Text</label>
+                        <textarea id="new-poem-body" rows="12" placeholder="Write your poem here..." style="width:100%;padding:0.75rem;border:1px solid rgba(0,0,0,0.12);"></textarea>
+                    </div>
+                    <div style="display:flex;gap:1rem;justify-content:center;">
+                        <button class="studio-btn secondary" onclick="this.closest('.modal').remove()">Cancel</button>
+                        <button class="studio-btn secondary" onclick="savePoemAsDraft()">Save as Draft</button>
+                        <button class="studio-btn" onclick="submitNewPoem()">Submit for Review</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
         
         function savePoemAsDraft() {
             const title = document.getElementById('new-poem-title').value;

@@ -2124,7 +2124,7 @@ finally.`
                                 <div style="font-family: var(--font-sans); font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-grey); margin-bottom: 0.75rem;">Nearby Works</div>
                                 <div style="display: flex; flex-direction: column; gap: 0.5rem;">
                                     ${nearbyWorks.map(([nearbyId, nearby]) => `
-                                        <div style="font-size: 0.9rem; color: var(--color-grey); cursor: pointer; transition: color 0.2s;" onclick="scrollToPoem('${nearbyId}')" onmouseenter="this.style.color='var(--color-accent)'" onmouseleave="this.style.color='var(--color-grey)'">
+                                        <div style="font-size: 0.9rem; color: var(--color-grey); cursor: pointer; transition: color 0.2s;" onclick="event.stopPropagation(); scrollToPoem('${nearbyId}')" onmouseenter="this.style.color='var(--color-accent)'" onmouseleave="this.style.color='var(--color-grey)'">
                                             → ${nearby.title} <span style="font-style: italic; font-size: 0.85rem;">by ${nearby.author}</span>
                                         </div>
                                     `).join('')}

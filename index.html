@@ -2936,9 +2936,9 @@ finally.`
                             <button onclick="switchWriterTab('submitted')" id="tab-submitted" class="writer-tab">Submitted (${submitted.length})</button>
                             <button onclick="switchWriterTab('published')" id="tab-published" class="writer-tab">Published (${published.length})</button>
                             <button onclick="switchWriterTab('archive')" id="tab-archive" class="writer-tab">Archive (${archived.length})</button>
-                            <button onclick="switchWriterTab('resonance')" id="tab-resonance" class="writer-tab">Resonance</button>                 <button onclick="switchWriterTab('boards')" id="tab-boards" class="writer-tab">📋 Boards</button>                 <button onclick="switchWriterTab('collab')" id="tab-collab" class="writer-tab">👥 Collab</button>
-                                                            <button onclick="switchWriterTab('boards')" id="tab-boards" class="writer-tab">📋 Boards</button>
-                                                                                            <button onclick="switchWriterTab('collab')" id="tab-collab" class="writer-tab">👥 Collab</button>
+                            <button onclick="switchWriterTab('resonance')" id="tab-resonance" class="writer-tab">Resonance</button>
+                            <button onclick="switchWriterTab('boards')" id="tab-boards" class="writer-tab">📋 Boards</button>
+                            <button onclick="switchWriterTab('collab')" id="tab-collab" class="writer-tab">👥 Collab</button>
                         </div>
                     </div>
                     
@@ -2992,9 +2992,10 @@ finally.`
                                 <div style="font-size: 0.9rem; color: var(--color-grey);">Highlights</div>
                             </div>
                         </div>
-                        <div id="resonance-details" class="writer-list">
-                            ${published.length === 0 ? '<p style="color: var(--color-grey);">Publish your first poem to see detailed analytics.</p>' : ''}
-                        </div>
+                    <div id="resonance-details" class="writer-list">
+                        ${published.length === 0 ? '<p style="color: var(--color-grey);">Publish your first poem to see detailed analytics.</p>' : ''}
+                    </div>
+                    </div>
 
                     <!-- Boards Section - Interactive Planning Boards -->
                     <div id="writer-section-boards" class="writer-section" style="display: none;">
@@ -3277,7 +3278,6 @@ finally.`
 Line breaks will be preserved exactly as you type them." style="width: 100%; padding: 0.75rem; border: 1px solid rgba(0,0,0,0.12); border-radius: 4px; font-family: var(--font-serif); font-size: 1rem; line-height: 1.8; white-space: pre-wrap;"></textarea>
                         </div>
                 <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem;">                            <button class="studio-btn secondary" onclick="this.closest('.modal').remove()">Cancel</button>
-                                                <button class="studio-btn secondary" onclick="this.closest('.modal').remove()">Cancel</button>
 <button class="studio-btn secondary" onclick="savePoemAsDraft()">Save as Draft</button>
                             <button class="studio-btn" onclick="submitNewPoem()">Submit for Review</button>
                         </div>

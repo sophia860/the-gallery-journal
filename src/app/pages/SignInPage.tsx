@@ -24,10 +24,10 @@ export function SignInPage() {
 
     try {
       await signIn(email, password);
-      
+
       // Get the current user's session
       const { data: { session } } = await supabase.auth.getSession();
-      
+
       if (session?.user) {
         // Query the profiles table to get user role
         const { data: profile, error: profileError } = await supabase
@@ -136,10 +136,14 @@ export function SignInPage() {
               
               <a
                 href={getRedirectUrl()}
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
                   if (typeof window !== 'undefined') {
                     localStorage.setItem('demoMode', 'true');
                   }
+                  // Use window.location.href to force a full page reload
+                  // so AuthContext re-initializes and detects demoMode in localStorage
+                  window.location.href = getRedirectUrl();
                 }}
                 className="mt-4 w-full px-6 py-4 bg-white border-2 border-[#E0D8D0] text-[#717171] hover:border-[#C4918A] hover:text-[#2C2C2C] transition-colors font-['Courier_New'] text-sm flex items-center justify-center gap-2"
               >

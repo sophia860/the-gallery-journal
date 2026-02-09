@@ -37,6 +37,8 @@ import { WriterEditorPage } from './pages/WriterEditorPage';
 // Collection Gallery and Community Wall
 import { CollectionGalleryPage } from './pages/CollectionGalleryPage';
 import { CommunityWallPage } from './pages/CommunityWallPage';
+import { SubmitToGalleryPage } from './pages/SubmitToGalleryPage';
+import { EditorialSubmissionsPage } from './editorial/EditorialSubmissionsPage';
 
 // 404 Page
 import { NotFoundPage } from './pages/NotFoundPage';
@@ -147,6 +149,10 @@ function AppContent() {
     pageContent = <CollectionGalleryPage />;
   } else if (route === '/community-wall') {
     pageContent = <CommunityWallPage />;
+  } else if (route === '/submit-to-gallery') {
+    pageContent = <SubmitToGalleryPage />;
+  } else if (route === '/editorial/submissions') {
+    pageContent = <EditorialSubmissionsPage />;
   } else if (route.startsWith('/writer/')) {
     const writerId = route.split('/writer/')[1];
     pageContent = <WriterProfilePage writerId={writerId} />;

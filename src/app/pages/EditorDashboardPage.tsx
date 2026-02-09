@@ -47,6 +47,7 @@ export function EditorDashboardPage() {
 
   useEffect(() => {
     // Wait for auth context to finish loading before checking auth
+    console.log('[EditorDashboard] Auth loading status:', authLoading, 'User:', user?.email);
     if (!authLoading) {
       checkAuth();
     }
@@ -59,11 +60,16 @@ export function EditorDashboardPage() {
   }, [view, profile]);
 
   const checkAuth = async () => {
+    console.log('[EditorDashboard] checkAuth called. User:', user?.email);
+    
     // If no user after auth loading is complete, redirect to signin
     if (!user) {
+      console.log('[EditorDashboard] No user found, redirecting to signin');
       window.location.href = '/signin?redirect=/editor-dashboard';
       return;
     }
+
+    console.log('[EditorDashboard] User found, fetching profile for:', user.id);
 
     try {
       const { data: profileData, error } = await supabase
@@ -72,23 +78,28 @@ export function EditorDashboardPage() {
         .eq('id', user.id)
         .single();
 
+      console.log('[EditorDashboard] Profile data:', profileData, 'Error:', error);
+
       if (error || !profileData) {
-        console.error('Error fetching profile:', error);
+        console.error('[EditorDashboard] Error fetching profile:', error);
         window.location.href = '/signin';
         return;
       }
 
       // Check if user has editor role - accept editor, eic, or admin
+      console.log('[EditorDashboard] Checking role:', profileData.role);
       if (!['editor', 'eic', 'admin'].includes(profileData.role)) {
+        console.log('[EditorDashboard] Access denied. Role:', profileData.role);
         alert('Access denied. This page is for editors only.');
         window.location.href = '/studio';
         return;
       }
 
+      console.log('[EditorDashboard] Access granted. Loading dashboard...');
       setProfile(profileData);
       setPageLoading(false);
     } catch (err) {
-      console.error('Auth check error:', err);
+      console.error('[EditorDashboard] Auth check error:', err);
       window.location.href = '/signin';
     }
   };

@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { GalleryNav } from '../components/GalleryNav';
 
 export function SignInPage() {
-  const { signIn, user } = useAuth();
+  const { signIn, user, supabase } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -24,15 +24,29 @@ export function SignInPage() {
 
     try {
       await signIn(email, password);
-      // Auth context will update the user, wait a tick for it to update
-      setTimeout(() => {
-        const userRole = user?.user_metadata?.role;
-        if (userRole === 'editor' || userRole === 'managing_editor') {
-          window.location.href = '/editor';
+      
+      // Get the current user's session
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session?.user) {
+        // Query the profiles table to get user role
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .single();
+
+        if (profileError) {
+          console.error('Error fetching profile:', profileError);
+        }
+
+        // Redirect based on role
+        if (profile?.role === 'editor' || profile?.role === 'eic' || profile?.role === 'admin') {
+          window.location.href = '/editor-dashboard';
         } else {
           window.location.href = getRedirectUrl();
         }
-      }, 100);
+      }
     } catch (err: any) {
       setError(err.message || 'Failed to sign in. Please check your credentials.');
     } finally {

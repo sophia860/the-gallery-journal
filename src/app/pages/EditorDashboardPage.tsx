@@ -1,0 +1,549 @@
+import { useState, useEffect } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import { FileText, BookOpen, Upload, LogOut, Menu, X } from 'lucide-react';
+import { GalleryNav } from '../components/GalleryNav';
+
+type ViewMode = 'submissions' | 'content' | 'upload';
+
+interface Submission {
+  id: string;
+  user_id: string;
+  title: string;
+  content: string;
+  genre: string;
+  status: 'pending' | 'under_review' | 'accepted' | 'rejected';
+  submitted_at: string;
+  reviewed_by?: string;
+  reviewed_at?: string;
+  notes?: string;
+}
+
+interface Profile {
+  id: string;
+  email: string;
+  display_name: string;
+  role: string;
+}
+
+export function EditorDashboardPage() {
+  const { user, supabase, signOut } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [view, setView] = useState<ViewMode>('submissions');
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  // Upload form state
+  const [uploadForm, setUploadForm] = useState({
+    title: '',
+    authorName: '',
+    authorEmail: '',
+    content: '',
+    genre: 'poetry',
+    status: 'pending',
+    submissionDate: new Date().toISOString().split('T')[0],
+  });
+
+  useEffect(() => {
+    checkAuth();
+  }, [user]);
+
+  useEffect(() => {
+    if (view === 'submissions') {
+      fetchSubmissions();
+    }
+  }, [view]);
+
+  const checkAuth = async () => {
+    if (!user) {
+      window.location.href = '/signin?redirect=/editor-dashboard';
+      return;
+    }
+
+    try {
+      const { data: profileData, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (error || !profileData) {
+        console.error('Error fetching profile:', error);
+        window.location.href = '/signin';
+        return;
+      }
+
+      // Check if user has editor role
+      if (!['editor', 'eic', 'admin'].includes(profileData.role)) {
+        window.location.href = '/studio';
+        return;
+      }
+
+      setProfile(profileData);
+    } catch (err) {
+      console.error('Auth check error:', err);
+      window.location.href = '/signin';
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchSubmissions = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('submissions')
+        .select('*')
+        .order('submitted_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching submissions:', error);
+        return;
+      }
+
+      setSubmissions(data || []);
+    } catch (err) {
+      console.error('Fetch submissions error:', err);
+    }
+  };
+
+  const updateSubmissionStatus = async (id: string, status: string, notes?: string) => {
+    try {
+      const { error } = await supabase
+        .from('submissions')
+        .update({
+          status,
+          notes,
+          reviewed_by: user?.id,
+          reviewed_at: new Date().toISOString(),
+        })
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error updating submission:', error);
+        alert('Failed to update submission');
+        return;
+      }
+
+      // Refresh submissions
+      fetchSubmissions();
+      setSelectedSubmission(null);
+      alert('Submission updated successfully!');
+    } catch (err) {
+      console.error('Update error:', err);
+      alert('Failed to update submission');
+    }
+  };
+
+  const handleUploadSubmission = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      const { error } = await supabase
+        .from('submissions')
+        .insert({
+          title: uploadForm.title,
+          content: uploadForm.content,
+          genre: uploadForm.genre,
+          status: uploadForm.status,
+          submitted_at: uploadForm.submissionDate,
+          user_id: user?.id, // Using current editor as placeholder
+          notes: `Legacy submission - Author: ${uploadForm.authorName} (${uploadForm.authorEmail})`,
+        });
+
+      if (error) {
+        console.error('Error uploading submission:', error);
+        alert('Failed to upload submission');
+        return;
+      }
+
+      alert('Submission uploaded successfully!');
+      setUploadForm({
+        title: '',
+        authorName: '',
+        authorEmail: '',
+        content: '',
+        genre: 'poetry',
+        status: 'pending',
+        submissionDate: new Date().toISOString().split('T')[0],
+      });
+    } catch (err) {
+      console.error('Upload error:', err);
+      alert('Failed to upload submission');
+    }
+  };
+
+  const handleLogout = async () => {
+    await signOut();
+    window.location.href = '/';
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#FAF7F2] flex items-center justify-center">
+        <div className="text-[#2C1810] font-['Cardo'] text-xl">Loading...</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#FAF7F2]">
+      {/* Top Navigation */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-[#E0D8D0] px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="p-2 hover:bg-[#F5F0EB] rounded-lg transition-colors"
+            >
+              {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+            <h1 className="font-['Cardo'] text-2xl text-[#2C1810]">Editor Dashboard</h1>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            <div className="text-right">
+              <p className="font-['Cardo'] text-sm text-[#2C1810]">{profile?.display_name}</p>
+              <p className="text-xs text-[#8B7355] uppercase tracking-wider">{profile?.role}</p>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 px-4 py-2 bg-[#E11D48] text-white hover:bg-[#C01040] transition-colors rounded"
+            >
+              <LogOut className="w-4 h-4" />
+              <span className="text-sm">Logout</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex pt-20">
+        {/* Sidebar */}
+        {sidebarOpen && (
+          <div className="fixed left-0 top-20 bottom-0 w-64 bg-white border-r border-[#E0D8D0] p-6">
+            <nav className="space-y-2">
+              <button
+                onClick={() => setView('submissions')}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                  view === 'submissions'
+                    ? 'bg-[#E11D48] text-white'
+                    : 'hover:bg-[#F5F0EB] text-[#2C1810]'
+                }`}
+              >
+                <FileText className="w-5 h-5" />
+                <span className="font-['Cardo'] text-base">Submissions</span>
+              </button>
+
+              <button
+                onClick={() => setView('content')}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                  view === 'content'
+                    ? 'bg-[#E11D48] text-white'
+                    : 'hover:bg-[#F5F0EB] text-[#2C1810]'
+                }`}
+              >
+                <BookOpen className="w-5 h-5" />
+                <span className="font-['Cardo'] text-base">Site Content</span>
+              </button>
+
+              <button
+                onClick={() => setView('upload')}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                  view === 'upload'
+                    ? 'bg-[#E11D48] text-white'
+                    : 'hover:bg-[#F5F0EB] text-[#2C1810]'
+                }`}
+              >
+                <Upload className="w-5 h-5" />
+                <span className="font-['Cardo'] text-base">Upload Old</span>
+              </button>
+            </nav>
+          </div>
+        )}
+
+        {/* Main Content */}
+        <div className={`flex-1 p-8 ${sidebarOpen ? 'ml-64' : 'ml-0'}`}>
+          {/* SUBMISSIONS VIEW */}
+          {view === 'submissions' && (
+            <div>
+              <h2 className="font-['Cardo'] text-3xl text-[#2C1810] mb-6">Submissions</h2>
+              
+              <div className="bg-white border border-[#E0D8D0] rounded-lg overflow-hidden">
+                <table className="w-full">
+                  <thead className="bg-[#F5F0EB] border-b border-[#E0D8D0]">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-['Courier_New'] text-[#2C1810] uppercase tracking-wider">
+                        Title
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-['Courier_New'] text-[#2C1810] uppercase tracking-wider">
+                        Genre
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-['Courier_New'] text-[#2C1810] uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-['Courier_New'] text-[#2C1810] uppercase tracking-wider">
+                        Submitted
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-['Courier_New'] text-[#2C1810] uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#E0D8D0]">
+                    {submissions.map((submission) => (
+                      <tr key={submission.id} className="hover:bg-[#FAF7F2]">
+                        <td className="px-6 py-4 font-['Libre_Baskerville'] text-sm text-[#2C1810]">
+                          {submission.title}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-[#8B7355]">
+                          {submission.genre}
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`px-2 py-1 text-xs rounded font-['Courier_New'] ${
+                            submission.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                            submission.status === 'under_review' ? 'bg-blue-100 text-blue-800' :
+                            submission.status === 'accepted' ? 'bg-green-100 text-green-800' :
+                            'bg-red-100 text-red-800'
+                          }`}>
+                            {submission.status.replace('_', ' ').toUpperCase()}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-[#8B7355]">
+                          {new Date(submission.submitted_at).toLocaleDateString()}
+                        </td>
+                        <td className="px-6 py-4">
+                          <button
+                            onClick={() => setSelectedSubmission(submission)}
+                            className="text-[#E11D48] hover:text-[#C01040] text-sm font-['Courier_New']"
+                          >
+                            REVIEW
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* SITE CONTENT VIEW */}
+          {view === 'content' && (
+            <div>
+              <h2 className="font-['Cardo'] text-3xl text-[#2C1810] mb-6">Site Content</h2>
+              <div className="bg-white border border-[#E0D8D0] rounded-lg p-8">
+                <p className="text-[#8B7355] font-['Libre_Baskerville'] text-lg">
+                  Content management interface coming soon. This will allow you to edit poems and writings displayed on the collection pages.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* UPLOAD OLD SUBMISSIONS VIEW */}
+          {view === 'upload' && (
+            <div>
+              <h2 className="font-['Cardo'] text-3xl text-[#2C1810] mb-6">Upload Old Submissions</h2>
+              
+              <div className="bg-white border border-[#E0D8D0] rounded-lg p-8">
+                <form onSubmit={handleUploadSubmission} className="space-y-6">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-['Courier_New'] text-[#2C1810] mb-2">
+                        TITLE *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={uploadForm.title}
+                        onChange={(e) => setUploadForm({ ...uploadForm, title: e.target.value })}
+                        className="w-full px-4 py-2 border border-[#E0D8D0] focus:border-[#C4A265] focus:outline-none rounded"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-['Courier_New'] text-[#2C1810] mb-2">
+                        AUTHOR NAME *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={uploadForm.authorName}
+                        onChange={(e) => setUploadForm({ ...uploadForm, authorName: e.target.value })}
+                        className="w-full px-4 py-2 border border-[#E0D8D0] focus:border-[#C4A265] focus:outline-none rounded"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-['Courier_New'] text-[#2C1810] mb-2">
+                        AUTHOR EMAIL *
+                      </label>
+                      <input
+                        type="email"
+                        required
+                        value={uploadForm.authorEmail}
+                        onChange={(e) => setUploadForm({ ...uploadForm, authorEmail: e.target.value })}
+                        className="w-full px-4 py-2 border border-[#E0D8D0] focus:border-[#C4A265] focus:outline-none rounded"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-['Courier_New'] text-[#2C1810] mb-2">
+                        GENRE *
+                      </label>
+                      <select
+                        required
+                        value={uploadForm.genre}
+                        onChange={(e) => setUploadForm({ ...uploadForm, genre: e.target.value })}
+                        className="w-full px-4 py-2 border border-[#E0D8D0] focus:border-[#C4A265] focus:outline-none rounded"
+                      >
+                        <option value="poetry">Poetry</option>
+                        <option value="fiction">Fiction</option>
+                        <option value="nonfiction">Nonfiction</option>
+                        <option value="essay">Essay</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-['Courier_New'] text-[#2C1810] mb-2">
+                        STATUS *
+                      </label>
+                      <select
+                        required
+                        value={uploadForm.status}
+                        onChange={(e) => setUploadForm({ ...uploadForm, status: e.target.value })}
+                        className="w-full px-4 py-2 border border-[#E0D8D0] focus:border-[#C4A265] focus:outline-none rounded"
+                      >
+                        <option value="pending">Pending</option>
+                        <option value="under_review">Under Review</option>
+                        <option value="accepted">Accepted</option>
+                        <option value="rejected">Rejected</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-['Courier_New'] text-[#2C1810] mb-2">
+                        SUBMISSION DATE *
+                      </label>
+                      <input
+                        type="date"
+                        required
+                        value={uploadForm.submissionDate}
+                        onChange={(e) => setUploadForm({ ...uploadForm, submissionDate: e.target.value })}
+                        className="w-full px-4 py-2 border border-[#E0D8D0] focus:border-[#C4A265] focus:outline-none rounded"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-['Courier_New'] text-[#2C1810] mb-2">
+                      CONTENT *
+                    </label>
+                    <textarea
+                      required
+                      rows={12}
+                      value={uploadForm.content}
+                      onChange={(e) => setUploadForm({ ...uploadForm, content: e.target.value })}
+                      className="w-full px-4 py-2 border border-[#E0D8D0] focus:border-[#C4A265] focus:outline-none rounded font-['Libre_Baskerville']"
+                      placeholder="Paste the full text of the submission here..."
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="px-8 py-3 bg-[#E11D48] text-white hover:bg-[#C01040] transition-colors font-['Courier_New'] text-sm rounded"
+                  >
+                    UPLOAD SUBMISSION
+                  </button>
+                </form>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Review Modal */}
+      {selectedSubmission && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-8">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-[#E0D8D0] px-8 py-6 flex items-center justify-between">
+              <h3 className="font-['Cardo'] text-2xl text-[#2C1810]">Review Submission</h3>
+              <button
+                onClick={() => setSelectedSubmission(null)}
+                className="p-2 hover:bg-[#F5F0EB] rounded-lg"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-8">
+              <div className="mb-6">
+                <h4 className="font-['Cardo'] text-3xl text-[#2C1810] mb-2">
+                  {selectedSubmission.title}
+                </h4>
+                <div className="flex gap-4 text-sm text-[#8B7355]">
+                  <span>Genre: {selectedSubmission.genre}</span>
+                  <span>Submitted: {new Date(selectedSubmission.submitted_at).toLocaleDateString()}</span>
+                </div>
+              </div>
+
+              <div className="mb-6 p-6 bg-[#FAF7F2] rounded-lg">
+                <pre className="font-['Libre_Baskerville'] text-base text-[#2C1810] whitespace-pre-wrap leading-relaxed">
+                  {selectedSubmission.content}
+                </pre>
+              </div>
+
+              <div className="mb-6">
+                <label className="block text-sm font-['Courier_New'] text-[#2C1810] mb-2">
+                  REVIEW NOTES
+                </label>
+                <textarea
+                  rows={4}
+                  defaultValue={selectedSubmission.notes || ''}
+                  id="review-notes"
+                  className="w-full px-4 py-2 border border-[#E0D8D0] focus:border-[#C4A265] focus:outline-none rounded"
+                  placeholder="Add notes about this submission..."
+                />
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    const notes = (document.getElementById('review-notes') as HTMLTextAreaElement)?.value;
+                    updateSubmissionStatus(selectedSubmission.id, 'accepted', notes);
+                  }}
+                  className="px-6 py-3 bg-green-600 text-white hover:bg-green-700 transition-colors font-['Courier_New'] text-sm rounded"
+                >
+                  ACCEPT
+                </button>
+                <button
+                  onClick={() => {
+                    const notes = (document.getElementById('review-notes') as HTMLTextAreaElement)?.value;
+                    updateSubmissionStatus(selectedSubmission.id, 'under_review', notes);
+                  }}
+                  className="px-6 py-3 bg-blue-600 text-white hover:bg-blue-700 transition-colors font-['Courier_New'] text-sm rounded"
+                >
+                  UNDER REVIEW
+                </button>
+                <button
+                  onClick={() => {
+                    const notes = (document.getElementById('review-notes') as HTMLTextAreaElement)?.value;
+                    updateSubmissionStatus(selectedSubmission.id, 'rejected', notes);
+                  }}
+                  className="px-6 py-3 bg-red-600 text-white hover:bg-red-700 transition-colors font-['Courier_New'] text-sm rounded"
+                >
+                  REJECT
+                </button>
+                <button
+                  onClick={() => setSelectedSubmission(null)}
+                  className="px-6 py-3 bg-gray-200 text-gray-800 hover:bg-gray-300 transition-colors font-['Courier_New'] text-sm rounded"
+                >
+                  CANCEL
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

@@ -26,6 +26,7 @@ import { RoomSettingsPage } from './studio/RoomSettingsPage';
 
 // Editor pages
 import { EditorDashboard } from './editor/EditorDashboard';
+import { EditorDashboardPage } from './pages/EditorDashboardPage';
 
 // Collection page
 import { CollectionPage } from './pages/CollectionPage';
@@ -80,7 +81,7 @@ function AppContent() {
   }, []);
 
   // Pages that use their own navigation (don't show the default Header)
-  const pagesWithOwnNav = ['/', '/gallery-wall', '/afterhours', '/collection', '/rooms', '/signin', '/signup', '/writer-editor', '/collection-gallery', '/community-wall'];
+  const pagesWithOwnNav = ['/', '/gallery-wall', '/afterhours', '/collection', '/rooms', '/signin', '/signup', '/writer-editor', '/collection-gallery', '/community-wall', '/editor-dashboard'];
   const showDefaultHeader = !pagesWithOwnNav.includes(route);
 
   if (loading) {
@@ -136,6 +137,8 @@ function AppContent() {
     pageContent = <RoomSettingsPage />;
   } else if (route === '/editor') {
     pageContent = <EditorDashboard />;
+  } else if (route === '/editor-dashboard') {
+    pageContent = <EditorDashboardPage />;
   } else if (route === '/collection') {
     pageContent = <CollectionPage />;
   } else if (route === '/writer-editor') {

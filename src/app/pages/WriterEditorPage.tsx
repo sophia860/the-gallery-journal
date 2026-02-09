@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { 
   Bold, Italic, Heading1, Heading2, Quote, Link as LinkIcon, 
   List, ListOrdered, Image, Save, Eye, Settings, ChevronDown,
-  ChevronUp, Tag, FileImage, X, Lock
+  ChevronUp, Tag, FileImage, X, Lock, Send
 } from 'lucide-react';
 import { GalleryNav } from '../components/GalleryNav';
 import { saveDraft, submitToGallery, type Draft } from '../../services/backend';
@@ -70,28 +70,54 @@ export function WriterEditorPage() {
 
   const handleSaveDraft = async () => {
     const draft: Draft = {
+      id: currentDraftId,
       title,
       content,
       category: selectedCategory,
       tags,
       shareToCommunity,
+      updatedAt: new Date().toISOString(),
     };
-    await saveDraft(draft);
-    setShowSuccessMessage('Draft saved successfully!');
-    setTimeout(() => setShowSuccessMessage(null), 3000);
+    const result = await saveDraft(draft);
+    if (result.success) {
+      setShowSuccessMessage('✓ Draft saved successfully!');
+      setTimeout(() => setShowSuccessMessage(null), 3000);
+    } else {
+      setShowSuccessMessage('✗ Failed to save draft');
+      setTimeout(() => setShowSuccessMessage(null), 3000);
+    }
   };
 
   const handleSubmitToGallery = async () => {
+    if (!title || !content || !selectedCategory) {
+      setShowSuccessMessage('✗ Please fill in title, content, and category');
+      setTimeout(() => setShowSuccessMessage(null), 3000);
+      return;
+    }
+
     const draft: Draft = {
+      id: currentDraftId,
       title,
       content,
       category: selectedCategory,
       tags,
       shareToCommunity,
     };
-    await submitToGallery(draft);
-    setShowSuccessMessage('Submitted to The Gallery successfully!');
-    setTimeout(() => setShowSuccessMessage(null), 3000);
+    const result = await submitToGallery(draft);
+    if (result.success) {
+      setShowSuccessMessage('✓ Submitted to The Gallery successfully!');
+      setTimeout(() => {
+        setShowSuccessMessage(null);
+        // Clear form after successful submission
+        setTitle('');
+        setContent('');
+        setSelectedCategory('');
+        setTags([]);
+      }, 3000);
+    } else {
+      setShowSuccessMessage('✗ Submission failed');
+      setTimeout(() => setShowSuccessMessage(null), 3000);
+    }
   };
 
   return (
@@ -231,7 +257,7 @@ export function WriterEditorPage() {
               >
                 <div className="flex items-center gap-3">
                   <FileImage className="w-5 h-5 text-[#DC143C]" />
-                  <span className="font-['Inter'] font-medium text-[#2C2C2C]">Publishing</span>
+                  <span className="font-['Inter'] font-medium text-[#2C2C2C]">Publishing Options</span>
                 </div>
                 {showPublishing ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
               </button>
@@ -241,7 +267,7 @@ export function WriterEditorPage() {
                   {/* Category Selection */}
                   <div>
                     <label className="block text-xs uppercase tracking-wider text-[#717171] mb-3 font-['Inter']">
-                      Category
+                      Category *
                     </label>
                     <div className="space-y-2">
                       {categories.map(cat => (
@@ -354,23 +380,31 @@ export function WriterEditorPage() {
                       Community members can see your work. Only published pieces appear in The Collection.
                     </p>
                   </div>
-
-                  {/* Save Draft / Publish Buttons */}
-                  <div className="space-y-2 pt-4">
-                    <button
-                      onClick={handleSubmitToGallery}
-                      className="w-full px-6 py-3 bg-[#DC143C] text-white hover:bg-[#B01030] transition-colors font-['Inter'] text-sm font-medium"
-                    >
-                      Submit to The Gallery
-                    </button>
-                    <button
-                      onClick={handleSaveDraft}
-                      className="w-full px-6 py-3 border-2 border-[#E8E0D8] text-[#2C2C2C] hover:border-[#C4B5A0] transition-colors font-['Inter'] text-sm"
-                    >
-                      Save as Draft
-                    </button>
-                  </div>
                 </div>
+              )}
+            </div>
+
+            {/* CRITICAL FIX: Action Buttons - ALWAYS VISIBLE */}
+            <div className="space-y-3 pt-4 border-t-2 border-[#E8E0D8]">
+              <button
+                onClick={handleSubmitToGallery}
+                disabled={!title || !content || !selectedCategory}
+                className="w-full px-6 py-4 bg-[#DC143C] text-white hover:bg-[#B01030] transition-colors font-['Inter'] text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+              >
+                <Send className="w-4 h-4" />
+                Submit to The Gallery
+              </button>
+              <button
+                onClick={handleSaveDraft}
+                className="w-full px-6 py-3 border-2 border-[#2C2C2C] text-[#2C2C2C] hover:bg-[#2C2C2C] hover:text-white transition-colors font-['Inter'] text-sm flex items-center justify-center gap-2"
+              >
+                <Save className="w-4 h-4" />
+                Save as Draft
+              </button>
+              {(!title || !content || !selectedCategory) && (
+                <p className="text-xs text-[#717171] text-center font-['Inter'] italic">
+                  Fill in title, content, and category to submit
+                </p>
               )}
             </div>
           </div>
@@ -419,9 +453,9 @@ export function WriterEditorPage() {
           </div>
         )}
 
-        {/* Success Message */}
+        {/* Success Message - Fixed Position */}
         {showSuccessMessage && (
-          <div className="fixed bottom-4 right-4 z-50 bg-[#DC143C] text-white px-4 py-2 rounded shadow-lg font-['Inter'] text-sm">
+          <div className="fixed bottom-8 right-8 z-50 bg-[#2C2C2C] text-white px-6 py-4 rounded-lg shadow-2xl font-['Inter'] text-sm flex items-center gap-3 animate-in slide-in-from-bottom-4">
             {showSuccessMessage}
           </div>
         )}

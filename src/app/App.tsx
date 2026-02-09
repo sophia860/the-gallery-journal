@@ -65,8 +65,15 @@ function AppContent() {
       const link = target.closest('a');
       
       if (link && link.href && link.origin === window.location.origin) {
+        const url = new URL(link.href);
+
+        // Allow default browser behavior for in-page anchor links
+        if (url.hash && url.pathname === window.location.pathname) {
+          return;
+        }
+
         e.preventDefault();
-        const path = new URL(link.href).pathname;
+        const path = url.pathname;
         window.history.pushState({}, '', path);
         setRoute(path);
       }

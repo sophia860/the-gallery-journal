@@ -158,7 +158,7 @@ export async function getSubmissions(): Promise<Submission[]> {
     return getSubmissionsFromStorage();
   }
 
-4
+try {
   const response = await apiRequest('/submissions');
     if (response.ok) {
       const data = await response.json();

@@ -2,10 +2,8 @@ import { apiRequest } from '../utils/api';
 
 // Demo mode check
 export function isDemoMode(): boolean {
-  if (typeof window === 'undefined') return false;
-  return localStorage.getItem('demoMode') === 'true';
+  return false;
 }
-
 // Local storage keys
 const STORAGE_KEYS = {
   DRAFTS: 'page_drafts',
@@ -160,8 +158,8 @@ export async function getSubmissions(): Promise<Submission[]> {
     return getSubmissionsFromStorage();
   }
 
-  try {
-    const response = await apiRequest('/submissions');
+4
+  const response = await apiRequest('/submissions');
     if (response.ok) {
       const data = await response.json();
       return data.data || [];

@@ -50,19 +50,23 @@ export function WriterEditorPage() {
   // Load most recent draft
   useEffect(() => {
     const loadDraft = async () => {
-      const drafts = await getDrafts();
-      if (drafts.length === 0) return;
-      const [latest] = drafts.sort((a, b) => {
-        const aTime = a.updatedAt || a.createdAt || '';
-        const bTime = b.updatedAt || b.createdAt || '';
-        return bTime.localeCompare(aTime);
-      });
-      setTitle(latest.title || '');
-      setContent(latest.content || '');
-      setSelectedCategory(latest.category || '');
-      setTags(latest.tags || []);
-      setShareToCommunity(latest.shareToCommunity !== false);
-      if (latest.id) setCurrentDraftId(latest.id);
+      try {
+        const drafts = await getDrafts();
+        if (drafts.length === 0) return;
+        const [latest] = [...drafts].sort((a, b) => {
+          const aTime = a.updatedAt || a.createdAt || '';
+          const bTime = b.updatedAt || b.createdAt || '';
+          return bTime.localeCompare(aTime);
+        });
+        setTitle(latest.title || '');
+        setContent(latest.content || '');
+        setSelectedCategory(latest.category || '');
+        setTags(latest.tags || []);
+        setShareToCommunity(latest.shareToCommunity !== false);
+        if (latest.id) setCurrentDraftId(latest.id);
+      } catch (err) {
+        console.warn('[WriterEditor] Failed to load drafts', err);
+      }
     };
     loadDraft();
   }, []);

@@ -313,7 +313,7 @@ export async function getPublishedPieces(): Promise<Submission[]> {
 
 export async function getCommunityPieces(): Promise<Submission[]> {
   const submissions = await getSubmissions();
-  // Only show published, community-approved work
+  // Only show published work explicitly shared with the community
   return submissions.filter(s => 
     s.shareToCommunity !== false && 
     s.status === 'published'

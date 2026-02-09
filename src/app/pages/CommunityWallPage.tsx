@@ -230,7 +230,6 @@ export function CommunityWallPage() {
   const publishedPieces = pieces.filter(p => p.status === 'published');
 
   const filteredPieces = publishedPieces
-    .filter(p => statusFilter === 'all' || p.status === statusFilter)
     .sort((a, b) => {
       if (sortBy === 'newest') {
         return new Date(b.sharedAt).getTime() - new Date(a.sharedAt).getTime();

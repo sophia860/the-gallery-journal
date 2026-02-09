@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { SubscriptionProvider } from './contexts/SubscriptionContext';
 import { Header } from './components/Header';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { LandingPage } from './pages/LandingPage';
@@ -17,6 +18,7 @@ import { GalleryLandingPage } from './pages/GalleryLandingPage';
 import { GalleryWallPage } from './pages/GalleryWallPage';
 import { AfterhoursPage } from './pages/AfterhoursPage';
 import { RoomsPage } from './pages/RoomsPage';
+import { PricingPage } from './pages/PricingPage';
 
 // Studio pages
 import { StudioHub } from './studio/StudioHub';
@@ -57,6 +59,7 @@ function AppContent() {
     const handlePopState = () => {
       setRoute(window.location.pathname);
     };
+
     window.addEventListener('popstate', handlePopState);
     
     // Intercept link clicks for client-side navigation
@@ -71,6 +74,7 @@ function AppContent() {
         setRoute(path);
       }
     };
+
     document.addEventListener('click', handleClick);
 
     return () => {
@@ -80,7 +84,7 @@ function AppContent() {
   }, []);
 
   // Pages that use their own navigation (don't show the default Header)
-  const pagesWithOwnNav = ['/', '/gallery-wall', '/afterhours', '/collection', '/rooms', '/signin', '/signup', '/writer-editor', '/collection-gallery', '/community-wall', '/editor-dashboard'];
+  const pagesWithOwnNav = ['/', '/gallery-wall', '/afterhours', '/collection', '/rooms', '/signin', '/signup', '/writer-editor', '/collection-gallery', '/community-wall', '/editor-dashboard', '/pricing'];
   const showDefaultHeader = !pagesWithOwnNav.includes(route);
 
   if (loading) {
@@ -110,6 +114,8 @@ function AppContent() {
     pageContent = <SignUpPage />;
   } else if (route === '/signin') {
     pageContent = <SignInPage />;
+  } else if (route === '/pricing') {
+    pageContent = <PricingPage />;
   } else if (route === '/dashboard') {
     pageContent = <ProtectedRoute><DashboardPage /></ProtectedRoute>;
   } else if (route === '/dashboard/new-exhibit' || route === '/studio/new-exhibit') {
@@ -145,7 +151,7 @@ function AppContent() {
   } else if (route === '/collection-gallery') {
     pageContent = <CollectionGalleryPage />;
   } else if (route === '/community-wall') {
-    pageContent = <ProtectedRoute><CommunityWallPage /></ProtectedRoute>;
+    pageContent = <CommunityWallPage />;
   } else if (route.startsWith('/writer/')) {
     const writerId = route.split('/writer/')[1];
     pageContent = <WriterProfilePage writerId={writerId} />;
@@ -164,11 +170,13 @@ function AppContent() {
   );
 }
 
-// Main App component - wraps everything in AuthProvider
+// Main App component - wraps everything in AuthProvider and SubscriptionProvider
 export default function App() {
   return (
     <AuthProvider>
-      <AppContent />
+      <SubscriptionProvider>
+        <AppContent />
+      </SubscriptionProvider>
     </AuthProvider>
   );
 }

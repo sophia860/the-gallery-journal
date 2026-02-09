@@ -27,7 +27,7 @@ interface Profile {
 
 export function EditorDashboardPage() {
   const { user, supabase, signOut, loading: authLoading } = useAuth();
-  const [loading, setLoading] = useState(true);
+  const [pageLoading, setPageLoading] = useState(true);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [view, setView] = useState<ViewMode>('submissions');
   const [submissions, setSubmissions] = useState<Submission[]>([]);
@@ -46,11 +46,11 @@ export function EditorDashboardPage() {
   });
 
   useEffect(() => {
-    // Don't check auth until auth context has finished loading
+    // Wait for auth context to finish loading before checking auth
     if (!authLoading) {
       checkAuth();
     }
-  }, [user, authLoading]);
+  }, [authLoading]);
 
   useEffect(() => {
     if (view === 'submissions' && profile) {
@@ -59,6 +59,7 @@ export function EditorDashboardPage() {
   }, [view, profile]);
 
   const checkAuth = async () => {
+    // If no user after auth loading is complete, redirect to signin
     if (!user) {
       window.location.href = '/signin?redirect=/editor-dashboard';
       return;
@@ -79,16 +80,16 @@ export function EditorDashboardPage() {
 
       // Check if user has editor role - accept editor, eic, or admin
       if (!['editor', 'eic', 'admin'].includes(profileData.role)) {
+        alert('Access denied. This page is for editors only.');
         window.location.href = '/studio';
         return;
       }
 
       setProfile(profileData);
+      setPageLoading(false);
     } catch (err) {
       console.error('Auth check error:', err);
       window.location.href = '/signin';
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -181,10 +182,14 @@ export function EditorDashboardPage() {
     window.location.href = '/';
   };
 
-  if (loading) {
+  // Show loading screen while auth is loading OR while checking profile/role
+  if (authLoading || pageLoading) {
     return (
       <div className="min-h-screen bg-[#FAF7F2] flex items-center justify-center">
-        <div className="text-[#2C1810] font-['Cardo'] text-xl">Loading...</div>
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#E11D48] mb-4"></div>
+          <div className="text-[#2C1810] font-['Cardo'] text-xl">Loading Editor Dashboard...</div>
+        </div>
       </div>
     );
   }

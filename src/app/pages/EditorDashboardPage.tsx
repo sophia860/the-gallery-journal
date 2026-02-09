@@ -26,7 +26,7 @@ interface Profile {
 }
 
 export function EditorDashboardPage() {
-  const { user, supabase, signOut } = useAuth();
+  const { user, supabase, signOut, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [view, setView] = useState<ViewMode>('submissions');
@@ -46,14 +46,17 @@ export function EditorDashboardPage() {
   });
 
   useEffect(() => {
-    checkAuth();
-  }, [user]);
+    // Don't check auth until auth context has finished loading
+    if (!authLoading) {
+      checkAuth();
+    }
+  }, [user, authLoading]);
 
   useEffect(() => {
-    if (view === 'submissions') {
+    if (view === 'submissions' && profile) {
       fetchSubmissions();
     }
-  }, [view]);
+  }, [view, profile]);
 
   const checkAuth = async () => {
     if (!user) {
@@ -74,7 +77,7 @@ export function EditorDashboardPage() {
         return;
       }
 
-      // Check if user has editor role
+      // Check if user has editor role - accept editor, eic, or admin
       if (!['editor', 'eic', 'admin'].includes(profileData.role)) {
         window.location.href = '/studio';
         return;

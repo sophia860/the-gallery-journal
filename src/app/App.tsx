@@ -25,7 +25,6 @@ import { MyWorkPage } from './studio/MyWorkPage';
 import { RoomSettingsPage } from './studio/RoomSettingsPage';
 
 // Editor pages
-import { EditorDashboard } from './editor/EditorDashboard';
 import { EditorDashboardPage } from './pages/EditorDashboardPage';
 
 // Collection page
@@ -136,7 +135,7 @@ function AppContent() {
   } else if (route === '/studio/room-settings') {
     pageContent = <RoomSettingsPage />;
   } else if (route === '/editor') {
-    pageContent = <EditorDashboard />;
+    pageContent = <EditorDashboardPage />;
   } else if (route === '/editor-dashboard') {
     pageContent = <EditorDashboardPage />;
   } else if (route === '/collection') {

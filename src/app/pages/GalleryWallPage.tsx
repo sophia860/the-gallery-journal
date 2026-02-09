@@ -16,18 +16,19 @@ const allPoems = [
     wallNumber: '01',
     firstLines: 'In your eyes I see / a universe unfolding...',
     content: `In your eyes I see
-a universe unfolding,
-galaxies that spiral soft,
-constellations only we can read.
+  a universe unfolding,
+  galaxies that spiral soft,
+  constellations only we can read.
 
-Your gaze holds summer evenings,
-the weight of August heat,
-the promise of October rain.
+  Your gaze holds summer evenings,
+  the weight of August heat,
+  the promise of October rain.
 
-When you look at me like that,
-time folds into itself—
-past and future collapse
-into this one perfect now.`,
+  When you look at me like that,
+  time folds into itself—
+  past and future collapse
+  into this one perfect now.`,
+    status: 'published' as const,
   },
   {
     id: '2',
@@ -210,6 +211,10 @@ export function GalleryWallPage() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [expandedPoem, setExpandedPoem] = useState<string | null>(null);
   const [hasAccess, setHasAccess] = useState(false);
+  const publishedPoems = allPoems.filter(poem => {
+    const status = (poem as { status?: string }).status;
+    return !status || status === 'published';
+  });
 
   // Check authentication with getSession() - DO NOT rely on user from context
   useEffect(() => {
@@ -272,8 +277,8 @@ export function GalleryWallPage() {
   }, [supabase]);
 
   const filteredPoems = selectedCategory === 'All' 
-    ? allPoems 
-    : allPoems.filter(p => p.category === selectedCategory);
+    ? publishedPoems 
+    : publishedPoems.filter(p => p.category === selectedCategory);
 
   // Members Only Gate
   if (!hasAccess) {

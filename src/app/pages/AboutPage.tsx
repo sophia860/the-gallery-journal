@@ -1,3 +1,4 @@
+// About page - redesigned with visual layout and scroll animations
 import { useEffect, useRef } from 'react';
 
 export function AboutPage() {

@@ -124,33 +124,6 @@ export function SignInPage() {
               </button>
             </form>
 
-            <div className="mt-6">
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-[#E0D8D0]"></div>
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-white px-2 text-[#717171] font-['Courier_New']">Or</span>
-                </div>
-              </div>
-              
-              <a
-                href={getRedirectUrl()}
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (typeof window !== 'undefined') {
-                    localStorage.setItem('demoMode', 'true');
-                  }
-                  // Use window.location.href to force a full page reload
-                  // so AuthContext re-initializes and detects demoMode in localStorage
-                  window.location.href = getRedirectUrl();
-                }}
-                className="mt-4 w-full px-6 py-4 bg-white border-2 border-[#E0D8D0] text-[#717171] hover:border-[#C4918A] hover:text-[#2C2C2C] transition-colors font-['Courier_New'] text-sm flex items-center justify-center gap-2"
-              >
-                Continue as Guest (Demo Mode)
-              </a>
-            </div>
-
             <p className="mt-8 text-center font-['Courier_New'] text-sm text-[#717171]">
               Don't have a room yet?{' '}
               <a href="/signup" className="text-[#E11D48] hover:text-[#C01040] transition-colors">

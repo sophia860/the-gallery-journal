@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { Header } from './components/Header';
+import { ProtectedRoute } from './components/ProtectedRoute';
 import { LandingPage } from './pages/LandingPage';
 import { SignUpPage } from './pages/SignUpPage';
 import { SignInPage } from './pages/SignInPage';
@@ -56,7 +57,6 @@ function AppContent() {
     const handlePopState = () => {
       setRoute(window.location.pathname);
     };
-
     window.addEventListener('popstate', handlePopState);
     
     // Intercept link clicks for client-side navigation
@@ -71,7 +71,6 @@ function AppContent() {
         setRoute(path);
       }
     };
-
     document.addEventListener('click', handleClick);
 
     return () => {
@@ -100,11 +99,11 @@ function AppContent() {
   if (route === '/') {
     pageContent = <GalleryLandingPage />;
   } else if (route === '/rooms' || route === '/gallery') {
-    pageContent = <RoomsPage />;
+    pageContent = <ProtectedRoute><RoomsPage /></ProtectedRoute>;
   } else if (route === '/gallery-wall') {
-    pageContent = <GalleryWallPage />;
+    pageContent = <ProtectedRoute><GalleryWallPage /></ProtectedRoute>;
   } else if (route === '/afterhours') {
-    pageContent = <AfterhoursPage />;
+    pageContent = <ProtectedRoute><AfterhoursPage /></ProtectedRoute>;
   } else if (route === '/about') {
     pageContent = <AboutPage />;
   } else if (route === '/signup') {
@@ -112,46 +111,46 @@ function AppContent() {
   } else if (route === '/signin') {
     pageContent = <SignInPage />;
   } else if (route === '/dashboard') {
-    pageContent = <DashboardPage />;
+    pageContent = <ProtectedRoute><DashboardPage /></ProtectedRoute>;
   } else if (route === '/dashboard/new-exhibit' || route === '/studio/new-exhibit') {
-    pageContent = <NewExhibitPage />;
+    pageContent = <ProtectedRoute><NewExhibitPage /></ProtectedRoute>;
   } else if (route === '/commonplace') {
     pageContent = <CommonplacePage />;
   } else if (route === '/letters') {
     pageContent = <LettersPage />;
   } else if (route.startsWith('/room/')) {
     const userId = route.split('/room/')[1];
-    pageContent = <RoomPage userId={userId} />;
+    pageContent = <ProtectedRoute><RoomPage userId={userId} /></ProtectedRoute>;
   } else if (route.startsWith('/exhibit/')) {
     const exhibitId = route.split('/exhibit/')[1];
     pageContent = <ExhibitPage exhibitId={exhibitId} />;
   } else if (route === '/studio') {
-    pageContent = <StudioHub />;
+    pageContent = <ProtectedRoute><StudioHub /></ProtectedRoute>;
   } else if (route === '/studio/freewrite') {
-    pageContent = <FreewritePage />;
+    pageContent = <ProtectedRoute><FreewritePage /></ProtectedRoute>;
   } else if (route === '/studio/poetry') {
-    pageContent = <PoetryEditorPage />;
+    pageContent = <ProtectedRoute><PoetryEditorPage /></ProtectedRoute>;
   } else if (route === '/studio/work') {
-    pageContent = <MyWorkPage />;
+    pageContent = <ProtectedRoute><MyWorkPage /></ProtectedRoute>;
   } else if (route === '/studio/room-settings') {
-    pageContent = <RoomSettingsPage />;
+    pageContent = <ProtectedRoute><RoomSettingsPage /></ProtectedRoute>;
   } else if (route === '/editor') {
-    pageContent = <EditorDashboard />;
+    pageContent = <ProtectedRoute><EditorDashboard /></ProtectedRoute>;
   } else if (route === '/editor-dashboard') {
-    pageContent = <EditorDashboardPage />;
+    pageContent = <ProtectedRoute><EditorDashboardPage /></ProtectedRoute>;
   } else if (route === '/collection') {
     pageContent = <CollectionPage />;
   } else if (route === '/writer-editor') {
-    pageContent = <WriterEditorPage />;
+    pageContent = <ProtectedRoute><WriterEditorPage /></ProtectedRoute>;
   } else if (route === '/collection-gallery') {
     pageContent = <CollectionGalleryPage />;
   } else if (route === '/community-wall') {
-    pageContent = <CommunityWallPage />;
+    pageContent = <ProtectedRoute><CommunityWallPage /></ProtectedRoute>;
   } else if (route.startsWith('/writer/')) {
     const writerId = route.split('/writer/')[1];
     pageContent = <WriterProfilePage writerId={writerId} />;
   } else if (route === '/writers-studio') {
-    pageContent = <WritersStudioPage />;
+    pageContent = <ProtectedRoute><WritersStudioPage /></ProtectedRoute>;
   } else {
     // 404
     pageContent = <NotFoundPage />;

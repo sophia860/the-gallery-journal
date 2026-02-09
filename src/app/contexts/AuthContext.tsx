@@ -38,6 +38,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const initAuth = async () => {
       try {
+        // Check for demo mode first
+        const isDemoMode = typeof window !== 'undefined' && localStorage.getItem('demoMode') === 'true';
+        
+        if (isDemoMode) {
+          console.log('[AuthContext] Demo mode detected, creating demo user');
+          // Create a demo user
+          const demoUser: User = {
+            id: 'demo-user',
+            email: 'demo@page.com',
+            user_metadata: {
+              name: 'Demo User',
+              role: 'writer',
+              writerName: 'Demo Writer'
+            }
+          };
+          setUser(demoUser);
+          setAccessToken('demo-token');
+          setLoading(false);
+          return;
+        }
+
+        // Regular auth flow
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
           setUser(session.user);
@@ -55,6 +77,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
+        // Don't override demo mode
+        const isDemoMode = typeof window !== 'undefined' && localStorage.getItem('demoMode') === 'true';
+        if (isDemoMode) return;
+        
         setUser(session?.user ?? null);
         setAccessToken(session?.access_token ?? null);
         setLoading(false);
@@ -106,6 +132,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
+    // Clear demo mode if active
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('demoMode');
+    }
+    
     await supabase.auth.signOut();
     setUser(null);
     setAccessToken(null);

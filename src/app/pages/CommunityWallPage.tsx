@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Heart, Lock } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { GalleryNav } from '../components/GalleryNav';
@@ -89,13 +89,65 @@ const statusLabels = {
 };
 
 export function CommunityWallPage() {
-  const { user } = useAuth();
+  const { supabase } = useAuth();
+  const [hasAccess, setHasAccess] = useState(false);
   const [sortBy, setSortBy] = useState<SortBy>('newest');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [pieces, setPieces] = useState(communityPieces);
 
+  // Check authentication with getSession() - DO NOT rely on user from context
+  useEffect(() => {
+    let mounted = true;
+
+    const checkAccess = async () => {
+      console.log('[CommunityWall] Checking access with getSession()...');
+      
+      try {
+        // Get current session directly from Supabase
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        console.log('[CommunityWall] Session result:', session ? 'exists' : 'null', error);
+
+        if (!mounted) return;
+
+        if (session) {
+          console.log('[CommunityWall] Access granted - user:', session.user.email);
+          setHasAccess(true);
+        } else {
+          console.log('[CommunityWall] No session - access denied');
+          setHasAccess(false);
+        }
+      } catch (err) {
+        console.error('[CommunityWall] Error checking session:', err);
+        if (mounted) {
+          setHasAccess(false);
+        }
+      }
+    };
+
+    checkAccess();
+
+    // Subscribe to auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('[CommunityWall] Auth state changed:', event, session ? 'has session' : 'no session');
+      
+      if (!mounted) return;
+
+      if (event === 'SIGNED_OUT') {
+        setHasAccess(false);
+      } else if (event === 'SIGNED_IN' && session) {
+        setHasAccess(true);
+      }
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, [supabase]);
+
   // Members Only Gate - Check if user is authenticated
-  if (!user) {
+  if (!hasAccess) {
     return (
       <div className="min-h-screen bg-[#FAF8F5] flex flex-col">
         <GalleryNav />

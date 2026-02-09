@@ -42,11 +42,6 @@ export interface Submission {
   publishedAt?: string;
   wallNumber?: string;
   shareToCommunity?: boolean;
-    // Author bio and social links (snapshot at submission time)
-  authorBio?: string;
-  authorInstagramUrl?: string;
-  authorTwitterUrl?: string;
-  authorWebsiteUrl?: string;
 }
 
 // ============ DRAFTS ============

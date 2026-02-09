@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { ArrowRight, X } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 import { GalleryNav } from '../components/GalleryNav';
 import { GalleryFooter } from '../components/GalleryFooter';
 
@@ -205,9 +206,70 @@ const categories = [
 ];
 
 export function GalleryWallPage() {
+  const { supabase } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [expandedPoem, setExpandedPoem] = useState<string | null>(null);
   const [hasAccess, setHasAccess] = useState(false);
+
+  // Check authentication with getSession() - DO NOT rely on user from context
+  useEffect(() => {
+    let mounted = true;
+
+    const checkAccess = async () => {
+      console.log('[GalleryWall] Checking access with getSession()...');
+      
+      try {
+        // Get current session directly from Supabase with retry logic for race condition
+        let { data: { session }, error } = await supabase.auth.getSession();
+        console.log('[GalleryWall] Initial session check:', session ? 'exists' : 'null', error);
+        
+        // If no session initially, wait 2 seconds and retry once (handles race condition on page load)
+        if (!session && !error) {
+          console.log('[GalleryWall] No session found, waiting 2s for session restoration...');
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          const retry = await supabase.auth.getSession();
+          session = retry.data.session;
+          console.log('[GalleryWall] Retry session check:', session ? 'exists' : 'null');
+        }
+
+        if (!mounted) return;
+
+        if (session) {
+          console.log('[GalleryWall] Access granted - user:', session.user.email);
+          setHasAccess(true);
+        } else {
+          console.log('[GalleryWall] No session after retry - access denied');
+          setHasAccess(false);
+        }
+      } catch (err) {
+        console.error('[GalleryWall] Error checking session:', err);
+        if (mounted) {
+          setHasAccess(false);
+        }
+      }
+    };
+
+    checkAccess();
+
+    // Subscribe to auth state changes for immediate access grant on signin
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('[GalleryWall] Auth state changed:', event, session ? 'has session' : 'no session');
+      
+      if (!mounted) return;
+
+      if (event === 'SIGNED_OUT') {
+        setHasAccess(false);
+      } else if (event === 'SIGNED_IN' && session) {
+        // Immediately grant access when user signs in
+        setHasAccess(true);
+      }
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, [supabase]);
 
   const filteredPoems = selectedCategory === 'All' 
     ? allPoems 
@@ -258,12 +320,12 @@ export function GalleryWallPage() {
 
             {/* Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-              <button
-                onClick={() => setHasAccess(true)}
-                className="px-8 py-4 bg-[#C4A265] text-white hover:bg-[#B08D4F] transition-colors font-['Cardo'] text-sm tracking-wider shadow-lg hover:shadow-xl"
+              <a
+                href="/signin?redirect=/gallery-wall"
+                className="px-8 py-4 bg-[#C4A265] text-white hover:bg-[#B08D4F] transition-colors font-['Cardo'] text-sm tracking-wider shadow-lg hover:shadow-xl inline-block"
               >
                 SIGN IN TO ENTER
-              </button>
+              </a>
               <a
                 href="/"
                 className="px-8 py-4 border-2 border-[#C4A265]/30 text-[#2C1810] hover:border-[#C4A265] transition-colors font-['Cardo'] text-sm tracking-wider inline-block"
@@ -508,7 +570,7 @@ export function GalleryWallPage() {
 
                 {/* Visit Author Button */}
                 <a
-                  href={`/room/${allPoems.find(p => p.id === expandedPoem)?.authorId}`}
+                  href={`/writer/${allPoems.find(p => p.id === expandedPoem)?.authorId}`}
                   className="inline-block px-8 py-4 border-2 border-[#C4A265] text-[#2C1810] hover:bg-[#C4A265] hover:text-white transition-all font-['Cardo'] text-sm tracking-wider"
                 >
                   VISIT {allPoems.find(p => p.id === expandedPoem)?.author.toUpperCase()}'S ROOM

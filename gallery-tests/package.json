@@ -1,0 +1,19 @@
+{
+  "name": "gallery-automated-tests",
+  "version": "1.0.0",
+  "description": "100-user automated testing for The Page Gallery Journal",
+  "scripts": {
+    "install:browsers": "npx playwright install",
+    "generate:users": "node test-data/generate-users.js",
+    "test:signup": "npx playwright test tests/signup-100-users.spec.ts --workers=5",
+    "test:submit": "npx playwright test tests/signin-and-submit.spec.ts --workers=5",
+    "test:full": "npx playwright test tests/full-flow-e2e.spec.ts --workers=5",
+    "test:all": "npm run generate:users && npm run test:signup && npm run test:submit",
+    "test:load": "k6 run k6-load-test.js",
+    "report": "npx playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.42.0",
+    "@faker-js/faker": "^8.4.0"
+  }
+}

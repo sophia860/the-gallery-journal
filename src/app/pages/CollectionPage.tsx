@@ -4,6 +4,7 @@ import { Moon, ChevronDown, ChevronUp } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { GalleryNav } from '../components/GalleryNav';
 import { GalleryFooter } from '../components/GalleryFooter';
+import { AuthorBioCard } from '../components/AuthorBioCard';
 
 // Winter 2026 Issue Content
 const winterPoems = [
@@ -14,6 +15,9 @@ const winterPoems = [
     authorId: 'sample1',
     category: 'Love & Relationships',
     wallNumber: '01',
+    authorBio: 'Pam Martin-Lawrence writes about love, longing, and the quiet moments that define us. Her work has appeared in various literary journals.',
+    authorInstagramUrl: 'https://instagram.com/pamwrites',
+    authorWebsiteUrl: 'https://pammartinlawrence.com',
     content: `In your eyes I see
 a universe unfolding,
 galaxies that spiral soft,
@@ -35,6 +39,8 @@ into this one perfect now.`,
     authorId: 'sample2',
     category: 'Love & Relationships',
     wallNumber: '02',
+    authorBio: 'Ella B Winters explores themes of passion, temporality, and the natural world. She lives in the Southwest where the heat inspires her work.',
+    authorTwitterUrl: 'https://twitter.com/ellabwinters',
     content: `The air is thick with wanting,
 humidity that clings like memory.
 We are melting into each other,
@@ -58,6 +64,9 @@ brief and brilliant.`,
     authorId: 'sample3',
     category: 'Nature & The Natural World',
     wallNumber: '03',
+    authorBio: 'Indee Sehrish Watson is a poet and oceanographer whose work bridges science and art. She collects sea glass and stories along the Pacific coast.',
+    authorInstagramUrl: 'https://instagram.com/indeewatson',
+    authorWebsiteUrl: 'https://indeewatson.com',
     content: `I keep finding ocean in my pockets—
 salt-crusted shells, smooth stones,
 evidence of the tide's attention.
@@ -79,6 +88,9 @@ and the next.`,
     authorId: 'sample4',
     category: 'Nature & The Natural World',
     wallNumber: '04',
+    authorBio: 'Bhavna Jain writes meditative poetry about transformation and renewal. Her debut collection explores the space between endings and beginnings.',
+    authorTwitterUrl: 'https://twitter.com/bhavnajain',
+    authorWebsiteUrl: 'https://bhavnajainwrites.com',
     content: `After the storm, such clarity—
 the sky washed clean,
 clouds scattered like old thoughts
@@ -101,6 +113,8 @@ another word for beginning.`,
     authorId: 'sample5',
     category: 'Time & Mortality',
     wallNumber: '05',
+    authorBio: 'Leonie Rowland finds extraordinary beauty in ordinary moments. Her poetry celebrates the sacred in everyday life.',
+    authorInstagramUrl: 'https://instagram.com/leonierowland',
     content: `Bless the small things:
 coffee still warm at noon,
 the dog's greeting at the door,
@@ -123,6 +137,8 @@ the holy routine.`,
     authorId: 'sample6',
     category: 'Self & Introspection',
     wallNumber: '06',
+    authorBio: 'Seth Trochtenberg is a New York-based poet exploring themes of solitude in crowded spaces and the art of presence.',
+    authorWebsiteUrl: 'https://sethtrochtenberg.com',
     content: `Standing still in the rush,
 I am an island in the stream.
 Thousands pass. None see me.
@@ -145,6 +161,9 @@ and nothing at all.`,
     authorId: 'sample7',
     category: 'Grief, Loss & Memory',
     wallNumber: '07',
+    authorBio: 'Sadiya Ali writes tender, aching poems about loss and the small sounds that keep the dead alive. Her work has been nominated for a Pushcart Prize.',
+    authorTwitterUrl: 'https://twitter.com/sadiyaalipoet',
+    authorInstagramUrl: 'https://instagram.com/sadiyaali',
     content: `The sound of ice in glasses—
 that's what brings you back.
 Not photographs, not letters,
@@ -167,6 +186,9 @@ ringing you gone.`,
     authorId: 'sample8',
     category: 'Family & Identity',
     wallNumber: '08',
+    authorBio: 'Luna Bailey is a mother and writer capturing the bittersweet beauty of watching children grow. She teaches creative writing in Portland.',
+    authorInstagramUrl: 'https://instagram.com/lunabailey',
+    authorWebsiteUrl: 'https://lunabailey.com',
     content: `She walks across the stage
 and I am watching her
 walk away from me,
@@ -368,6 +390,16 @@ export function CollectionPage() {
                             </motion.div>
                           ))}
                         </div>
+
+                        {/* Author Bio Card */}
+                        <AuthorBioCard
+                          name={poem.author}
+                          bio={poem.authorBio}
+                          instagramUrl={poem.authorInstagramUrl}
+                          twitterUrl={poem.authorTwitterUrl}
+                          websiteUrl={poem.authorWebsiteUrl}
+                          authorId={poem.authorId}
+                        />
 
                         <div className="mt-8 pt-6 border-t border-[#E0D8D0]">
                           <a

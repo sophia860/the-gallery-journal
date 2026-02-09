@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Heart, Lock } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 import { GalleryNav } from '../components/GalleryNav';
 import { Footer } from '../components/Footer';
 
@@ -88,13 +89,13 @@ const statusLabels = {
 };
 
 export function CommunityWallPage() {
+  const { user } = useAuth();
   const [sortBy, setSortBy] = useState<SortBy>('newest');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [pieces, setPieces] = useState(communityPieces);
-  const [hasAccess, setHasAccess] = useState(false);
 
-  // Members Only Gate
-  if (!hasAccess) {
+  // Members Only Gate - Check if user is authenticated
+  if (!user) {
     return (
       <div className="min-h-screen bg-[#FAF8F5] flex flex-col">
         <GalleryNav />
@@ -138,12 +139,12 @@ export function CommunityWallPage() {
 
             {/* Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-              <button
-                onClick={() => setHasAccess(true)}
-                className="px-8 py-4 bg-[#E11D48] text-white hover:bg-[#C01040] transition-colors font-['Courier_New'] text-sm tracking-wider shadow-lg hover:shadow-xl"
+              <a
+                href="/signin?redirect=/community-wall"
+                className="px-8 py-4 bg-[#E11D48] text-white hover:bg-[#C01040] transition-colors font-['Courier_New'] text-sm tracking-wider shadow-lg hover:shadow-xl inline-block"
               >
                 SIGN IN TO ENTER
-              </button>
+              </a>
               <a
                 href="/"
                 className="px-8 py-4 border-2 border-[#E0D8D0] text-[#2C2C2C] hover:border-[#C4918A] transition-colors font-['Courier_New'] text-sm tracking-wider inline-block"

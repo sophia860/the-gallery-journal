@@ -23,6 +23,11 @@ export interface Draft {
   shareToCommunity: boolean;
   createdAt?: string;
   updatedAt?: string;
+  // Author bio and social links (optional, captured during draft creation/submission)
+  authorBio?: string;
+  authorInstagramUrl?: string;
+  authorTwitterUrl?: string;
+  authorWebsiteUrl?: string;
 }
 
 export interface Submission {
@@ -125,6 +130,11 @@ export async function submitToGallery(draft: Draft): Promise<{ success: boolean;
     category: draft.category,
     tags: draft.tags,
     shareToCommunity: draft.shareToCommunity,
+    // Include author bio and social links if provided
+    authorBio: draft.authorBio,
+    authorInstagramUrl: draft.authorInstagramUrl,
+    authorTwitterUrl: draft.authorTwitterUrl,
+    authorWebsiteUrl: draft.authorWebsiteUrl,
   };
 
   try {

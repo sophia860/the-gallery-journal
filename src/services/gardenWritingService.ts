@@ -4,7 +4,13 @@ import { Writing } from '/src/types/garden';
 
 const supabase = createClient(
   `https://${projectId}.supabase.co`,
-  publicAnonKey
+  publicAnonKey,
+  {
+    auth: {
+      storageKey: 'sb-page-gallery-writing',
+      storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+    },
+  }
 );
 
 // Get user's writings

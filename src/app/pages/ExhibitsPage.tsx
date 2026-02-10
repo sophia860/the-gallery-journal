@@ -27,7 +27,7 @@ export function ExhibitsPage() {
           </h2>
 
           {/* Along the Oxbow */}
-          <div className="mb-12 pb-12 border-b border-[#1A1A1A]/10">
+          <div className="mb-12 pb-12 border-b border-dashed border-[#c4b5a0]">
             <h3 className="font-['Courier_New'] text-[20px] uppercase tracking-[0.1em] text-[#1A1A1A] mb-4">
               ALONG THE OXBOW
             </h3>

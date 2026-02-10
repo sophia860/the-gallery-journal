@@ -4,7 +4,13 @@ import { Profile, GardenStats } from '/src/types/garden';
 
 const supabase = createClient(
   `https://${projectId}.supabase.co`,
-  publicAnonKey
+  publicAnonKey,
+  {
+    auth: {
+      storageKey: 'sb-page-gallery-profile',
+      storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+    },
+  }
 );
 
 // Get profile by user ID

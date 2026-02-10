@@ -4,18 +4,34 @@
 @import './design-system.css';
 @import './components.css';
 
-/* Global paper-grain texture and custom cursor */
+/* Global styles - Sleep Well Creatives aesthetic */
 body {
-  cursor: crosshair;
-  background-color: #FAF8F5;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  background-color: #F5F0E8;
+  cursor: default;
+  font-family: 'Inter', sans-serif;
 }
 
 /* Override cursor for interactive elements */
-button, a, input, textarea, select {
+button, a {
   cursor: pointer;
 }
 
-input[type="text"], input[type="email"], input[type="password"], textarea {
+input[type="text"], 
+input[type="email"], 
+input[type="password"], 
+input[type="search"], 
+textarea {
   cursor: text;
+}
+
+/* Clean, no shadows anywhere */
+* {
+  box-shadow: none !important;
+}
+
+/* Headings in Playfair Display italic */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-weight: 400;
 }

@@ -4,7 +4,13 @@ import { Circle, CircleMember, CircleInvite } from '/src/types/garden';
 
 const supabase = createClient(
   `https://${projectId}.supabase.co`,
-  publicAnonKey
+  publicAnonKey,
+  {
+    auth: {
+      storageKey: 'sb-page-gallery-circles',
+      storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+    },
+  }
 );
 
 // Get user's circles

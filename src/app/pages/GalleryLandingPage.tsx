@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { ArrowRight, Moon, User, Send, Eye, Heart, Award } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { GalleryNav } from '../components/GalleryNav';
 import { GalleryFooter } from '../components/GalleryFooter';
@@ -205,48 +205,35 @@ const categories = [
 
 const joinFeatures = [
   {
-    icon: User,
     title: 'Your Page',
-    description: 'A personal page where your pieces, drafts, and bio live.',
+    description: 'A personal space for your pieces, drafts, and bio.',
   },
   {
-    icon: Send,
-    title: 'Submit Directly',
-    description: 'Submit to The Gallery from your page — no cold forms.',
+    title: 'Submit & Track',
+    description: 'Send work to The Gallery and follow it through the editorial queue.',
   },
   {
-    icon: Eye,
-    title: 'Track Your Work',
-    description: 'See where your pieces are in the editorial queue.',
-  },
-  {
-    icon: Heart,
     title: 'Follow Writers',
-    description: 'Follow writers you love and get notified when they publish.',
-  },
-  {
-    icon: Award,
-    title: 'Build Your Record',
-    description: 'A track record that editors can see at a glance.',
+    description: 'Stay close to the writers you love.',
   },
 ];
 
 const submitSteps = [
   {
     title: 'Create Your Page',
-    description: 'Add a bio and your work.',
+    description: 'Create your page',
   },
   {
     title: 'Upload a Draft',
-    description: 'Write or paste a piece on your page.',
+    description: 'Upload a draft',
   },
   {
     title: 'Submit',
-    description: 'Click submit to enter the editorial queue.',
+    description: 'Hit submit',
   },
   {
     title: 'Track It',
-    description: 'Follow it from received to accepted.',
+    description: 'Track it through',
   },
 ];
 
@@ -491,39 +478,36 @@ export function GalleryLandingPage() {
       </section>
 
       {/* Join Page Section */}
-      <section className="py-24 px-8 bg-[#EDE8E1] border-y border-[#E0D8D0]/70">
-        <div className="max-w-6xl mx-auto space-y-20">
+      <section className="py-20 px-8 bg-[#F5F0EB]">
+        <div className="max-w-6xl mx-auto space-y-16">
           {/* Part A — Hero band */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="text-center space-y-8 rounded-3xl bg-[#0B1221] text-white p-12 shadow-xl overflow-hidden"
+            className="text-center space-y-10 bg-gradient-to-r from-[#1A1F2E] to-[#0F1318] text-white px-8 py-16 md:py-20"
           >
-            <h2 className="font-[family-name:var(--font-display)] text-6xl md:text-7xl">
-              Join <span className="italic text-[#E6D5B8]">page</span>
+            <h2 className="font-['Cardo'] italic text-7xl md:text-8xl lg:text-9xl leading-none">
+              Join <span className="text-[#C4A265] italic">page</span>
             </h2>
-            <p className="font-[family-name:var(--font-body)] text-xl md:text-2xl text-white/80 max-w-3xl mx-auto leading-relaxed">
-              The social home of The Gallery — follow writers, share drafts, and see what the editors are reading.
+            <p className="font-[family-name:var(--font-body)] text-lg md:text-xl text-white/80 italic">
+              — "Where writers gather, share, and become."
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
               <a
                 href="/signup"
-                className="inline-flex items-center justify-center px-8 py-4 bg-[#E11D48] text-white rounded-md hover:bg-[#C01040] transition-all font-[family-name:var(--font-ui)] text-sm tracking-wide shadow-md"
+                className="inline-flex items-center justify-center px-8 py-3 border border-[#C4A265] text-[#C4A265] font-['Courier_New'] text-sm tracking-[0.25em] uppercase hover:bg-[#C4A265] hover:text-[#0F1318] transition-colors"
               >
                 Join Now
               </a>
               <a
                 href="/meet-the-page"
-                className="inline-flex items-center justify-center px-8 py-4 border border-white/30 text-white rounded-md hover:bg-white/10 transition-all font-[family-name:var(--font-ui)] text-sm tracking-wide"
+                className="text-[#C4A265] underline underline-offset-4 font-['Cardo'] italic text-lg hover:text-[#E6D5B8]"
               >
                 Learn More
               </a>
             </div>
-            <p className="font-[family-name:var(--font-body)] text-sm text-white/60">
-              Free to join, for writers and readers.
-            </p>
           </motion.div>
 
           {/* Part B — Why Join grid */}
@@ -535,40 +519,31 @@ export function GalleryLandingPage() {
             className="space-y-10"
           >
             <div className="text-center space-y-4">
-              <h3 className="font-[family-name:var(--font-display)] text-4xl md:text-5xl text-[#1A1F2E]">
-                Why Join <span className="italic text-[#8B7355]">page</span>?
+              <h3 className="font-['Cardo'] italic text-5xl text-[#1A1F2E]">
+                Why <span className="text-[#8B7355] italic">page</span>?
               </h3>
-              <p className="font-[family-name:var(--font-body)] text-lg text-[#1A1F2E]/75 max-w-3xl mx-auto">
-                Built for writers, editors, and the readers who follow them.
-              </p>
             </div>
-            <div className="grid gap-6 md:grid-cols-3 xl:grid-cols-5">
-              {joinFeatures.map((feature, index) => {
-                const Icon = feature.icon;
-
-                return (
-                  <motion.div
-                    key={feature.title}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    viewport={{ once: true }}
-                    className="p-6 bg-white/90 border border-[#E0D8D0] rounded-lg shadow-sm hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-12 h-12 rounded-full bg-[#F5F0EB] border border-[#E0D8D0] flex items-center justify-center">
-                        <Icon className="w-6 h-6 text-[#8B7355]" />
-                      </div>
-                      <h4 className="font-[family-name:var(--font-display)] text-xl text-[#1A1F2E]">
-                        {feature.title}
-                      </h4>
-                    </div>
-                    <p className="font-[family-name:var(--font-body)] text-base text-[#1A1F2E]/75 leading-relaxed">
-                      {feature.description}
-                    </p>
-                  </motion.div>
-                );
-              })}
+            <div className="grid gap-10 md:grid-cols-3">
+              {joinFeatures.map((feature, index) => (
+                <motion.div
+                  key={feature.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className="space-y-4"
+                >
+                  <div className="flex items-center gap-3 text-[#8B7355]">
+                    <span className="text-lg leading-none">—</span>
+                    <span className="font-['Courier_New'] text-xs tracking-[0.25em] uppercase">
+                      {feature.title}
+                    </span>
+                  </div>
+                  <p className="font-[family-name:var(--font-body)] text-base text-[#1A1F2E]/80 leading-relaxed">
+                    {feature.description}
+                  </p>
+                </motion.div>
+              ))}
             </div>
           </motion.div>
 
@@ -581,14 +556,12 @@ export function GalleryLandingPage() {
             className="space-y-10"
           >
             <div className="text-center space-y-4">
-              <h3 className="font-[family-name:var(--font-display)] text-4xl md:text-5xl text-[#1A1F2E]">
-                How You Submit to The Gallery
+              <h3 className="font-['Cardo'] italic text-4xl md:text-5xl text-[#1A1F2E]">
+                From draft to gallery
               </h3>
-              <p className="font-[family-name:var(--font-body)] text-lg text-[#1A1F2E]/75 max-w-2xl mx-auto">
-                Start on your page, submit in a click, track it all the way.
-              </p>
             </div>
-            <div className="grid gap-6 md:grid-cols-4">
+            <div className="relative grid gap-8 md:grid-cols-4">
+              <div className="hidden md:block absolute top-2 left-0 right-0 h-px bg-[#8B7355]/30"></div>
               {submitSteps.map((step, index) => (
                 <motion.div
                   key={step.title}
@@ -596,12 +569,12 @@ export function GalleryLandingPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   viewport={{ once: true }}
-                  className="p-6 bg-white/90 border border-[#E0D8D0] rounded-lg"
+                  className="space-y-3 relative"
                 >
-                  <div className="w-10 h-10 rounded-full bg-[#8B7355] text-white flex items-center justify-center font-[family-name:var(--font-ui)] text-sm tracking-wide mb-4">
-                    {index + 1}
+                  <div className="font-['Courier_New'] text-sm tracking-[0.25em] text-[#8B7355] inline-block bg-[#F5F0EB] px-2">
+                    {`0${index + 1}`.slice(-2)}
                   </div>
-                  <h4 className="font-[family-name:var(--font-display)] text-xl text-[#1A1F2E] mb-2">
+                  <h4 className="font-[family-name:var(--font-display)] text-xl text-[#1A1F2E]">
                     {step.title}
                   </h4>
                   <p className="font-[family-name:var(--font-body)] text-base text-[#1A1F2E]/75 leading-relaxed">
@@ -609,14 +582,6 @@ export function GalleryLandingPage() {
                   </p>
                 </motion.div>
               ))}
-            </div>
-            <div className="text-center">
-              <a
-                href="/signup"
-                className="inline-flex items-center justify-center px-10 py-4 bg-[#E11D48] text-white rounded-md hover:bg-[#C01040] transition-all font-[family-name:var(--font-ui)] text-sm tracking-wide shadow-md"
-              >
-                Create Your Page
-              </a>
             </div>
           </motion.div>
         </div>

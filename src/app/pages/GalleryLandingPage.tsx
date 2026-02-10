@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { ArrowRight, Users, Heart, BookOpen, Feather, Sparkles, TrendingUp } from 'lucide-react';
+import { ArrowRight, Users, Heart, BookOpen, Feather, Sparkles, TrendingUp, RefreshCw } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { GalleryNav } from '../components/GalleryNav';
 import { GalleryFooter } from '../components/GalleryFooter';
@@ -594,6 +594,18 @@ export function GalleryLandingPage() {
 
       {/* Footer */}
       <GalleryFooter />
+      
+      {/* Temporary Admin Link - Remove before production */}
+      <div className="fixed bottom-4 right-4 z-50">
+        <a
+          href="/admin/reset-gallery"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-[#2C1810] text-white hover:bg-[#8A9A7B] transition-all rounded-lg shadow-lg text-sm"
+          title="Admin: Reset Gallery"
+        >
+          <RefreshCw className="w-4 h-4" />
+          <span>Reset Gallery</span>
+        </a>
+      </div>
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { ArrowRight, Moon } from 'lucide-react';
+import { ArrowRight, Moon, User, Send, Eye, Heart, Award } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { GalleryNav } from '../components/GalleryNav';
 import { GalleryFooter } from '../components/GalleryFooter';
@@ -201,6 +201,53 @@ const categories = [
   'Family & Identity',
   'Time & Mortality',
   'Self & Introspection',
+];
+
+const joinFeatures = [
+  {
+    icon: User,
+    title: 'Your Own Page',
+    description: 'A personal page where your pieces, drafts, and bio live.',
+  },
+  {
+    icon: Send,
+    title: 'Submit Directly',
+    description: 'Submit to The Gallery from your page — no cold forms.',
+  },
+  {
+    icon: Eye,
+    title: 'Track Your Work',
+    description: 'See where your pieces are in the editorial queue.',
+  },
+  {
+    icon: Heart,
+    title: 'Follow Writers',
+    description: 'Follow writers you love and get notified when they publish.',
+  },
+  {
+    icon: Award,
+    title: 'Build Your Record',
+    description: 'A track record that editors can see at a glance.',
+  },
+];
+
+const submitSteps = [
+  {
+    title: 'Create Your Page',
+    description: 'Add a bio and your work.',
+  },
+  {
+    title: 'Upload a Draft',
+    description: 'Write or paste a piece on your page.',
+  },
+  {
+    title: 'Submit',
+    description: 'Click submit to enter the editorial queue.',
+  },
+  {
+    title: 'Track It',
+    description: 'Follow it from received to accepted.',
+  },
 ];
 
 export function GalleryLandingPage() {
@@ -439,6 +486,134 @@ export function GalleryLandingPage() {
               VIEW COMPLETE ISSUE
               <ArrowRight className="w-5 h-5" />
             </a>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Join Page Section */}
+      <section className="py-24 px-8 bg-[#EDE8E1] border-y border-[#E0D8D0]/70">
+        <div className="max-w-6xl mx-auto space-y-20">
+          {/* Part A — Hero band */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center space-y-8"
+          >
+            <h2 className="font-[family-name:var(--font-display)] text-6xl md:text-7xl text-[#1A1F2E]">
+              Join <span className="italic text-[#8B7355]">page</span>
+            </h2>
+            <p className="font-[family-name:var(--font-body)] text-xl md:text-2xl text-[#1A1F2E]/80 max-w-3xl mx-auto leading-relaxed">
+              The social home of The Gallery — follow writers, share drafts, and see what the editors are reading.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <a
+                href="/signup"
+                className="inline-flex items-center justify-center px-8 py-4 bg-[#E11D48] text-white rounded-md hover:bg-[#C01040] transition-all font-[family-name:var(--font-ui)] text-sm tracking-wide shadow-md"
+              >
+                Join Now
+              </a>
+              <a
+                href="/meet-the-page"
+                className="inline-flex items-center justify-center px-8 py-4 border border-[#8B7355] text-[#8B7355] rounded-md hover:bg-[#8B7355] hover:text-white transition-all font-[family-name:var(--font-ui)] text-sm tracking-wide"
+              >
+                Learn More
+              </a>
+            </div>
+            <p className="font-[family-name:var(--font-body)] text-sm text-[#1A1F2E]/70">
+              Free to join, for writers and readers.
+            </p>
+          </motion.div>
+
+          {/* Part B — Why Join grid */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="space-y-10"
+          >
+            <div className="text-center space-y-4">
+              <h3 className="font-[family-name:var(--font-display)] text-4xl md:text-5xl text-[#1A1F2E]">
+                Why Join <span className="italic text-[#8B7355]">page</span>?
+              </h3>
+              <p className="font-[family-name:var(--font-body)] text-lg text-[#1A1F2E]/75 max-w-3xl mx-auto">
+                Built for writers, editors, and the readers who follow them.
+              </p>
+            </div>
+            <div className="grid gap-6 md:grid-cols-3 xl:grid-cols-5">
+              {joinFeatures.map((feature, index) => (
+                <motion.div
+                  key={feature.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className="p-6 bg-white/90 border border-[#E0D8D0] rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                >
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-12 h-12 rounded-full bg-[#F5F0EB] border border-[#E0D8D0] flex items-center justify-center">
+                      <feature.icon className="w-6 h-6 text-[#8B7355]" />
+                    </div>
+                    <h4 className="font-[family-name:var(--font-display)] text-xl text-[#1A1F2E]">
+                      {feature.title}
+                    </h4>
+                  </div>
+                  <p className="font-[family-name:var(--font-body)] text-base text-[#1A1F2E]/75 leading-relaxed">
+                    {feature.description}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Part C — How to Submit */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="space-y-10"
+          >
+            <div className="text-center space-y-4">
+              <h3 className="font-[family-name:var(--font-display)] text-4xl md:text-5xl text-[#1A1F2E]">
+                How You Submit to The Gallery
+              </h3>
+              <p className="font-[family-name:var(--font-body)] text-lg text-[#1A1F2E]/75 max-w-2xl mx-auto">
+                Start on your page, submit in a click, track it all the way.
+              </p>
+            </div>
+            <div className="grid gap-6 md:grid-cols-4">
+              {submitSteps.map((step, index) => (
+                <motion.div
+                  key={step.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className="p-6 bg-white/90 border border-[#E0D8D0] rounded-lg"
+                >
+                  <div className="w-10 h-10 rounded-full bg-[#8B7355] text-white flex items-center justify-center font-[family-name:var(--font-ui)] text-sm tracking-wide mb-4">
+                    {index + 1}
+                  </div>
+                  <h4 className="font-[family-name:var(--font-display)] text-xl text-[#1A1F2E] mb-2">
+                    {step.title}
+                  </h4>
+                  <p className="font-[family-name:var(--font-body)] text-base text-[#1A1F2E]/75 leading-relaxed">
+                    {step.description}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+            <div className="text-center">
+              <a
+                href="/signup"
+                className="inline-flex items-center justify-center px-10 py-4 bg-[#E11D48] text-white rounded-md hover:bg-[#C01040] transition-all font-[family-name:var(--font-ui)] text-sm tracking-wide shadow-md"
+              >
+                Create Your Page
+              </a>
+            </div>
           </motion.div>
         </div>
       </section>

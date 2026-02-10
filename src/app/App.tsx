@@ -1,61 +1,44 @@
 import { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { Header } from './components/Header';
-import { LandingPage } from './pages/LandingPage';
+
+// Public Pages
+import { GalleryLandingPage } from './pages/GalleryLandingPage';
+import { AboutPage } from './pages/AboutPage';
+import { RoomsPage } from './pages/RoomsPage';
+import { PricingPage } from './pages/PricingPage';
+import { RoomPage } from './pages/RoomPage';
+import { ExhibitPage } from './pages/ExhibitPage';
+
+// Auth Pages
 import { SignUpPage } from './pages/SignUpPage';
 import { SignInPage } from './pages/SignInPage';
-import { DashboardPage } from './pages/DashboardPage';
-import { RoomPage } from './pages/RoomPage';
-import { NewExhibitPage } from './pages/NewExhibitPage';
-import { ExhibitPage } from './pages/ExhibitPage';
-import { CommonplacePage } from './pages/CommonplacePage';
-import { WelcomePage } from './pages/WelcomePage';
-import { AboutPage } from './pages/AboutPage';
-import { LettersPage } from './pages/LettersPage';
-import { GalleryLandingPage } from './pages/GalleryLandingPage';
-import { GalleryWallPage } from './pages/GalleryWallPage';
-import { AfterhoursPage } from './pages/AfterhoursPage';
-import { RoomsPage } from './pages/RoomsPage';
 
-// Studio pages
+// Studio Pages (Writer Tools)
 import { StudioHub } from './studio/StudioHub';
 import { FreewritePage } from './studio/FreewritePage';
-import { PoetryEditorPage } from './studio/PoetryEditorPage';
+import { MyGarden } from './studio/MyGarden';
 import { MyWorkPage } from './studio/MyWorkPage';
 import { RoomSettingsPage } from './studio/RoomSettingsPage';
+import { NewExhibitPage } from './pages/NewExhibitPage';
 
-// Editor pages
-import { EditorDashboard } from './editor/EditorDashboard';
+// Editor Pages (Editorial Team)
 import { EditorDashboardPage } from './pages/EditorDashboardPage';
 import { EditorialSubmissionsPage } from './pages/EditorialSubmissionsPage';
 
-// Collection page
-import { CollectionPage } from './pages/CollectionPage';
-
-// Writer Editor page
-import { WriterEditorPage } from './pages/WriterEditorPage';
-
-// Collection Gallery and Community Wall
+// Community Pages
 import { CollectionGalleryPage } from './pages/CollectionGalleryPage';
 import { CommunityWallPage } from './pages/CommunityWallPage';
 
-// Pricing
-import { PricingPage } from './pages/PricingPage';
-
-// Submit Page
-import { SubmitPage } from './pages/SubmitPage';
+// Admin Pages
+import { AdminPage } from './pages/AdminPage';
+import { AddPoemsPage } from './pages/AddPoemsPage';
+import { ResetGalleryPage } from './pages/ResetGalleryPage';
+import { DemoModePage } from './pages/DemoModePage';
+import { DesignSystemDemo } from './pages/DesignSystemDemo';
 
 // 404 Page
 import { NotFoundPage } from './pages/NotFoundPage';
-
-// Writer Profile Page
-import { WriterProfilePage } from './pages/WriterProfilePage';
-
-// Writers' Studio Page
-import { WritersStudioPage } from './pages/WritersStudioPage';
-
-// Author Bio Card Demo
-import { AuthorBioCardDemo } from './pages/AuthorBioCardDemo';
 
 // AppContent component that uses auth - MUST be inside AuthProvider
 function AppContent() {
@@ -91,7 +74,18 @@ function AppContent() {
   }, []);
 
   // Pages that use their own navigation (don't show the default Header)
-  const pagesWithOwnNav = ['/', '/gallery-wall', '/afterhours', '/collection', '/rooms', '/signin', '/signup', '/writer-editor', '/collection-gallery', '/community-wall', '/editor-dashboard', '/about', '/meet-the-page', '/submit', '/editorial-submissions'];
+  const pagesWithOwnNav = [
+    '/',
+    '/about',
+    '/rooms',
+    '/signin',
+    '/signup',
+    '/pricing',
+    '/collection-gallery',
+    '/community-wall',
+    '/editor-dashboard',
+    '/editorial-submissions'
+  ];
   const showDefaultHeader = !pagesWithOwnNav.includes(route);
 
   if (loading) {
@@ -104,76 +98,77 @@ function AppContent() {
     );
   }
 
-  // Route matching
+  // Route matching - cleaned and organized
   let pageContent;
   
+  // Public Pages
   if (route === '/') {
     pageContent = <GalleryLandingPage />;
-  } else if (route === '/rooms' || route === '/gallery') {
-    pageContent = <RoomsPage />;
-  } else if (route === '/gallery-wall') {
-    pageContent = <GalleryWallPage />;
-  } else if (route === '/afterhours') {
-    pageContent = <AfterhoursPage />;
   } else if (route === '/about') {
     pageContent = <AboutPage />;
-  } else if (route === '/meet-the-page') {
-    pageContent = <AboutPage />;
-  } else if (route === '/signup') {
-    pageContent = <SignUpPage />;
-  } else if (route === '/signin') {
-    pageContent = <SignInPage />;
-  } else if (route === '/dashboard') {
-    pageContent = <DashboardPage />;
-  } else if (route === '/dashboard/new-exhibit' || route === '/studio/new-exhibit') {
-    pageContent = <NewExhibitPage />;
-  } else if (route === '/commonplace') {
-    pageContent = <CommonplacePage />;
-  } else if (route === '/letters') {
-    pageContent = <LettersPage />;
+  } else if (route === '/rooms' || route === '/gallery') {
+    pageContent = <RoomsPage />;
+  } else if (route === '/pricing') {
+    pageContent = <PricingPage />;
   } else if (route.startsWith('/room/')) {
     const userId = route.split('/room/')[1];
     pageContent = <RoomPage userId={userId} />;
   } else if (route.startsWith('/exhibit/')) {
     const exhibitId = route.split('/exhibit/')[1];
     pageContent = <ExhibitPage exhibitId={exhibitId} />;
-  } else if (route === '/studio') {
+  }
+  
+  // Auth Pages
+  else if (route === '/signup') {
+    pageContent = <SignUpPage />;
+  } else if (route === '/signin') {
+    pageContent = <SignInPage />;
+  }
+  
+  // Studio Pages (Writer Tools)
+  else if (route === '/studio') {
     pageContent = <StudioHub />;
   } else if (route === '/studio/freewrite') {
     pageContent = <FreewritePage />;
-  } else if (route === '/studio/poetry') {
-    pageContent = <PoetryEditorPage />;
+  } else if (route === '/studio/my-garden') {
+    pageContent = <MyGarden />;
   } else if (route === '/studio/work') {
     pageContent = <MyWorkPage />;
   } else if (route === '/studio/room-settings') {
     pageContent = <RoomSettingsPage />;
-  } else if (route === '/editor') {
-    pageContent = <EditorDashboard />;
-  } else if (route === '/editor-dashboard') {
+  } else if (route === '/studio/new-exhibit') {
+    pageContent = <NewExhibitPage />;
+  }
+  
+  // Editor Pages (Editorial Team)
+  else if (route === '/editor-dashboard') {
     pageContent = <EditorDashboardPage />;
   } else if (route === '/editorial-submissions') {
     pageContent = <EditorialSubmissionsPage />;
-  } else if (route === '/collection') {
-    pageContent = <CollectionPage />;
-  } else if (route === '/writer-editor') {
-    pageContent = <WriterEditorPage />;
-  } else if (route === '/collection-gallery') {
+  }
+  
+  // Community Pages
+  else if (route === '/collection-gallery') {
     pageContent = <CollectionGalleryPage />;
   } else if (route === '/community-wall') {
     pageContent = <CommunityWallPage />;
-  } else if (route === '/pricing') {
-    pageContent = <PricingPage />;
-  } else if (route === '/submit') {
-    pageContent = <SubmitPage />;
-  } else if (route.startsWith('/writer/')) {
-    const writerId = route.split('/writer/')[1];
-    pageContent = <WriterProfilePage writerId={writerId} />;
-  } else if (route === '/writers-studio') {
-    pageContent = <WritersStudioPage />;
-  } else if (route === '/author-bio-card-demo') {
-    pageContent = <AuthorBioCardDemo />;
-  } else {
-    // 404
+  }
+  
+  // Admin Pages
+  else if (route === '/admin') {
+    pageContent = <AdminPage />;
+  } else if (route === '/admin/add-poems') {
+    pageContent = <AddPoemsPage />;
+  } else if (route === '/admin/reset-gallery') {
+    pageContent = <ResetGalleryPage />;
+  } else if (route === '/admin/demo-mode') {
+    pageContent = <DemoModePage />;
+  } else if (route === '/admin/design-system-demo') {
+    pageContent = <DesignSystemDemo />;
+  }
+  
+  // 404 Page
+  else {
     pageContent = <NotFoundPage />;
   }
 

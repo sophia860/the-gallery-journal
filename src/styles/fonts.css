@@ -1,7 +1,14 @@
 /* Font imports for PAGE - The Page Gallery Writing Platform */
 
-/* Headlines / Titles - Libre Baskerville for editorial authority */
+/* PRIMARY VOICES - Design System */
+
+/* Display Voice - Cardo (italic-forward, poetic, editorial) */
+@import url('https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&display=swap');
+
+/* Literary Voice - Libre Baskerville (reading, body text, contemplative) */
 @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
+
+/* LEGACY FONTS - For compatibility */
 
 /* Alternative Headline Option - Playfair Display */
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap');

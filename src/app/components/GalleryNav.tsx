@@ -35,73 +35,73 @@ export function GalleryNav({ currentPage = '', variant = 'light' }: GalleryNavPr
   const mobileBg = isDark ? 'bg-[#1A1F2E]' : 'bg-[#F5F0EB]';
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 px-8 py-6 ${bgColor} backdrop-blur-sm border-b ${borderColor}`}>
+    <header className={`fixed top-0 left-0 right-0 z-50 px-8 py-8 ${bgColor} backdrop-blur-md border-b ${borderColor} shadow-sm`}>
       <div className="max-w-7xl mx-auto flex justify-between items-center">
-        <a href="/" className={`font-['Cardo'] text-3xl italic ${textColor} hover:text-[#E11D48] transition-colors`}>
+        <a href="/" className={`font-['Cardo'] text-3xl italic ${textColor} hover:text-[#E11D48] transition-colors duration-300`}>
           The Gallery
         </a>
         
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-8 font-[family-name:var(--font-ui)] text-sm">
+        <nav className="hidden md:flex items-center gap-10 font-[family-name:var(--font-ui)] text-sm tracking-wide">
           <a 
             href="/collection-gallery" 
-            className={`${linkColor} ${linkHover} transition-all relative group ${isActive('collection') ? activeColor : ''}`}
+            className={`${linkColor} ${linkHover} transition-all duration-300 relative group ${isActive('collection') ? activeColor : ''}`}
           >
             The Collection
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#E11D48] group-hover:w-full transition-all duration-300"></span>
+            <span className="absolute -bottom-2 left-0 w-0 h-0.5 bg-[#E11D48] group-hover:w-full transition-all duration-300"></span>
           </a>
           <a 
             href="/community-wall" 
-            className={`${linkColor} ${linkHover} transition-all relative group flex items-center gap-1.5 ${isActive('community') ? activeColor : ''}`}
+            className={`${linkColor} ${linkHover} transition-all duration-300 relative group flex items-center gap-1.5 ${isActive('community') ? activeColor : ''}`}
           >
-            {!user && <Lock className="w-3 h-3" />}
+            {!user && <Lock className="w-3 h-3 opacity-60" />}
             Gallery Wall
             {!user && (
-              <span className="ml-1 px-1.5 py-0.5 bg-[#C4918A]/20 text-[#8B7355] text-xs rounded">
+              <span className="ml-1 px-2 py-0.5 bg-[#C4918A]/10 text-[#8B7355] text-xs rounded-full">
                 Members
               </span>
             )}
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#E11D48] group-hover:w-full transition-all duration-300"></span>
+            <span className="absolute -bottom-2 left-0 w-0 h-0.5 bg-[#E11D48] group-hover:w-full transition-all duration-300"></span>
           </a>
           <a 
             href="/afterhours" 
-            className={`${linkColor} ${linkHover} transition-all relative group flex items-center gap-2 ${isActive('afterhours') ? activeColor : ''}`}
+            className={`${linkColor} ${linkHover} transition-all duration-300 relative group flex items-center gap-2 ${isActive('afterhours') ? activeColor : ''}`}
           >
-            <Moon className="w-4 h-4" />
+            <Moon className="w-4 h-4 opacity-80" />
             Afterhours
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#E11D48] group-hover:w-full transition-all duration-300"></span>
+            <span className="absolute -bottom-2 left-0 w-0 h-0.5 bg-[#E11D48] group-hover:w-full transition-all duration-300"></span>
           </a>
           <a 
             href="/rooms" 
-            className={`${linkColor} ${linkHover} transition-all relative group ${isActive('rooms') ? activeColor : ''}`}
+            className={`${linkColor} ${linkHover} transition-all duration-300 relative group ${isActive('rooms') ? activeColor : ''}`}
           >
             Rooms
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#E11D48] group-hover:w-full transition-all duration-300"></span>
+            <span className="absolute -bottom-2 left-0 w-0 h-0.5 bg-[#E11D48] group-hover:w-full transition-all duration-300"></span>
           </a>
           
           <a 
             href="/pricing" 
-            className={`${linkColor} ${linkHover} transition-all relative group ${isActive('pricing') ? activeColor : ''}`}
+            className={`${linkColor} ${linkHover} transition-all duration-300 relative group ${isActive('pricing') ? activeColor : ''}`}
           >
             Pricing
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#E11D48] group-hover:w-full transition-all duration-300"></span>
+            <span className="absolute -bottom-2 left-0 w-0 h-0.5 bg-[#E11D48] group-hover:w-full transition-all duration-300"></span>
           </a>
           
           {/* Editor Dashboard - only show for editors */}
           {isEditor && (
             <a 
               href="/editor-dashboard" 
-              className={`${linkColor} ${linkHover} transition-all relative group ${isActive('editor-dashboard') ? activeColor : ''}`}
+              className={`${linkColor} ${linkHover} transition-all duration-300 relative group ${isActive('editor-dashboard') ? activeColor : ''}`}
             >
               Editor Dashboard
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#E11D48] group-hover:w-full transition-all duration-300"></span>
+              <span className="absolute -bottom-2 left-0 w-0 h-0.5 bg-[#E11D48] group-hover:w-full transition-all duration-300"></span>
             </a>
           )}
           
           {user ? (
             <a 
               href="/studio" 
-              className="px-6 py-3 bg-[#E11D48] text-white hover:bg-[#C01040] hover:scale-105 transition-all"
+              className="px-8 py-3 bg-[#E11D48] text-white hover:bg-[#C01040] hover:scale-105 hover:shadow-lg transition-all duration-300 rounded-lg"
             >
               Your Studio
             </a>
@@ -109,14 +109,14 @@ export function GalleryNav({ currentPage = '', variant = 'light' }: GalleryNavPr
             <>
               <a 
                 href="/signin" 
-                className={`${linkColor} ${linkHover} transition-all relative group`}
+                className={`${linkColor} ${linkHover} transition-all duration-300 relative group`}
               >
                 Log In
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#E11D48] group-hover:w-full transition-all duration-300"></span>
+                <span className="absolute -bottom-2 left-0 w-0 h-0.5 bg-[#E11D48] group-hover:w-full transition-all duration-300"></span>
               </a>
               <a 
                 href="/signup" 
-                className="px-6 py-3 bg-[#E11D48] text-white hover:bg-[#C01040] hover:scale-105 transition-all"
+                className="px-8 py-3 bg-[#E11D48] text-white hover:bg-[#C01040] hover:scale-105 hover:shadow-lg transition-all duration-300 rounded-lg"
               >
                 Join
               </a>

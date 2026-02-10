@@ -1,0 +1,441 @@
+/**
+ * COMPONENT STYLES
+ * Reusable component classes using the design system
+ */
+
+/* ============================================
+   BUTTONS - Growth States
+   ============================================ */
+
+.btn-base {
+  padding: var(--space-4) var(--space-8);
+  border-radius: var(--radius-lg);
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-style: italic;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  cursor: pointer;
+  transition: all var(--timing-grow) var(--ease-organic);
+  border: 2px solid transparent;
+}
+
+.btn-base:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+.btn-base:active {
+  transform: translateY(0);
+  transition-duration: var(--timing-sprout);
+}
+
+.btn-primary {
+  background: var(--color-sprout);
+  color: var(--surface-canvas);
+  border-color: var(--color-sprout);
+}
+
+.btn-primary:hover {
+  background: #6F7D62;
+  box-shadow: var(--shadow-hover);
+}
+
+.btn-secondary {
+  background: var(--surface-canvas);
+  color: var(--color-earth-dark);
+  border-color: var(--color-earth-light);
+}
+
+.btn-secondary:hover {
+  border-color: var(--color-sprout);
+  color: var(--color-sprout);
+}
+
+.btn-bloom {
+  background: var(--state-bloom);
+  color: var(--surface-canvas);
+  border-color: var(--state-bloom);
+}
+
+.btn-bloom:hover {
+  background: #C01040;
+  transform: scale(1.05);
+}
+
+.btn-seed {
+  background: var(--state-seed);
+  color: var(--surface-canvas);
+  border-color: var(--state-seed);
+}
+
+.btn-seed:hover {
+  background: #B89255;
+}
+
+/* ============================================
+   CARDS - Breathing Elements
+   ============================================ */
+
+.card {
+  background: var(--surface-canvas);
+  border: 2px solid var(--color-earth-light);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  transition: all var(--timing-grow) var(--ease-organic);
+}
+
+.card:hover {
+  border-color: var(--color-sprout);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-4px);
+}
+
+.card-interactive {
+  cursor: pointer;
+}
+
+/* ============================================
+   INPUTS - Welcoming Fields
+   ============================================ */
+
+.input {
+  width: 100%;
+  padding: var(--space-4);
+  background: var(--surface-canvas);
+  border: 2px solid var(--color-earth-light);
+  border-radius: var(--radius-md);
+  font-family: var(--font-literary);
+  font-size: var(--text-base);
+  color: var(--color-earth-dark);
+  transition: all var(--timing-grow) var(--ease-organic);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-sprout);
+  box-shadow: 0 0 0 3px var(--quiet-murmur);
+}
+
+.input::placeholder {
+  color: var(--color-earth-medium);
+  opacity: 0.6;
+}
+
+.textarea {
+  min-height: 120px;
+  resize: vertical;
+  line-height: var(--leading-relaxed);
+}
+
+/* ============================================
+   BADGES & TAGS
+   ============================================ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: var(--quiet-murmur);
+  border-radius: var(--radius-full);
+  font-family: var(--font-journal);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-widest);
+  color: var(--color-earth-dark);
+}
+
+.badge-sprout {
+  background: rgba(138, 154, 123, 0.15);
+  color: var(--color-sprout);
+  border: 1px solid var(--color-sprout);
+}
+
+.badge-seed {
+  background: rgba(196, 162, 101, 0.15);
+  color: var(--state-seed);
+  border: 1px solid var(--state-seed);
+}
+
+.badge-bloom {
+  background: rgba(225, 29, 72, 0.15);
+  color: var(--state-bloom);
+  border: 1px solid var(--state-bloom);
+}
+
+/* ============================================
+   HEADINGS - Display Voice
+   ============================================ */
+
+.heading-hero {
+  font-family: var(--font-display);
+  font-size: var(--text-7xl);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-earth-dark);
+  font-style: italic;
+}
+
+.heading-page {
+  font-family: var(--font-display);
+  font-size: var(--text-5xl);
+  line-height: var(--leading-tight);
+  color: var(--color-earth-dark);
+  font-style: italic;
+}
+
+.heading-section {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  line-height: var(--leading-snug);
+  color: var(--color-earth-dark);
+  font-style: italic;
+}
+
+.heading-card {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  line-height: var(--leading-snug);
+  color: var(--color-earth-dark);
+  font-style: italic;
+}
+
+/* ============================================
+   BODY TEXT - Literary Voice
+   ============================================ */
+
+.text-body {
+  font-family: var(--font-literary);
+  font-size: var(--text-base);
+  line-height: var(--leading-relaxed);
+  color: var(--color-earth-dark);
+}
+
+.text-large {
+  font-family: var(--font-literary);
+  font-size: var(--text-xl);
+  line-height: var(--leading-relaxed);
+  color: var(--color-earth-medium);
+}
+
+.text-small {
+  font-family: var(--font-literary);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  color: var(--color-earth-medium);
+}
+
+.text-meta {
+  font-family: var(--font-journal);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+  color: var(--color-earth-medium);
+}
+
+/* ============================================
+   LINKS - Growing Underlines
+   ============================================ */
+
+.link {
+  position: relative;
+  color: var(--color-sprout);
+  text-decoration: none;
+  transition: color var(--timing-sprout) var(--ease-organic);
+}
+
+.link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: currentColor;
+  transition: width var(--timing-grow) var(--ease-organic);
+}
+
+.link:hover::after {
+  width: 100%;
+}
+
+.link:hover {
+  color: #6F7D62;
+}
+
+/* ============================================
+   CONTAINERS
+   ============================================ */
+
+.container-page {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 0 var(--space-8);
+}
+
+.container-narrow {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 0 var(--space-8);
+}
+
+.container-wide {
+  max-width: 90rem;
+  margin: 0 auto;
+  padding: 0 var(--space-8);
+}
+
+/* ============================================
+   SURFACES
+   ============================================ */
+
+.surface-gallery {
+  background: var(--surface-gallery);
+}
+
+.surface-studio {
+  background: var(--surface-studio);
+}
+
+.surface-canvas {
+  background: var(--surface-canvas);
+}
+
+.surface-parchment {
+  background: var(--surface-parchment);
+}
+
+.surface-gradient-warm {
+  background: linear-gradient(to bottom, var(--surface-parchment), var(--surface-gallery));
+}
+
+/* ============================================
+   SPACING UTILITIES
+   ============================================ */
+
+.space-section {
+  padding-top: var(--space-24);
+  padding-bottom: var(--space-24);
+}
+
+.space-page-top {
+  padding-top: calc(var(--space-24) + var(--space-8));
+}
+
+.gap-prose {
+  margin-bottom: var(--space-6);
+}
+
+/* ============================================
+   RESPONSIVE BEHAVIOR
+   ============================================ */
+
+@media (max-width: 768px) {
+  .heading-hero {
+    font-size: var(--text-5xl);
+  }
+  
+  .heading-page {
+    font-size: var(--text-4xl);
+  }
+  
+  .heading-section {
+    font-size: var(--text-2xl);
+  }
+  
+  .btn-base {
+    padding: var(--space-3) var(--space-6);
+    font-size: var(--text-sm);
+  }
+  
+  .card {
+    padding: var(--space-6);
+  }
+}
+
+/* ============================================
+   STATES - Growth Indicators
+   ============================================ */
+
+.state-seed {
+  position: relative;
+}
+
+.state-seed::before {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  background: var(--state-seed);
+  border-radius: 50%;
+}
+
+.state-sprout {
+  position: relative;
+}
+
+.state-sprout::before {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  background: var(--state-sprout);
+  border-radius: 50%;
+}
+
+.state-bloom {
+  position: relative;
+}
+
+.state-bloom::before {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  background: var(--state-bloom);
+  border-radius: 50%;
+}
+
+/* ============================================
+   LOADING STATES
+   ============================================ */
+
+.loading-spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--color-earth-light);
+  border-top-color: var(--color-sprout);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   SHADOWS - Depth Layers
+   ============================================ */
+
+.shadow-subtle {
+  box-shadow: var(--shadow-rest);
+}
+
+.shadow-lifted {
+  box-shadow: var(--shadow-hover);
+}
+
+.shadow-elevated {
+  box-shadow: var(--shadow-active);
+}

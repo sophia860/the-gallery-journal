@@ -42,15 +42,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const isDemoMode = typeof window !== 'undefined' && localStorage.getItem('demoMode') === 'true';
         
         if (isDemoMode) {
-          console.log('[AuthContext] Demo mode detected, creating demo user');
-          // Create a demo user
+          const demoRole = localStorage.getItem('demoRole') || 'writer';
+          console.log(`[AuthContext] Demo mode detected, creating demo ${demoRole}`);
+          
+          // Create a demo user with the selected role
           const demoUser: User = {
             id: 'demo-user',
-            email: 'demo@page.com',
+            email: demoRole === 'editor' ? 'editor@page.com' : 'demo@page.com',
             user_metadata: {
-              name: 'Demo User',
-              role: 'writer',
-              writerName: 'Demo Writer'
+              name: demoRole === 'editor' ? 'Demo Editor' : 'Demo Writer',
+              role: demoRole,
+              writerName: demoRole === 'editor' ? 'Demo Editor' : 'Demo Writer'
             }
           };
           setUser(demoUser);

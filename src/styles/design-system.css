@@ -1,0 +1,407 @@
+/**
+ * THE PAGE - Design System
+ * Narrative: A literary garden that grows ideas over time
+ * 
+ * Core Principles:
+ * - Organic growth over mechanical efficiency
+ * - Depth over speed
+ * - Contemplation over performance
+ * - Seasons over algorithms
+ */
+
+/* ============================================
+   COLOR TOKENS - Emotional Roles
+   ============================================ */
+
+:root {
+  /* PRIMARY: Earth & Growth - The foundation of our garden */
+  --color-earth-dark: #2C1810;        /* Deep soil - body text, high emphasis */
+  --color-earth-medium: #8B7355;      /* Rich loam - secondary text, thoughtful */
+  --color-earth-light: #E0D8D0;       /* Sandy paths - borders, quiet structure */
+  
+  /* ACCENT: New Growth - Moments of blooming */
+  --color-sprout: #8A9A7B;            /* Living green - success, growth states, primary actions */
+  --color-bloom: #E11D48;             /* Opening petals - critical actions, emphasis */
+  --color-seed: #C4A265;              /* Golden potential - rewards, highlights */
+  
+  /* SURFACE: Paper & Parchment - Where words live */
+  --surface-gallery: #F5F0EB;         /* Warm gallery walls - public reading spaces */
+  --surface-studio: #FAF7F2;          /* Cream writing desk - private creation */
+  --surface-canvas: #FFFFFF;          /* Fresh paper - writing surfaces */
+  --surface-parchment: #FAF8F5;       /* Aged paper - backgrounds */
+  
+  /* QUIET: Atmosphere - The air between words */
+  --quiet-whisper: rgba(139, 115, 85, 0.1);   /* Barely there */
+  --quiet-murmur: rgba(139, 115, 85, 0.2);    /* Gentle presence */
+  --quiet-speak: rgba(139, 115, 85, 0.3);     /* Soft assertion */
+  
+  /* SEMANTIC: Growth States */
+  --state-seed: #C4A265;              /* Early idea - potential */
+  --state-sprout: #8A9A7B;            /* Developing - progress */
+  --state-bloom: #E11D48;             /* Complete - ready */
+  
+  /* INTERACTION: Touch & Response */
+  --shadow-rest: 0 1px 3px rgba(44, 24, 16, 0.08);
+  --shadow-hover: 0 4px 12px rgba(44, 24, 16, 0.12);
+  --shadow-active: 0 8px 24px rgba(44, 24, 16, 0.16);
+  
+  /* TIMING: Organic Pacing - Like watching plants grow */
+  --timing-sprout: 200ms;             /* Quick acknowledgment */
+  --timing-grow: 300ms;               /* Natural unfold */
+  --timing-bloom: 500ms;              /* Full reveal */
+  --timing-season: 800ms;             /* Deep transition */
+  
+  /* EASING: Natural Motion */
+  --ease-organic: cubic-bezier(0.4, 0.0, 0.2, 1);     /* Ease out */
+  --ease-growth: cubic-bezier(0.0, 0.0, 0.2, 1);      /* Accelerate */
+  --ease-settle: cubic-bezier(0.4, 0.0, 0.6, 1);      /* Gentle land */
+}
+
+/* ============================================
+   TYPOGRAPHY - One Clear Voice
+   ============================================ */
+
+/* PRIMARY: Libre Baskerville - The Literary Voice
+   Used for: Body text, descriptions, reading content
+   Character: Elegant, readable, book-like, contemplative */
+
+/* SECONDARY: Cardo - The Display Voice  
+   Used for: Headings, titles, emphasis
+   Character: Italic-forward, poetic, editorial */
+
+/* UTILITY: System monospace - The Garden Journal
+   Used for: Metadata, timestamps, technical info
+   Character: Handwritten notes, marginalia */
+
+:root {
+  /* Type Scale - Modular (1.25 ratio, refined for reading) */
+  --text-xs: 0.75rem;      /* 12px - whispers */
+  --text-sm: 0.875rem;     /* 14px - footnotes */
+  --text-base: 1rem;       /* 16px - body */
+  --text-lg: 1.125rem;     /* 18px - emphasis */
+  --text-xl: 1.25rem;      /* 20px - subheadings */
+  --text-2xl: 1.5rem;      /* 24px - section titles */
+  --text-3xl: 1.875rem;    /* 30px - page titles */
+  --text-4xl: 2.25rem;     /* 36px - hero small */
+  --text-5xl: 3rem;        /* 48px - hero */
+  --text-6xl: 3.75rem;     /* 60px - hero large */
+  --text-7xl: 4.5rem;      /* 72px - statement */
+  
+  /* Line Heights - For comfortable reading */
+  --leading-tight: 1.1;    /* Titles, compact */
+  --leading-snug: 1.375;   /* Subheadings */
+  --leading-normal: 1.5;   /* Body text */
+  --leading-relaxed: 1.625;/* Reading prose */
+  --leading-loose: 2;      /* Poetry, breathing room */
+  
+  /* Letter Spacing - Subtle refinement */
+  --tracking-tight: -0.025em;   /* Large display */
+  --tracking-normal: 0;         /* Default */
+  --tracking-wide: 0.025em;     /* Small caps */
+  --tracking-wider: 0.05em;     /* Emphasis */
+  --tracking-widest: 0.1em;     /* Metadata */
+}
+
+/* ============================================
+   SPACING - Rhythmic Intervals
+   Based on 8px grid, poetic proportions
+   ============================================ */
+
+:root {
+  --space-1: 0.25rem;   /* 4px - hairline */
+  --space-2: 0.5rem;    /* 8px - breath */
+  --space-3: 0.75rem;   /* 12px - pause */
+  --space-4: 1rem;      /* 16px - beat */
+  --space-5: 1.25rem;   /* 20px - measure */
+  --space-6: 1.5rem;    /* 24px - stanza */
+  --space-8: 2rem;      /* 32px - paragraph */
+  --space-10: 2.5rem;   /* 40px - section */
+  --space-12: 3rem;     /* 48px - chapter */
+  --space-16: 4rem;     /* 64px - page */
+  --space-20: 5rem;     /* 80px - opening */
+  --space-24: 6rem;     /* 96px - title */
+}
+
+/* ============================================
+   BORDERS - Gentle Boundaries
+   ============================================ */
+
+:root {
+  --border-width-subtle: 1px;   /* Whisper */
+  --border-width-default: 2px;  /* Present */
+  --border-width-emphasis: 4px; /* Statement */
+  
+  --radius-sm: 0.5rem;    /* 8px - soft corners */
+  --radius-md: 0.75rem;   /* 12px - cards */
+  --radius-lg: 1rem;      /* 16px - panels */
+  --radius-xl: 1.25rem;   /* 20px - features */
+  --radius-2xl: 1.5rem;   /* 24px - hero elements */
+  --radius-full: 9999px;  /* Pills, tags */
+}
+
+/* ============================================
+   COMPONENT BEHAVIOR - Consistent Responses
+   ============================================ */
+
+/* Interactive Elements - They all grow when touched */
+.interactive-base {
+  transition: all var(--timing-grow) var(--ease-organic);
+  cursor: pointer;
+}
+
+.interactive-base:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-hover);
+}
+
+.interactive-base:active {
+  transform: translateY(0);
+  transition-duration: var(--timing-sprout);
+}
+
+/* Buttons - Three growth states */
+.btn-primary {
+  background: var(--color-sprout);
+  color: var(--surface-canvas);
+  border: var(--border-width-default) solid var(--color-sprout);
+  transition: all var(--timing-grow) var(--ease-organic);
+}
+
+.btn-primary:hover {
+  background: #6F7D62;
+  transform: scale(1.02);
+  box-shadow: var(--shadow-hover);
+}
+
+.btn-secondary {
+  background: var(--surface-canvas);
+  color: var(--color-earth-dark);
+  border: var(--border-width-default) solid var(--color-earth-light);
+  transition: all var(--timing-grow) var(--ease-organic);
+}
+
+.btn-secondary:hover {
+  border-color: var(--color-sprout);
+  color: var(--color-sprout);
+  box-shadow: var(--shadow-hover);
+}
+
+/* Cards - They breathe when you look at them */
+.card-base {
+  background: var(--surface-canvas);
+  border: var(--border-width-default) solid var(--color-earth-light);
+  border-radius: var(--radius-xl);
+  transition: all var(--timing-grow) var(--ease-organic);
+}
+
+.card-base:hover {
+  border-color: var(--color-sprout);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+}
+
+/* Inputs - They welcome your words */
+.input-base {
+  background: var(--surface-canvas);
+  border: var(--border-width-default) solid var(--color-earth-light);
+  border-radius: var(--radius-md);
+  transition: all var(--timing-grow) var(--ease-organic);
+  font-family: 'Libre Baskerville', serif;
+}
+
+.input-base:focus {
+  outline: none;
+  border-color: var(--color-sprout);
+  box-shadow: 0 0 0 3px var(--quiet-murmur);
+}
+
+/* Tags - Little seeds of meaning */
+.tag-base {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  background: var(--quiet-murmur);
+  color: var(--color-earth-dark);
+  border-radius: var(--radius-full);
+  font-family: 'Courier New', monospace;
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  transition: all var(--timing-sprout) var(--ease-organic);
+}
+
+.tag-base:hover {
+  background: var(--color-sprout);
+  color: var(--surface-canvas);
+  transform: scale(1.05);
+}
+
+/* ============================================
+   MICRO-INTERACTIONS - Telling the Story
+   ============================================ */
+
+/* 1. UNDERLINE GROWTH - Links reveal themselves slowly */
+.link-grow {
+  position: relative;
+  text-decoration: none;
+}
+
+.link-grow::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: currentColor;
+  transition: width var(--timing-grow) var(--ease-organic);
+}
+
+.link-grow:hover::after {
+  width: 100%;
+}
+
+/* 2. ICON SPROUT - Icons grow when activated */
+@keyframes sprout-up {
+  0% { transform: scale(1) translateY(0); }
+  50% { transform: scale(1.2) translateY(-2px); }
+  100% { transform: scale(1.1) translateY(-1px); }
+}
+
+.icon-sprout:hover {
+  animation: sprout-up var(--timing-grow) var(--ease-organic);
+}
+
+/* 3. TEXT BLOOM - Important text expands gently */
+@keyframes text-bloom {
+  0% { letter-spacing: var(--tracking-normal); }
+  100% { letter-spacing: var(--tracking-wide); }
+}
+
+.text-bloom:hover {
+  animation: text-bloom var(--timing-bloom) var(--ease-settle) forwards;
+}
+
+/* 4. FADE GROW - Content appears like morning light */
+@keyframes fade-grow {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-grow-in {
+  animation: fade-grow var(--timing-bloom) var(--ease-settle);
+}
+
+/* 5. PULSE GLOW - Gentle breathing for active states */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 var(--quiet-murmur); }
+  50% { box-shadow: 0 0 0 4px var(--quiet-murmur); }
+}
+
+.pulse-glow {
+  animation: pulse-glow var(--timing-season) var(--ease-organic) infinite;
+}
+
+/* 6. HOVER LIFT - Elements rise to meet your attention */
+.hover-lift {
+  transition: transform var(--timing-grow) var(--ease-organic);
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+}
+
+/* ============================================
+   ACCESSIBILITY - Inclusive Garden
+   ============================================ */
+
+/* Focus states - Clear, kind, present */
+*:focus-visible {
+  outline: var(--border-width-emphasis) solid var(--color-sprout);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Reduced motion - Respect user preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High contrast - Ensure readability */
+@media (prefers-contrast: high) {
+  :root {
+    --color-earth-dark: #000000;
+    --color-earth-light: #666666;
+    --color-sprout: #006400;
+    --color-bloom: #CC0000;
+  }
+}
+
+/* ============================================
+   PROSE STYLES - The Reading Experience
+   ============================================ */
+
+.prose {
+  font-family: 'Libre Baskerville', serif;
+  font-size: var(--text-lg);
+  line-height: var(--leading-relaxed);
+  color: var(--color-earth-dark);
+  max-width: 65ch; /* Optimal reading width */
+}
+
+.prose p {
+  margin-bottom: var(--space-6);
+}
+
+.prose h2 {
+  font-family: 'Cardo', serif;
+  font-size: var(--text-3xl);
+  font-style: italic;
+  line-height: var(--leading-tight);
+  margin-top: var(--space-12);
+  margin-bottom: var(--space-6);
+}
+
+.prose blockquote {
+  border-left: var(--border-width-emphasis) solid var(--color-earth-light);
+  padding-left: var(--space-6);
+  font-style: italic;
+  color: var(--color-earth-medium);
+  margin: var(--space-8) 0;
+}
+
+/* ============================================
+   UTILITY CLASSES - Consistent Application
+   ============================================ */
+
+/* Text Styles */
+.text-literary { font-family: 'Libre Baskerville', serif; }
+.text-display { font-family: 'Cardo', serif; font-style: italic; }
+.text-journal { font-family: 'Courier New', monospace; }
+
+/* Colors */
+.text-earth-dark { color: var(--color-earth-dark); }
+.text-earth-medium { color: var(--color-earth-medium); }
+.text-sprout { color: var(--color-sprout); }
+.text-bloom { color: var(--color-bloom); }
+
+.bg-gallery { background: var(--surface-gallery); }
+.bg-studio { background: var(--surface-studio); }
+.bg-canvas { background: var(--surface-canvas); }
+
+/* Borders */
+.border-earth { border-color: var(--color-earth-light); }
+.border-sprout { border-color: var(--color-sprout); }
+.border-bloom { border-color: var(--color-bloom); }

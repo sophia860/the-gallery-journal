@@ -1,67 +1,101 @@
 @custom-variant dark (&:is(.dark *));
 
-/* PAGE Design System - Calm Technology for Literary Work */
+/* 
+ * THE PAGE - Design System
+ * A literary garden where ideas grow in seasons, not feeds
+ * 
+ * Typography Philosophy: Two voices
+ * - Libre Baskerville: The literary voice (body, reading)
+ * - Cardo: The display voice (titles, emphasis, italic-forward)
+ * - Monospace (system): The garden journal (metadata, timestamps)
+ */
+
 :root {
-  /* Typography */
+  /* TYPOGRAPHY - Two Families Only */
   --font-size: 16px;
-  --font-headline: 'Libre Baskerville', serif;
-  --font-headline-alt: 'Playfair Display', serif;
-  --font-body: 'Open Sans', sans-serif;
-  --font-body-alt: 'Source Sans Pro', sans-serif;
-  --font-poetry: 'EB Garamond', serif;
-  --font-ui: 'Inter', sans-serif;
+  --font-literary: 'Libre Baskerville', serif;  /* Reading, body text */
+  --font-display: 'Cardo', serif;                /* Headlines, poetry */
+  --font-journal: 'Courier New', monospace;      /* Metadata, notes */
   
-  /* PAGE Color Palette - Muted, warm, editorial */
-  --page-ivory: #F5F0EB;
-  --page-stone: #E0D8D0;
-  --page-charcoal: #2C2C2C;
-  --page-rose: #C4918A;
-  --page-sage: #8A9A7B;
-  --page-navy: #1A1F2E;
+  /* For compatibility - all map to our two families */
+  --font-headline: 'Cardo', serif;
+  --font-body: 'Libre Baskerville', serif;
+  --font-ui: 'Libre Baskerville', serif;
   
-  /* Light mode mappings */
-  --background: var(--page-ivory);
-  --foreground: var(--page-charcoal);
-  --card: #ffffff;
-  --card-foreground: var(--page-charcoal);
-  --popover: #ffffff;
-  --popover-foreground: var(--page-charcoal);
-  --primary: var(--page-charcoal);
-  --primary-foreground: var(--page-ivory);
-  --secondary: var(--page-stone);
-  --secondary-foreground: var(--page-charcoal);
-  --muted: var(--page-stone);
-  --muted-foreground: #717171;
-  --accent: var(--page-rose);
-  --accent-foreground: var(--page-charcoal);
-  --destructive: #d4183d;
-  --destructive-foreground: #ffffff;
-  --border: rgba(44, 44, 44, 0.1);
+  /* COLOR PALETTE - Emotional Roles */
+  /* Earth & Growth (Primary) */
+  --page-earth-dark: #2C1810;      /* Deep soil - body text */
+  --page-earth-medium: #8B7355;    /* Rich loam - secondary */
+  --page-earth-light: #E0D8D0;     /* Sandy paths - borders */
+  
+  /* Growth States (Accent) */
+  --page-sprout: #8A9A7B;          /* Living green - growth */
+  --page-bloom: #E11D48;           /* Opening petals - emphasis */
+  --page-seed: #C4A265;            /* Golden potential - rewards */
+  
+  /* Surfaces (Paper & Parchment) */
+  --page-gallery: #F5F0EB;         /* Warm gallery walls */
+  --page-studio: #FAF7F2;          /* Cream writing desk */
+  --page-canvas: #FFFFFF;          /* Fresh paper */
+  --page-parchment: #FAF8F5;       /* Aged paper */
+  
+  /* Legacy color names (mapped to new system) */
+  --page-ivory: var(--page-parchment);
+  --page-cream: var(--page-gallery);
+  --page-stone: var(--page-earth-light);
+  --page-border: var(--page-earth-light);
+  --page-charcoal: var(--page-earth-dark);
+  --page-charcoal-light: var(--page-earth-medium);
+  --page-sage: var(--page-sprout);
+  --page-gold: var(--page-seed);
+  --page-crimson: var(--page-bloom);
+  
+  /* Semantic mappings */
+  --background: var(--page-parchment);
+  --foreground: var(--page-earth-dark);
+  --card: var(--page-canvas);
+  --card-foreground: var(--page-earth-dark);
+  --popover: var(--page-canvas);
+  --popover-foreground: var(--page-earth-dark);
+  --primary: var(--page-sprout);
+  --primary-foreground: var(--page-canvas);
+  --secondary: var(--page-earth-light);
+  --secondary-foreground: var(--page-earth-dark);
+  --muted: var(--page-earth-light);
+  --muted-foreground: var(--page-earth-medium);
+  --accent: var(--page-seed);
+  --accent-foreground: var(--page-earth-dark);
+  --destructive: var(--page-bloom);
+  --destructive-foreground: var(--page-canvas);
+  --border: var(--page-earth-light);
   --input: transparent;
-  --input-background: var(--page-stone);
+  --input-background: var(--page-earth-light);
   --switch-background: #cbced4;
+  --ring: var(--page-sprout);
+  
+  /* Chart colors */
+  --chart-1: var(--page-sprout);
+  --chart-2: var(--page-seed);
+  --chart-3: var(--page-earth-medium);
+  --chart-4: var(--page-earth-light);
+  --chart-5: var(--page-bloom);
+  
+  /* Border radius - softer, more organic */
+  --radius: 0.75rem;
+  
+  /* Font weights - subtle hierarchy */
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --ring: var(--page-rose);
   
-  /* Chart colors - muted palette */
-  --chart-1: var(--page-rose);
-  --chart-2: var(--page-sage);
-  --chart-3: #B5A8A1;
-  --chart-4: #A8998F;
-  --chart-5: #8B8278;
-  
-  --radius: 0rem; /* Brutalist - no rounded corners */
-  
-  /* Sidebar - not used in PAGE but keeping for compatibility */
-  --sidebar: var(--page-ivory);
-  --sidebar-foreground: var(--page-charcoal);
-  --sidebar-primary: var(--page-charcoal);
-  --sidebar-primary-foreground: var(--page-ivory);
-  --sidebar-accent: var(--page-stone);
-  --sidebar-accent-foreground: var(--page-charcoal);
-  --sidebar-border: rgba(44, 44, 44, 0.1);
-  --sidebar-ring: var(--page-rose);
+  /* Sidebar (for compatibility) */
+  --sidebar: var(--page-parchment);
+  --sidebar-foreground: var(--page-earth-dark);
+  --sidebar-primary: var(--page-sprout);
+  --sidebar-primary-foreground: var(--page-canvas);
+  --sidebar-accent: var(--page-earth-light);
+  --sidebar-accent-foreground: var(--page-earth-dark);
+  --sidebar-border: var(--page-earth-light);
+  --sidebar-ring: var(--page-sprout);
 }
 
 .dark {

@@ -34,6 +34,43 @@ const supabase = createClient(
 
 export function registerAdditionalRoutes(app: Hono) {
 
+// ============ ADMIN ROUTES ============
+
+// Clear all exhibits from the gallery (admin only)
+app.delete(
+  "/make-server-07dc516a/admin/clear-exhibits",
+  requireAuth,
+  async (c: AuthContext) => {
+    try {
+      // Get all exhibit keys
+      const allExhibits = await kv.getByPrefix('exhibit:');
+      
+      // Delete each exhibit
+      const exhibitKeys = allExhibits.map(ex => `exhibit:${ex.id}`);
+      if (exhibitKeys.length > 0) {
+        await kv.mdel(exhibitKeys);
+      }
+      
+      // Clear all user_exhibits lists
+      const userExhibitKeys = await kv.getByPrefix('user_exhibits:');
+      const userKeys = userExhibitKeys.map(() => userExhibitKeys).flat();
+      if (userKeys.length > 0) {
+        await kv.mdel(userKeys.map(k => `user_exhibits:${k}`));
+      }
+      
+      logInfo('admin:clear-exhibits', `Cleared ${exhibitKeys.length} exhibits from gallery`);
+      
+      return successResponse(c, {
+        message: 'All exhibits cleared from gallery',
+        count: exhibitKeys.length
+      });
+    } catch (err: any) {
+      logError('admin:clear-exhibits', err);
+      return errorResponse(c, 'Failed to clear exhibits', 'INTERNAL_ERROR', 500);
+    }
+  }
+);
+
 // ============ EXHIBIT ROUTES ============
 
 app.post(

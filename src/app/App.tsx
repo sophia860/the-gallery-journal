@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { SubscriptionProvider } from './contexts/SubscriptionContext';
 import { Header } from './components/Header';
-import { ProtectedRoute } from './components/ProtectedRoute';
 import { LandingPage } from './pages/LandingPage';
 import { SignUpPage } from './pages/SignUpPage';
 import { SignInPage } from './pages/SignInPage';
@@ -19,6 +18,7 @@ import { GalleryWallPage } from './pages/GalleryWallPage';
 import { AfterhoursPage } from './pages/AfterhoursPage';
 import { RoomsPage } from './pages/RoomsPage';
 import { PricingPage } from './pages/PricingPage';
+import { MeetThePagePage } from './pages/MeetThePagePage';
 
 // Studio pages
 import { StudioHub } from './studio/StudioHub';
@@ -28,7 +28,6 @@ import { MyWorkPage } from './studio/MyWorkPage';
 import { RoomSettingsPage } from './studio/RoomSettingsPage';
 
 // Editor pages
-import { EditorDashboard } from './editor/EditorDashboard';
 import { EditorDashboardPage } from './pages/EditorDashboardPage';
 
 // Collection page
@@ -40,6 +39,8 @@ import { WriterEditorPage } from './pages/WriterEditorPage';
 // Collection Gallery and Community Wall
 import { CollectionGalleryPage } from './pages/CollectionGalleryPage';
 import { CommunityWallPage } from './pages/CommunityWallPage';
+import { SubmitToGalleryPage } from './pages/SubmitToGalleryPage';
+import { EditorialSubmissionsPage } from './editorial/EditorialSubmissionsPage';
 
 // 404 Page
 import { NotFoundPage } from './pages/NotFoundPage';
@@ -68,8 +69,15 @@ function AppContent() {
       const link = target.closest('a');
       
       if (link && link.href && link.origin === window.location.origin) {
+        const url = new URL(link.href);
+
+        // Allow default browser behavior for in-page anchor links
+        if (url.hash && url.pathname === window.location.pathname) {
+          return;
+        }
+
         e.preventDefault();
-        const path = new URL(link.href).pathname;
+        const path = url.pathname;
         window.history.pushState({}, '', path);
         setRoute(path);
       }
@@ -84,7 +92,7 @@ function AppContent() {
   }, []);
 
   // Pages that use their own navigation (don't show the default Header)
-  const pagesWithOwnNav = ['/', '/gallery-wall', '/afterhours', '/collection', '/rooms', '/signin', '/signup', '/writer-editor', '/collection-gallery', '/community-wall', '/editor-dashboard', '/pricing'];
+  const pagesWithOwnNav = ['/', '/gallery-wall', '/afterhours', '/collection', '/rooms', '/signin', '/signup', '/writer-editor', '/collection-gallery', '/community-wall', '/editor-dashboard', '/meet-the-page'];
   const showDefaultHeader = !pagesWithOwnNav.includes(route);
 
   if (loading) {
@@ -103,11 +111,13 @@ function AppContent() {
   if (route === '/') {
     pageContent = <GalleryLandingPage />;
   } else if (route === '/rooms' || route === '/gallery') {
-    pageContent = <ProtectedRoute><RoomsPage /></ProtectedRoute>;
+    pageContent = <RoomsPage />;
   } else if (route === '/gallery-wall') {
-    pageContent = <ProtectedRoute><GalleryWallPage /></ProtectedRoute>;
+    pageContent = <GalleryWallPage />;
+  } else if (route === '/meet-the-page') {
+    pageContent = <MeetThePagePage />;
   } else if (route === '/afterhours') {
-    pageContent = <ProtectedRoute><AfterhoursPage /></ProtectedRoute>;
+    pageContent = <AfterhoursPage />;
   } else if (route === '/about') {
     pageContent = <AboutPage />;
   } else if (route === '/signup') {
@@ -117,46 +127,50 @@ function AppContent() {
   } else if (route === '/pricing') {
     pageContent = <PricingPage />;
   } else if (route === '/dashboard') {
-    pageContent = <ProtectedRoute><DashboardPage /></ProtectedRoute>;
+    pageContent = <DashboardPage />;
   } else if (route === '/dashboard/new-exhibit' || route === '/studio/new-exhibit') {
-    pageContent = <ProtectedRoute><NewExhibitPage /></ProtectedRoute>;
+    pageContent = <NewExhibitPage />;
   } else if (route === '/commonplace') {
     pageContent = <CommonplacePage />;
   } else if (route === '/letters') {
     pageContent = <LettersPage />;
   } else if (route.startsWith('/room/')) {
     const userId = route.split('/room/')[1];
-    pageContent = <ProtectedRoute><RoomPage userId={userId} /></ProtectedRoute>;
+    pageContent = <RoomPage userId={userId} />;
   } else if (route.startsWith('/exhibit/')) {
     const exhibitId = route.split('/exhibit/')[1];
     pageContent = <ExhibitPage exhibitId={exhibitId} />;
   } else if (route === '/studio') {
-    pageContent = <ProtectedRoute><StudioHub /></ProtectedRoute>;
+    pageContent = <StudioHub />;
   } else if (route === '/studio/freewrite') {
-    pageContent = <ProtectedRoute><FreewritePage /></ProtectedRoute>;
+    pageContent = <FreewritePage />;
   } else if (route === '/studio/poetry') {
-    pageContent = <ProtectedRoute><PoetryEditorPage /></ProtectedRoute>;
+    pageContent = <PoetryEditorPage />;
   } else if (route === '/studio/work') {
-    pageContent = <ProtectedRoute><MyWorkPage /></ProtectedRoute>;
+    pageContent = <MyWorkPage />;
   } else if (route === '/studio/room-settings') {
-    pageContent = <ProtectedRoute><RoomSettingsPage /></ProtectedRoute>;
+    pageContent = <RoomSettingsPage />;
   } else if (route === '/editor') {
-    pageContent = <ProtectedRoute><EditorDashboard /></ProtectedRoute>;
+    pageContent = <EditorDashboardPage />;
   } else if (route === '/editor-dashboard') {
-    pageContent = <ProtectedRoute><EditorDashboardPage /></ProtectedRoute>;
+    pageContent = <EditorDashboardPage />;
   } else if (route === '/collection') {
     pageContent = <CollectionPage />;
   } else if (route === '/writer-editor') {
-    pageContent = <ProtectedRoute><WriterEditorPage /></ProtectedRoute>;
+    pageContent = <WriterEditorPage />;
   } else if (route === '/collection-gallery') {
     pageContent = <CollectionGalleryPage />;
   } else if (route === '/community-wall') {
     pageContent = <CommunityWallPage />;
+  } else if (route === '/submit-to-gallery') {
+    pageContent = <SubmitToGalleryPage />;
+  } else if (route === '/editorial/submissions') {
+    pageContent = <EditorialSubmissionsPage />;
   } else if (route.startsWith('/writer/')) {
     const writerId = route.split('/writer/')[1];
     pageContent = <WriterProfilePage writerId={writerId} />;
   } else if (route === '/writers-studio') {
-    pageContent = <ProtectedRoute><WritersStudioPage /></ProtectedRoute>;
+    pageContent = <WritersStudioPage />;
   } else {
     // 404
     pageContent = <NotFoundPage />;

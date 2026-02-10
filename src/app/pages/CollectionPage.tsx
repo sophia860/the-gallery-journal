@@ -249,9 +249,9 @@ export function CollectionPage() {
 
       {/* Hero Section */}
       <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8 }}
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.8, ease: 'easeOut' }}
         className="pt-40 pb-24 px-8 border-b-2 border-[#E0D8D0]"
       >
         <div className="max-w-5xl mx-auto text-center">
@@ -273,21 +273,31 @@ export function CollectionPage() {
       </motion.div>
 
       {/* Category Navigation Pills */}
-      <div className="sticky top-24 z-40 bg-[#F5F0EB]/95 backdrop-blur-sm border-b border-[#E0D8D0] py-6">
+      <motion.div 
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ duration: 0.6 }}
+        viewport={{ once: true }}
+        className="sticky top-24 z-40 bg-[#F5F0EB]/95 backdrop-blur-sm border-b border-[#E0D8D0] py-6"
+      >
         <div className="max-w-6xl mx-auto px-8">
           <div className="flex flex-wrap gap-3 justify-center">
-            {categories.map((category) => (
-              <a
+            {categories.map((category, index) => (
+              <motion.a
                 key={category}
                 href={`#${category.toLowerCase().replace(/\s+&\s+/g, '-').replace(/\s+/g, '-')}`}
+                initial={{ opacity: 0, y: -10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: index * 0.1 }}
+                viewport={{ once: true }}
                 className="px-4 py-2 border border-[#C4918A] text-[#C4918A] hover:bg-[#C4918A] hover:text-white transition-colors whitespace-nowrap font-['Courier_New'] text-sm"
               >
                 {category}
-              </a>
+              </motion.a>
             ))}
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Sections */}
       {sections.map((section, sectionIdx) => (
@@ -302,36 +312,45 @@ export function CollectionPage() {
         >
           <div className="max-w-4xl mx-auto">
             {/* Section Header */}
-            <div className="mb-16 pb-8 border-b-2 border-[#E0D8D0]">
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.7 }}
+              viewport={{ once: true }}
+              className="mb-16 pb-8 border-b-2 border-[#E0D8D0]"
+            >
               <h2 className="font-['Cardo'] text-5xl mb-6 text-[#2C2C2C]">
                 {section.title}
               </h2>
               <p className="font-[family-name:var(--font-body)] text-lg leading-relaxed text-[#717171] italic">
                 {section.intro}
               </p>
-            </div>
+            </motion.div>
 
             {/* Poems in Section */}
             <div className="space-y-12">
-              {section.poems.map((poem) => {
+              {section.poems.map((poem, poemIdx) => {
                 const isExpanded = expandedPieces[poem.id];
 
                 return (
                   <motion.div
                     key={poem.id}
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 40 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
+                    transition={{ duration: 0.6, delay: poemIdx * 0.15 }}
                     viewport={{ once: true }}
-                    className="border-2 border-[#E0D8D0] bg-white hover:border-[#C4918A] transition-all"
+                    className={`border border-[#E0D8D0] bg-white hover:border-[#C4918A] transition-all ${
+                      isExpanded ? 'border-l-[3px] border-l-[#C4918A]' : ''
+                    }`}
                   >
                     <button
                       onClick={() => togglePiece(poem.id)}
                       className="w-full p-8 text-left flex justify-between items-center group"
                     >
                       <div className="flex-1">
-                        <div className="font-['Courier_New'] text-xs text-[#717171] mb-2">
-                          WALL {poem.wallNumber}
+                        <div className="font-['Courier_New'] text-xs text-[#717171] mb-2 flex items-center gap-1">
+                          <span>§</span>
+                          <span>WALL {poem.wallNumber}</span>
                         </div>
                         <h3 className="font-['Cardo'] text-3xl mb-2 text-[#2C2C2C] group-hover:text-[#C4918A] transition-colors">
                           {poem.title}
@@ -354,27 +373,48 @@ export function CollectionPage() {
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
                         transition={{ duration: 0.3 }}
-                        className="px-8 pb-8 pt-4 border-t border-[#E0D8D0]"
+                        className="px-12 pb-12 pt-8 border-t border-[#E0D8D0]"
                       >
                         <div className="font-[family-name:var(--font-poetry)] text-xl leading-loose whitespace-pre-wrap text-[#2C2C2C] mb-8">
-                          {poem.content.split('\n').map((line, idx) => (
-                            <motion.div
-                              key={idx}
-                              initial={{ opacity: 0, x: -10 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ duration: 0.4, delay: idx * 0.05 }}
-                            >
-                              {line}
-                            </motion.div>
-                          ))}
+                          {poem.content.split('\n').map((line, idx) => {
+                            // Drop cap on first line
+                            if (idx === 0 && line.length > 0) {
+                              const firstChar = line.charAt(0);
+                              const restOfLine = line.slice(1);
+                              return (
+                                <motion.div
+                                  key={idx}
+                                  initial={{ opacity: 0, x: -10 }}
+                                  animate={{ opacity: 1, x: 0 }}
+                                  transition={{ duration: 0.4, delay: idx * 0.05 }}
+                                  className="flex"
+                                >
+                                  <span className="font-['Cardo'] text-5xl text-[#C4918A] float-left leading-none mr-1">
+                                    {firstChar}
+                                  </span>
+                                  <span>{restOfLine}</span>
+                                </motion.div>
+                              );
+                            }
+                            return (
+                              <motion.div
+                                key={idx}
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ duration: 0.4, delay: idx * 0.05 }}
+                              >
+                                {line}
+                              </motion.div>
+                            );
+                          })}
                         </div>
 
-                        <div className="mt-8 pt-6 border-t border-[#E0D8D0]">
+                        <div className="mt-12 pt-8 border-t border-[#E0D8D0]">
                           <a
                             href={`/room/${poem.authorId}`}
-                            className="inline-block px-6 py-3 border-2 border-[#C4918A] text-[#C4918A] hover:bg-[#C4918A] hover:text-white transition-colors font-['Courier_New'] text-sm"
+                            className="font-['Courier_New'] text-sm uppercase tracking-widest text-[#C4918A] hover:underline hover:underline-offset-4 transition-all inline-flex items-center gap-2"
                           >
-                            VISIT {poem.author.toUpperCase()}'S ROOM
+                            Visit Room →
                           </a>
                         </div>
                       </motion.div>

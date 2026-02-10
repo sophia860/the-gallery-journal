@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { ArrowRight, X } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 import { GalleryNav } from '../components/GalleryNav';
 import { GalleryFooter } from '../components/GalleryFooter';
 
@@ -15,18 +16,19 @@ const allPoems = [
     wallNumber: '01',
     firstLines: 'In your eyes I see / a universe unfolding...',
     content: `In your eyes I see
-a universe unfolding,
-galaxies that spiral soft,
-constellations only we can read.
+  a universe unfolding,
+  galaxies that spiral soft,
+  constellations only we can read.
 
-Your gaze holds summer evenings,
-the weight of August heat,
-the promise of October rain.
+  Your gaze holds summer evenings,
+  the weight of August heat,
+  the promise of October rain.
 
-When you look at me like that,
-time folds into itself—
-past and future collapse
-into this one perfect now.`,
+  When you look at me like that,
+  time folds into itself—
+  past and future collapse
+  into this one perfect now.`,
+    status: 'published' as const,
   },
   {
     id: '2',
@@ -36,6 +38,7 @@ into this one perfect now.`,
     category: 'Love & Relationships',
     wallNumber: '02',
     firstLines: 'The air is thick with wanting...',
+    status: 'published' as const,
     content: `The air is thick with wanting,
 humidity that clings like memory.
 We are melting into each other,
@@ -60,6 +63,7 @@ brief and brilliant.`,
     category: 'Nature & The Natural World',
     wallNumber: '03',
     firstLines: 'I keep finding ocean in my pockets...',
+    status: 'published' as const,
     content: `I keep finding ocean in my pockets—
 salt-crusted shells, smooth stones,
 evidence of the tide's attention.
@@ -82,6 +86,7 @@ and the next.`,
     category: 'Nature & The Natural World',
     wallNumber: '04',
     firstLines: 'After the storm, such clarity...',
+    status: 'published' as const,
     content: `After the storm, such clarity—
 the sky washed clean,
 clouds scattered like old thoughts
@@ -105,6 +110,7 @@ another word for beginning.`,
     category: 'Time & Mortality',
     wallNumber: '05',
     firstLines: 'Bless the small things...',
+    status: 'published' as const,
     content: `Bless the small things:
 coffee still warm at noon,
 the dog's greeting at the door,
@@ -128,6 +134,7 @@ the holy routine.`,
     category: 'Self & Introspection',
     wallNumber: '06',
     firstLines: 'Standing still in the rush...',
+    status: 'published' as const,
     content: `Standing still in the rush,
 I am an island in the stream.
 Thousands pass. None see me.
@@ -151,6 +158,7 @@ and nothing at all.`,
     category: 'Grief, Loss & Memory',
     wallNumber: '07',
     firstLines: 'The sound of ice in glasses...',
+    status: 'published' as const,
     content: `The sound of ice in glasses—
 that's what brings you back.
 Not photographs, not letters,
@@ -174,6 +182,7 @@ ringing you gone.`,
     category: 'Family & Identity',
     wallNumber: '08',
     firstLines: 'She walks across the stage...',
+    status: 'published' as const,
     content: `She walks across the stage
 and I am watching her
 walk away from me,
@@ -205,13 +214,75 @@ const categories = [
 ];
 
 export function GalleryWallPage() {
+  const { supabase } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [expandedPoem, setExpandedPoem] = useState<string | null>(null);
   const [hasAccess, setHasAccess] = useState(false);
+  const publishedPoems = allPoems.filter(poem => poem.status === 'published');
+
+  // Check authentication with getSession() - DO NOT rely on user from context
+  useEffect(() => {
+    let mounted = true;
+
+    const checkAccess = async () => {
+      console.log('[GalleryWall] Checking access with getSession()...');
+      
+      try {
+        // Get current session directly from Supabase with retry logic for race condition
+        let { data: { session }, error } = await supabase.auth.getSession();
+        console.log('[GalleryWall] Initial session check:', session ? 'exists' : 'null', error);
+        
+        // If no session initially, wait 2 seconds and retry once (handles race condition on page load)
+        if (!session && !error) {
+          console.log('[GalleryWall] No session found, waiting 2s for session restoration...');
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          const retry = await supabase.auth.getSession();
+          session = retry.data.session;
+          console.log('[GalleryWall] Retry session check:', session ? 'exists' : 'null');
+        }
+
+        if (!mounted) return;
+
+        if (session) {
+          console.log('[GalleryWall] Access granted - user:', session.user.email);
+          setHasAccess(true);
+        } else {
+          console.log('[GalleryWall] No session after retry - access denied');
+          setHasAccess(false);
+        }
+      } catch (err) {
+        console.error('[GalleryWall] Error checking session:', err);
+        if (mounted) {
+          setHasAccess(false);
+        }
+      }
+    };
+
+    checkAccess();
+
+    // Subscribe to auth state changes for immediate access grant on signin
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('[GalleryWall] Auth state changed:', event, session ? 'has session' : 'no session');
+      
+      if (!mounted) return;
+
+      if (event === 'SIGNED_OUT') {
+        setHasAccess(false);
+      } else if (event === 'SIGNED_IN' && session) {
+        // Immediately grant access when user signs in
+        setHasAccess(true);
+      }
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, [supabase]);
 
   const filteredPoems = selectedCategory === 'All' 
-    ? allPoems 
-    : allPoems.filter(p => p.category === selectedCategory);
+    ? publishedPoems 
+    : publishedPoems.filter(p => p.category === selectedCategory);
 
   // Members Only Gate
   if (!hasAccess) {
@@ -258,12 +329,12 @@ export function GalleryWallPage() {
 
             {/* Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-              <button
-                onClick={() => setHasAccess(true)}
-                className="px-8 py-4 bg-[#C4A265] text-white hover:bg-[#B08D4F] transition-colors font-['Cardo'] text-sm tracking-wider shadow-lg hover:shadow-xl"
+              <a
+                href="/signin?redirect=/gallery-wall"
+                className="px-8 py-4 bg-[#C4A265] text-white hover:bg-[#B08D4F] transition-colors font-['Cardo'] text-sm tracking-wider shadow-lg hover:shadow-xl inline-block"
               >
                 SIGN IN TO ENTER
-              </button>
+              </a>
               <a
                 href="/"
                 className="px-8 py-4 border-2 border-[#C4A265]/30 text-[#2C1810] hover:border-[#C4A265] transition-colors font-['Cardo'] text-sm tracking-wider inline-block"
@@ -508,7 +579,7 @@ export function GalleryWallPage() {
 
                 {/* Visit Author Button */}
                 <a
-                  href={`/room/${allPoems.find(p => p.id === expandedPoem)?.authorId}`}
+                  href={`/writer/${allPoems.find(p => p.id === expandedPoem)?.authorId}`}
                   className="inline-block px-8 py-4 border-2 border-[#C4A265] text-[#2C1810] hover:bg-[#C4A265] hover:text-white transition-all font-['Cardo'] text-sm tracking-wider"
                 >
                   VISIT {allPoems.find(p => p.id === expandedPoem)?.author.toUpperCase()}'S ROOM

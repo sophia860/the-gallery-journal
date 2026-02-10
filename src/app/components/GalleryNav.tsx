@@ -10,6 +10,12 @@ interface GalleryNavProps {
 export function GalleryNav({ currentPage = '', variant = 'light' }: GalleryNavProps) {
   const { user } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
+  // Check if user has editor role
+  const userRole = user?.user_metadata?.role || 'writer';
+  const isEditor = ['editor', 'eic', 'admin'].includes(userRole);
+  const editorLink = isEditor ? '/editor-dashboard' : '/signin?redirect=/editor-dashboard';
+  const editorLabel = isEditor ? 'Editor Dashboard' : 'Editor Login';
 
   const isActive = (page: string) => {
     if (!currentPage) {
@@ -47,6 +53,13 @@ export function GalleryNav({ currentPage = '', variant = 'light' }: GalleryNavPr
             <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#E11D48] group-hover:w-full transition-all duration-300"></span>
           </a>
           <a 
+            href="/meet-the-page" 
+            className={`${linkColor} ${linkHover} transition-all relative group ${isActive('meet-the-page') ? activeColor : ''}`}
+          >
+            The Page
+            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#E11D48] group-hover:w-full transition-all duration-300"></span>
+          </a>
+          <a 
             href="/community-wall" 
             className={`${linkColor} ${linkHover} transition-all relative group flex items-center gap-1.5 ${isActive('community') ? activeColor : ''}`}
           >
@@ -72,6 +85,16 @@ export function GalleryNav({ currentPage = '', variant = 'light' }: GalleryNavPr
             className={`${linkColor} ${linkHover} transition-all relative group ${isActive('rooms') ? activeColor : ''}`}
           >
             Rooms
+            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#E11D48] group-hover:w-full transition-all duration-300"></span>
+          </a>
+          
+          {/* Editor access */}
+          <a 
+            href={editorLink} 
+            className={`${linkColor} ${linkHover} transition-all relative group flex items-center gap-2 ${isActive('editor-dashboard') ? activeColor : ''}`}
+          >
+            {!isEditor && <Lock className="w-3 h-3" />}
+            {editorLabel}
             <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#E11D48] group-hover:w-full transition-all duration-300"></span>
           </a>
           
@@ -125,6 +148,13 @@ export function GalleryNav({ currentPage = '', variant = 'light' }: GalleryNavPr
               onClick={() => setMobileMenuOpen(false)}
             >
               The Collection
+            </a>
+            <a 
+              href="/meet-the-page" 
+              className={`block py-2 ${linkColor} ${linkHover} transition-colors ${isActive('meet-the-page') ? activeColor : ''}`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              The Page
             </a>
             <div className="block py-2">
               <a 
@@ -194,6 +224,16 @@ export function GalleryNav({ currentPage = '', variant = 'light' }: GalleryNavPr
               onClick={() => setMobileMenuOpen(false)}
             >
               Rooms
+            </a>
+            
+            {/* Editor access */}
+            <a 
+              href={editorLink} 
+              className={`block py-2 flex items-center gap-2 ${linkColor} ${linkHover} transition-colors ${isActive('editor-dashboard') ? activeColor : ''}`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              {!isEditor && <Lock className="w-3 h-3" />}
+              {editorLabel}
             </a>
             
             {user ? (

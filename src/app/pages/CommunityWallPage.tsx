@@ -39,7 +39,7 @@ const communityPieces = [
     author: 'Chen Wei',
     authorInitials: 'CW',
     authorColor: '#8A9A7B',
-    status: 'submitted',
+    status: 'published',
     category: 'Time & Mortality',
     excerpt: 'Each day I wake and wonder if today will be the day I become the person I imagine.',
     sharedAt: '2026-02-07T08:00:00Z',
@@ -65,7 +65,7 @@ const communityPieces = [
     author: 'Luna Martinez',
     authorInitials: 'LM',
     authorColor: '#8A9A7B',
-    status: 'under_review',
+    status: 'published',
     category: 'Time & Mortality',
     excerpt: "There's a moment between sleeping and waking when I forget everything.",
     sharedAt: '2026-01-30T12:00:00Z',
@@ -93,7 +93,7 @@ export function CommunityWallPage() {
   const { user } = useAuth();
   const { hasActiveSubscription, loading: subscriptionLoading } = useSubscription();
   const [sortBy, setSortBy] = useState<SortBy>('newest');
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('published');
   const [pieces, setPieces] = useState(communityPieces);
 
   // Auth Gate - Unauthenticated users
@@ -226,8 +226,9 @@ export function CommunityWallPage() {
     }));
   };
 
-  const filteredPieces = pieces
-    .filter(p => statusFilter === 'all' || p.status === statusFilter)
+  const publishedPieces = pieces.filter(p => p.status === 'published');
+
+  const filteredPieces = publishedPieces
     .sort((a, b) => {
       if (sortBy === 'newest') {
         return new Date(b.sharedAt).getTime() - new Date(a.sharedAt).getTime();
@@ -287,9 +288,9 @@ export function CommunityWallPage() {
               </select>
             </div>
 
-            {/* Status Filter */}
+            {/* Status Filter - published only */}
             <div className="flex gap-2 flex-wrap">
-              {(['all', 'submitted', 'under_review', 'published'] as StatusFilter[]).map(status => (
+              {(['all', 'published'] as StatusFilter[]).map(status => (
                 <button
                   key={status}
                   onClick={() => setStatusFilter(status)}

@@ -1,18 +1,16 @@
 {
   "rewrites": [
     {
-      "source": "/((?!assets/).*)",
+      "source": "/editor-dashboard",
       "destination": "/index.html"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/editor-dashboard",
-      "dest": "/index.html"
     },
     {
-      "src": "/auth/callback",
-      "dest": "/index.html"
+      "source": "/auth/callback",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/((?!assets/).*)",
+      "destination": "/index.html"
     }
   ]
 }

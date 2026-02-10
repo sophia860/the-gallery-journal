@@ -1,25 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion } from 'motion/react';
 import { ArrowRight, X } from 'lucide-react';
 import { GalleryNav } from '../components/GalleryNav';
 import { Footer } from '../components/Footer';
-
-// Type for exhibit data
-interface Exhibit {
-  id: string;
-  userId: string;
-  title: string;
-  openingNote: string;
-  pieces: Array<{
-    id: string;
-    title: string;
-    content: string;
-    type: string;
-  }>;
-  coverImage: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
 
 // Type for display piece
 interface DisplayPiece {
@@ -43,97 +26,182 @@ const categories = [
   'Self & Introspection'
 ];
 
+// Hardcoded poems by Nix Carlson - Always available
+const PUBLISHED_POEMS: DisplayPiece[] = [
+  {
+    id: '1',
+    title: 'I THOUGHT YOU\'D BEEN QUEER LONGER THAN THAT',
+    author: 'Nix Carlson',
+    category: 'Self & Introspection',
+    excerpt: 'I thought you\'d been queer longer than that, you said, like it was a compliment...',
+    content: `I thought you'd been queer longer than that,
+you said, like it was a compliment,
+like I'd earned some invisible badge
+by wearing the right shoes
+or knowing the right songs.
+
+But I've been queer since before
+I had the words for it—
+in the way I looked at girls in seventh grade,
+in the way I couldn't explain
+why I felt more myself
+in borrowed clothes,
+in spaces between.
+
+You don't measure queerness
+in years or coming-out stories.
+You measure it in the quiet knowing,
+the way you finally exhale
+when you stop pretending.`,
+    publishedDate: '2026-01-15',
+    wallNumber: '01'
+  },
+  {
+    id: '2',
+    title: 'POLYAMORY',
+    author: 'Nix Carlson',
+    category: 'Love & Relationships',
+    excerpt: 'They ask how it works, like love is a math problem with only one solution...',
+    content: `They ask how it works,
+like love is a math problem
+with only one solution.
+
+But love isn't division—
+it's multiplication.
+My heart doesn't split
+into smaller pieces;
+it grows larger rooms.
+
+Yes, it's complicated.
+So is a symphony.
+So is a garden.
+So is anything worth doing.
+
+I'm learning that jealousy
+isn't a proof of love—
+it's a question to ask yourself.
+Compersion is the answer:
+joy in the joy of those you love.
+
+We're making it up as we go,
+writing our own instruction manual,
+and isn't that what love
+has always been?`,
+    publishedDate: '2026-01-20',
+    wallNumber: '02'
+  },
+  {
+    id: '3',
+    title: 'YES',
+    author: 'Nix Carlson',
+    category: 'Love & Relationships',
+    excerpt: 'Yes to the first kiss that tasted like coffee and courage...',
+    content: `Yes to the first kiss
+that tasted like coffee and courage.
+
+Yes to the second date
+where we talked until the restaurant
+closed around us.
+
+Yes to the third month
+when I stopped counting
+and started believing.
+
+Yes to moving in together,
+to learning how you fold towels
+(wrong, but I love you anyway).
+
+Yes to the hard conversations,
+the ones that start with
+"we need to talk"
+and end with
+"I'm not going anywhere."
+
+Yes to forever,
+whatever shape it takes.
+Yes to us.
+Yes.`,
+    publishedDate: '2026-01-25',
+    wallNumber: '03'
+  },
+  {
+    id: '4',
+    title: 'REASONS YOU REFUSE TO DATE ME',
+    author: 'Nix Carlson',
+    category: 'Love & Relationships',
+    excerpt: 'You say I\'m too intense, like it\'s a warning label on a bottle of something dangerous...',
+    content: `You say I'm too intense,
+like it's a warning label
+on a bottle of something dangerous.
+
+You say you need space,
+but I see the way you orbit
+everyone else's gravity.
+
+You say timing is everything,
+but I've been waiting
+for the right moment
+since before we met.
+
+You say you're not ready,
+and maybe that's true,
+or maybe I'm just not
+the one you want to be ready for.
+
+Either way,
+I'm learning to accept
+that sometimes
+the door is closed
+not because it's locked,
+but because it was never
+meant for me to open.`,
+    publishedDate: '2026-01-30',
+    wallNumber: '04'
+  },
+  {
+    id: '5',
+    title: 'I PROBABLY L*VE YOU',
+    author: 'Nix Carlson',
+    category: 'Love & Relationships',
+    excerpt: 'I can\'t say it yet, not out loud, not with all four letters in the right order...',
+    content: `I can't say it yet,
+not out loud,
+not with all four letters
+in the right order.
+
+But I probably l*ve you
+in the way I remember
+how you take your coffee.
+
+But I probably l*ve you
+in the way I text you
+the street art I see
+because you'd appreciate it.
+
+I probably l*ve you
+in the way I'm scared
+of how much I probably l*ve you.
+
+One day I'll say it without the asterisk,
+without the probably,
+without the fear.
+
+But for now,
+know this:
+I probably l*ve you
+more than I know how to say.`,
+    publishedDate: '2026-02-05',
+    wallNumber: '05'
+  }
+];
+
 export function CollectionGalleryPage() {
-  const [publishedPieces, setPublishedPieces] = useState<DisplayPiece[]>([]);
   const [selectedPiece, setSelectedPiece] = useState<DisplayPiece | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
-  const [loading, setLoading] = useState(true);
-
-  // Load poems from localStorage on mount
-  useEffect(() => {
-    loadPoemsFromLocalStorage();
-  }, []);
-
-  const loadPoemsFromLocalStorage = () => {
-    try {
-      const pieces: DisplayPiece[] = [];
-      
-      // Get all exhibit IDs
-      const exhibitAllData = localStorage.getItem('exhibit:all');
-      let exhibitIds: string[] = [];
-      
-      console.log('Loading poems from localStorage...');
-      console.log('exhibit:all data:', exhibitAllData);
-      
-      if (exhibitAllData) {
-        exhibitIds = JSON.parse(exhibitAllData);
-      } else {
-        // Fallback: scan localStorage for exhibit keys
-        console.log('No exhibit:all found, scanning localStorage...');
-        for (let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i);
-          if (key && key.startsWith('exhibit:') && key !== 'exhibit:all') {
-            exhibitIds.push(key.replace('exhibit:', ''));
-          }
-        }
-      }
-
-      console.log('Found exhibit IDs:', exhibitIds);
-
-      // Load each exhibit
-      exhibitIds.forEach((exhibitId, index) => {
-        const exhibitData = localStorage.getItem(`exhibit:${exhibitId}`);
-        console.log(`Loading exhibit:${exhibitId}`, exhibitData ? 'found' : 'not found');
-        
-        if (exhibitData) {
-          try {
-            const exhibit: Exhibit = JSON.parse(exhibitData);
-            console.log('Parsed exhibit:', exhibit);
-            
-            // Extract author name from opening note (assumes format "by Author Name")
-            const authorMatch = exhibit.openingNote.match(/by\s+([^\n]+)/);
-            const authorName = authorMatch ? authorMatch[1].trim() : 'Unknown Author';
-            
-            // Get the first piece (poem)
-            const firstPiece = exhibit.pieces[0];
-            if (firstPiece) {
-              // Create excerpt (first 100 characters)
-              const excerpt = firstPiece.content
-                .split('\n')
-                .filter(line => line.trim())
-                .slice(0, 2)
-                .join(' ')
-                .substring(0, 150) + '...';
-
-              pieces.push({
-                id: exhibit.id,
-                title: exhibit.title,
-                author: authorName,
-                category: 'Poetry', // Default category for now
-                excerpt: excerpt,
-                content: firstPiece.content,
-                publishedDate: exhibit.createdAt,
-                wallNumber: String(index + 1).padStart(2, '0')
-              });
-            }
-          } catch (error) {
-            console.error(`Error parsing exhibit ${exhibitId}:`, error);
-          }
-        }
-      });
-
-      console.log('Loaded pieces:', pieces);
-      setPublishedPieces(pieces);
-      setLoading(false);
-    } catch (error) {
-      console.error('Error loading poems from localStorage:', error);
-      setLoading(false);
-    }
-  };
 
   const filteredPieces = selectedCategory === 'All'
-    ? publishedPieces
-    : publishedPieces.filter(p => p.category === selectedCategory);
+    ? PUBLISHED_POEMS
+    : PUBLISHED_POEMS.filter(p => p.category === selectedCategory);
 
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
@@ -198,17 +266,18 @@ export function CollectionGalleryPage() {
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
-                className={`font-['Cardo'] text-base tracking-wide transition-all pb-2 relative ${
+                className={`pb-2 px-1 text-sm uppercase tracking-[0.15em] font-['Inter'] font-semibold transition-all relative ${
                   selectedCategory === category
-                    ? 'text-[#2C1810] font-medium'
+                    ? 'text-[#2C1810]'
                     : 'text-[#8B7355] hover:text-[#2C1810]'
                 }`}
               >
                 {category}
                 {selectedCategory === category && (
                   <motion.div
-                    layoutId="activeCollectionFilter"
+                    layoutId="activeCategory"
                     className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#C4A265]"
+                    initial={false}
                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
                 )}
@@ -218,278 +287,133 @@ export function CollectionGalleryPage() {
         </div>
       </div>
 
-      {/* Poems - Alternating Editorial Layout */}
+      {/* Published Pieces Grid */}
       <section className="py-20 px-8">
         <div className="max-w-5xl mx-auto">
-          {loading ? (
-            /* Loading State */
-            <div className="text-center py-20">
-              <div className="font-['Cardo'] text-xl text-[#8B7355] mb-4">
-                Loading poems...
-              </div>
-              <div className="flex items-center justify-center">
-                <div className="h-px w-16 bg-[#C4A265]/30"></div>
-                <div className="w-1 h-1 bg-[#C4A265] mx-3 rotate-45 animate-pulse"></div>
-                <div className="h-px w-16 bg-[#C4A265]/30"></div>
-              </div>
-            </div>
-          ) : filteredPieces.length === 0 ? (
-            /* Empty State */
-            <div className="text-center py-20">
-              <div className="font-['Cardo'] text-6xl text-[#2C1810] mb-6 italic">
-                No poems found
-              </div>
-              <p className="font-['Libre_Baskerville'] text-lg text-[#8B7355] mb-8 italic">
-                Please visit the <a href="/admin/reset-gallery" className="text-[#C4A265] hover:underline">Reset Gallery</a> page to load the Nix Carlson collection.
-              </p>
-              <div className="flex items-center justify-center">
-                <div className="h-px w-16 bg-[#C4A265]/30"></div>
-                <div className="w-1 h-1 bg-[#C4A265] mx-3 rotate-45"></div>
-                <div className="h-px w-16 bg-[#C4A265]/30"></div>
-              </div>
-            </div>
-          ) : (
-            /* Poems List */
-            filteredPieces.map((piece, index) => (
-              <div key={piece.id}>
-                {/* Poem Entry */}
-                <motion.div
-                  initial={{ opacity: 0, y: 40 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: index * 0.1 }}
-                  className={`relative py-16 ${
-                    index % 2 === 0 
-                      ? 'border-l-[3px] border-[#C4A265] pl-12 pr-0' 
-                      : 'border-r-[3px] border-[#C4A265] pr-12 pl-0 text-right'
-                  }`}
-                >
-                  {/* Decorative Wall Number */}
-                  <div className={`absolute ${
-                    index % 2 === 0 ? 'left-16' : 'right-16'
-                  } top-8 font-['Cardo'] text-8xl text-[#2C1810] opacity-5 pointer-events-none`}>
-                    {piece.wallNumber}
-                  </div>
-
-                  {/* Category Label */}
-                  <div className={`text-xs uppercase tracking-[0.2em] text-[#C4A265] mb-3 font-['Cardo'] ${
-                    index % 2 === 0 ? 'text-left' : 'text-right'
-                  }`}>
-                    {piece.category}
+          <div className="grid md:grid-cols-2 gap-8">
+            {filteredPieces.map((piece, index) => (
+              <motion.article
+                key={piece.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                onClick={() => setSelectedPiece(piece)}
+                className="group cursor-pointer"
+              >
+                {/* Card Container */}
+                <div className="h-full p-8 bg-white border-2 border-[#E8E0D8] hover:border-[#C4A265] hover:shadow-xl transition-all duration-300">
+                  {/* Wall Number */}
+                  <div className="font-['Courier_New'] text-xs tracking-wider text-[#8B7355] mb-4 uppercase">
+                    Wall {piece.wallNumber}
                   </div>
 
                   {/* Title */}
-                  <button
-                    onClick={() => setSelectedPiece(piece)}
-                    className={`group block mb-3 ${index % 2 === 0 ? 'text-left' : 'text-right'}`}
-                  >
-                    <h2 className="font-['Cardo'] text-5xl text-[#2C1810] hover:text-[#C4A265] transition-colors duration-300">
-                      {piece.title}
-                    </h2>
-                  </button>
+                  <h2 className="font-['Cardo'] text-3xl text-[#2C1810] mb-3 group-hover:text-[#C4A265] transition-colors">
+                    {piece.title}
+                  </h2>
 
                   {/* Author */}
-                  <p className={`text-sm uppercase tracking-[0.15em] text-[#8B7355] mb-6 font-['Cardo'] ${
-                    index % 2 === 0 ? 'text-left' : 'text-right'
-                  }`}>
+                  <p className="font-['Courier_New'] text-sm text-[#8B7355] mb-6">
                     by {piece.author}
                   </p>
 
                   {/* Excerpt */}
-                  <p className={`font-['Libre_Baskerville'] text-lg text-[#2C1810] leading-relaxed italic mb-8 max-w-2xl ${
-                    index % 2 === 0 ? 'text-left' : 'text-right ml-auto'
-                  }`}>
+                  <p className="font-['Libre_Baskerville'] text-base text-[#2C1810]/70 leading-relaxed mb-6 italic">
                     {piece.excerpt}
                   </p>
 
-                  {/* Read Link */}
-                  <button
-                    onClick={() => setSelectedPiece(piece)}
-                    className={`group flex items-center gap-2 text-[#C4A265] hover:gap-4 transition-all font-['Cardo'] text-sm tracking-wider ${
-                      index % 2 === 0 ? 'text-left' : 'text-right ml-auto flex-row-reverse'
-                    }`}
-                  >
-                    <span>READ POEM</span>
-                    <ArrowRight className={`w-4 h-4 group-hover:translate-x-1 transition-transform ${
-                      index % 2 === 1 ? 'rotate-180' : ''
-                    }`} />
-                  </button>
-                </motion.div>
-
-                {/* Ornamental Divider (except after last poem) */}
-                {index < filteredPieces.length - 1 && (
-                  <div className="flex items-center justify-center my-8">
-                    <div className="h-px w-16 bg-[#C4A265]/30"></div>
-                    <div className="w-1 h-1 bg-[#C4A265] mx-3 rotate-45"></div>
-                    <div className="h-px w-16 bg-[#C4A265]/30"></div>
+                  {/* Read Button */}
+                  <div className="flex items-center gap-2 text-sm font-['Inter'] font-semibold text-[#C4A265] uppercase tracking-wider">
+                    Read Full Piece
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                   </div>
-                )}
-              </div>
-            ))
+                </div>
+              </motion.article>
+            ))}
+          </div>
+
+          {filteredPieces.length === 0 && (
+            <div className="text-center py-20">
+              <p className="font-['Libre_Baskerville'] text-xl text-[#8B7355] italic">
+                No pieces found in this category.
+              </p>
+            </div>
           )}
         </div>
       </section>
 
-      {/* Reading Modal */}
+      {/* Footer */}
+      <Footer />
+
+      {/* Full Piece Modal */}
       {selectedPiece && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.6 }}
-          className="fixed inset-0 z-50 bg-[#FAF8F5] overflow-y-auto"
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 md:p-8"
+          onClick={() => setSelectedPiece(null)}
         >
-          {/* Atmospheric background */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#FAF8F5] via-[#F5F0EB] to-[#FAF8F5] opacity-60"></div>
-          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[radial-gradient(circle,_#C4A265_0%,_transparent_70%)] opacity-5"></div>
-          <div className="absolute bottom-0 left-0 w-[800px] h-[800px] bg-[radial-gradient(circle,_#8B7355_0%,_transparent_70%)] opacity-5"></div>
-          
-          <div className="relative">
-            {/* Close Button - Elegant */}
-            <motion.button
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+            transition={{ type: "spring", damping: 25 }}
+            className="bg-[#FAF8F5] max-w-3xl w-full max-h-[90vh] overflow-y-auto relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
               onClick={() => setSelectedPiece(null)}
-              className="fixed top-8 right-8 z-10 group"
+              className="absolute top-6 right-6 p-2 hover:bg-[#E8E0D8] transition-colors rounded-full z-10"
             >
-              <div className="flex items-center gap-3 px-6 py-3 bg-white/80 backdrop-blur-sm border border-[#E0D8D0] hover:border-[#C4A265] rounded-full transition-all shadow-lg hover:shadow-xl">
-                <X className="w-5 h-5 text-[#8B7355] group-hover:text-[#C4A265] transition-colors" />
-                <span className="font-['Cardo'] text-sm tracking-wider text-[#8B7355] group-hover:text-[#C4A265] transition-colors">CLOSE</span>
+              <X className="w-6 h-6 text-[#2C1810]" />
+            </button>
+
+            {/* Modal Content */}
+            <div className="p-12 md:p-16">
+              {/* Wall Number */}
+              <div className="font-['Courier_New'] text-xs tracking-wider text-[#8B7355] mb-6 uppercase">
+                Wall {selectedPiece.wallNumber}
               </div>
-            </motion.button>
-
-            {/* Main Content Container */}
-            <div className="max-w-4xl mx-auto px-8 py-32">
-              {/* Wall Number - Large Decorative */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 0.03, scale: 1 }}
-                transition={{ duration: 1 }}
-                className="absolute top-24 left-1/2 -translate-x-1/2 font-['Cardo'] text-[20rem] text-[#2C1810] pointer-events-none select-none"
-                style={{ lineHeight: 1 }}
-              >
-                {selectedPiece.wallNumber}
-              </motion.div>
-
-              {/* Category Badge */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.1 }}
-                className="text-center mb-8"
-              >
-                <span className="inline-block px-6 py-2 border-2 border-[#C4A265] text-xs uppercase tracking-[0.3em] text-[#C4A265] font-['Cardo'] bg-white/50 backdrop-blur-sm">
-                  {selectedPiece.category}
-                </span>
-              </motion.div>
 
               {/* Title */}
-              <motion.h1
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-                className="font-['Cardo'] text-7xl md:text-8xl text-[#2C1810] text-center mb-6 italic leading-tight"
-              >
+              <h2 className="font-['Cardo'] text-5xl md:text-6xl text-[#2C1810] mb-4 leading-tight">
                 {selectedPiece.title}
-              </motion.h1>
+              </h2>
 
-              {/* Author */}
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                className="text-center text-base uppercase tracking-[0.2em] text-[#8B7355] mb-16 font-['Cardo']"
-              >
-                by {selectedPiece.author}
-              </motion.p>
-
-              {/* Ornamental Divider */}
-              <motion.div
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ duration: 1, delay: 0.5 }}
-                className="flex items-center justify-center mb-20"
-              >
-                <div className="h-px w-32 bg-[#C4A265]"></div>
-                <div className="w-2 h-2 bg-[#C4A265] mx-6 rotate-45"></div>
-                <div className="h-px w-32 bg-[#C4A265]"></div>
-              </motion.div>
-
-              {/* Poem Content - Beautiful Typography */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.8, delay: 0.6 }}
-                className="relative"
-              >
-                <div className="font-['Libre_Baskerville'] text-3xl md:text-4xl leading-loose text-[#2C1810] text-center mb-20 max-w-3xl mx-auto">
-                  {selectedPiece.content.split('\n').map((line, idx) => (
-                    <motion.div
-                      key={idx}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.6, delay: 0.7 + idx * 0.05 }}
-                      className="mb-2"
-                    >
-                      {line || '\u00A0'}
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
-
-              {/* Bottom Ornament */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.8, delay: 1 }}
-                className="flex items-center justify-center mb-12"
-              >
-                <div className="h-px w-24 bg-[#C4A265]/40"></div>
-                <div className="w-1.5 h-1.5 bg-[#C4A265] mx-4 rotate-45"></div>
-                <div className="h-px w-24 bg-[#C4A265]/40"></div>
-              </motion.div>
-
-              {/* Published Date & Meta */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.6, delay: 1.2 }}
-                className="text-center"
-              >
-                <p className="font-['Cardo'] text-sm text-[#8B7355] italic mb-6">
-                  Published {new Date(selectedPiece.publishedDate).toLocaleDateString('en-US', { 
-                    month: 'long', 
-                    day: 'numeric', 
-                    year: 'numeric' 
+              {/* Author & Date */}
+              <div className="flex items-center gap-4 mb-12 pb-8 border-b border-[#C4A265]/30">
+                <p className="font-['Courier_New'] text-sm text-[#8B7355]">
+                  by {selectedPiece.author}
+                </p>
+                <span className="text-[#C4A265]">•</span>
+                <p className="font-['Courier_New'] text-sm text-[#8B7355]">
+                  {new Date(selectedPiece.publishedDate).toLocaleDateString('en-US', {
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric'
                   })}
                 </p>
-                <p className="font-['Cardo'] text-xs uppercase tracking-[0.3em] text-[#8B7355]/60">
-                  Wall {selectedPiece.wallNumber} • Winter 2026
-                </p>
-              </motion.div>
+              </div>
 
-              {/* Scroll hint */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.6, delay: 1.4 }}
-                className="mt-20 text-center"
-              >
-                <button
-                  onClick={() => setSelectedPiece(null)}
-                  className="group inline-flex items-center gap-3 px-8 py-4 border-2 border-[#C4A265] text-[#C4A265] hover:bg-[#C4A265] hover:text-white transition-all font-['Cardo'] text-sm tracking-wider"
-                >
-                  <ArrowRight className="w-4 h-4 rotate-180 group-hover:-translate-x-1 transition-transform" />
-                  RETURN TO COLLECTION
-                </button>
-              </motion.div>
+              {/* Poem Content */}
+              <div className="prose prose-lg max-w-none">
+                <div className="font-['Libre_Baskerville'] text-xl text-[#2C1810] leading-loose whitespace-pre-line">
+                  {selectedPiece.content}
+                </div>
+              </div>
+
+              {/* Category Tag */}
+              <div className="mt-12 pt-8 border-t border-[#C4A265]/30">
+                <span className="inline-block px-4 py-2 bg-[#C4A265]/10 border border-[#C4A265]/30 text-[#2C1810] text-sm font-['Inter'] font-medium uppercase tracking-wider">
+                  {selectedPiece.category}
+                </span>
+              </div>
             </div>
-          </div>
+          </motion.div>
         </motion.div>
       )}
-
-      {/* Footer */}
-      <Footer />
     </div>
   );
 }

@@ -13,7 +13,6 @@ import { EditorDashboard } from './editor/EditorDashboard';
 
 // Admin Pages (for demo setup)
 import { AdminPage } from './pages/AdminPage';
-import { ResetGalleryPage } from './pages/ResetGalleryPage';
 import { DemoModePage } from './pages/DemoModePage';
 import { DesignSystemDemo } from './pages/DesignSystemDemo';
 
@@ -97,8 +96,6 @@ function AppContent() {
   // Admin Pages (for demo setup)
   else if (route === '/admin') {
     pageContent = <AdminPage />;
-  } else if (route === '/admin/reset-gallery') {
-    pageContent = <ResetGalleryPage />;
   } else if (route === '/admin/demo-mode') {
     pageContent = <DemoModePage />;
   } else if (route === '/admin/design-system-demo') {

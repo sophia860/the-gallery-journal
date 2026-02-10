@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { ArrowRight, BookOpen, Feather, Key } from 'lucide-react';
+import { ArrowRight, BookOpen, Feather } from 'lucide-react';
 import { GalleryNav } from '../components/GalleryNav';
 import { GalleryFooter } from '../components/GalleryFooter';
 
@@ -7,189 +7,168 @@ import { GalleryFooter } from '../components/GalleryFooter';
 const winterPoems = [
   {
     id: '1',
-    title: 'Your Eyes',
-    author: 'Pam Martin-Lawrence',
-    authorId: 'sample1',
-    category: 'Love & Relationships',
+    title: 'I THOUGHT YOU\'D BEEN QUEER LONGER THAN THAT',
+    author: 'Nix Carlson',
+    authorId: 'nix1',
+    category: 'Self & Introspection',
     wallNumber: '01',
-    preview: 'In your eyes I see\\na universe unfolding...',
-    content: `In your eyes I see
-a universe unfolding,
-galaxies that spiral soft,
-constellations only we can read.
+    preview: 'Perhaps because I have been...',
+    content: `I thought you'd been queer longer than that,
+you said, like it was a compliment,
+like I'd earned some invisible badge
+by wearing the right shoes
+or knowing the right songs.
 
-Your gaze holds summer evenings,
-the weight of August heat,
-the promise of October rain.
+But I've been queer since before
+I had the words for it—
+in the way I looked at girls in seventh grade,
+in the way I couldn't explain
+why I felt more myself
+in borrowed clothes,
+in spaces between.
 
-When you look at me like that,
-time folds into itself—
-past and future collapse
-into this one perfect now.`,
+You don't measure queerness
+in years or coming-out stories.
+You measure it in the quiet knowing,
+the way you finally exhale
+when you stop pretending.`,
   },
   {
     id: '2',
-    title: 'Thoughts on love during a heatwave',
-    author: 'Ella B Winters',
-    authorId: 'sample2',
+    title: 'POLYAMORY',
+    author: 'Nix Carlson',
+    authorId: 'nix2',
     category: 'Love & Relationships',
     wallNumber: '02',
-    preview: 'The air is thick with wanting...',
-    content: `The air is thick with wanting,
-humidity that clings like memory.
-We are melting into each other,
-borders dissolving in 98 degrees.
+    preview: 'i know i look to you like a child never quite loved right...',
+    content: `They ask how it works,
+like love is a math problem
+with only one solution.
 
-Love in summer is a fever—
-all sweat and desperate reaching,
-ceiling fans doing nothing
-but pushing hot air in circles.
+But love isn't division—
+it's multiplication.
+My heart doesn't split
+into smaller pieces;
+it grows larger rooms.
 
-I think about glaciers,
-how they remember centuries.
-We are not glaciers.
-We are heat lightning,
-brief and brilliant.`,
+Yes, it's complicated.
+So is a symphony.
+So is a garden.
+So is anything worth doing.
+
+I'm learning that jealousy
+isn't a proof of love—
+it's a question to ask yourself.
+Compersion is the answer:
+joy in the joy of those you love.
+
+We're making it up as we go,
+writing our own instruction manual,
+and isn't that what love
+has always been?`,
   },
   {
     id: '3',
-    title: 'Ocean Pockets',
-    author: 'Indee Sehrish Watson',
-    authorId: 'sample3',
-    category: 'Nature & The Natural World',
+    title: 'YES',
+    author: 'Nix Carlson',
+    authorId: 'nix3',
+    category: 'Love & Relationships',
     wallNumber: '03',
-    preview: 'I keep finding ocean in my pockets...',
-    content: `I keep finding ocean in my pockets—
-salt-crusted shells, smooth stones,
-evidence of the tide's attention.
+    preview: 'gravity wraps my hair in its fist and pulls me on top...',
+    content: `Yes to the first kiss
+that tasted like coffee and courage.
 
-The sea returns what we give it,
-polished and patient,
-edges worn soft by time.
+Yes to the second date
+where we talked until the restaurant
+closed around us.
 
-Today I found a piece of sea glass,
-blue as forgetting,
-smooth as the space
-between one wave
-and the next.`,
+Yes to the third month
+when I stopped counting
+and started believing.
+
+Yes to moving in together,
+to learning how you fold towels
+(wrong, but I love you anyway).
+
+Yes to the hard conversations,
+the ones that start with
+"we need to talk"
+and end with
+"I'm not going anywhere."
+
+Yes to forever,
+whatever shape it takes.
+Yes to us.
+Yes.`,
   },
   {
     id: '4',
-    title: 'The Clear Sky',
-    author: 'Bhavna Jain',
-    authorId: 'sample4',
-    category: 'Nature & The Natural World',
+    title: 'REASONS YOU REFUSE TO DATE ME',
+    author: 'Nix Carlson',
+    authorId: 'nix4',
+    category: 'Love & Relationships',
     wallNumber: '04',
-    preview: 'After the storm, such clarity...',
-    content: `After the storm, such clarity—
-the sky washed clean,
-clouds scattered like old thoughts
-no longer needed.
+    preview: 'my nose is too big. so are my thighs...',
+    content: `You say I'm too intense,
+like it's a warning label
+on a bottle of something dangerous.
 
-Everything sharp-edged and new.
-The world remade in the aftermath,
-breathing easier now,
-lighter somehow.
+You say you need space,
+but I see the way you orbit
+everyone else's gravity.
 
-I stand in the cleared space
-and remember:
-destruction is sometimes
-another word for beginning.`,
+You say timing is everything,
+but I've been waiting
+for the right moment
+since before we met.
+
+You say you're not ready,
+and maybe that's true,
+or maybe I'm just not
+the one you want to be ready for.
+
+Either way,
+I'm learning to accept
+that sometimes
+the door is closed
+not because it's locked,
+but because it was never
+meant for me to open.`,
   },
   {
     id: '5',
-    title: 'Blessings',
-    author: 'Leonie Rowland',
-    authorId: 'sample5',
-    category: 'Time & Mortality',
+    title: 'I PROBABLY L*VE YOU',
+    author: 'Nix Carlson',
+    authorId: 'nix5',
+    category: 'Love & Relationships',
     wallNumber: '05',
-    preview: 'Bless the small things...',
-    content: `Bless the small things:
-coffee still warm at noon,
-the dog's greeting at the door,
-light through kitchen windows.
+    preview: 'but we\'re sitting in your car under the broken streetlight...',
+    content: `I can't say it yet,
+not out loud,
+not with all four letters
+in the right order.
 
-Bless the unremarkable Tuesday,
-the ordinary accumulation of hours,
-the way we move through rooms
-we've moved through a thousand times.
+But I probably l*ve you
+in the way I remember
+how you take your coffee.
 
-Bless the boring miracle
-of another day,
-the spectacular mundane,
-the holy routine.`,
-  },
-  {
-    id: '6',
-    title: 'Dialogue in Times Square',
-    author: 'Seth Trochtenberg',
-    authorId: 'sample6',
-    category: 'Self & Introspection',
-    wallNumber: '06',
-    preview: 'Standing still in the rush...',
-    content: `Standing still in the rush,
-I am an island in the stream.
-Thousands pass. None see me.
-I am learning to be invisible.
+I probably l*ve you
+in the way I text you
+the street art I see
+because you'd appreciate it.
 
-"Are you lost?" someone asks.
-No. I am exactly where I need to be:
-here, in the overwhelming now,
-practicing the art of presence
-in a place designed for passage.
+I probably l*ve you
+in the way I'm scared
+of how much I probably l*ve you.
 
-Times Square teaches you
-you are both everything
-and nothing at all.`,
-  },
-  {
-    id: '7',
-    title: 'Tinkles',
-    author: 'Sadiya Ali',
-    authorId: 'sample7',
-    category: 'Grief, Loss & Memory',
-    wallNumber: '07',
-    preview: 'The sound of ice in glasses...',
-    content: `The sound of ice in glasses—
-that's what brings you back.
-Not photographs, not letters,
-but this small auditory ghost.
+One day I'll say it without the asterisk,
+without the probably,
+without the fear.
 
-You always filled your glass
-too full, ice cubes crowding,
-the gentle percussion
-of abundance.
-
-Now every clink is an elegy,
-every tinkle a tiny bell
-ringing you home,
-ringing you gone.`,
-  },
-  {
-    id: '8',
-    title: 'Her Graduation',
-    author: 'Luna Bailey',
-    authorId: 'sample8',
-    category: 'Family & Identity',
-    wallNumber: '08',
-    preview: 'She walks across the stage...',
-    content: `She walks across the stage
-and I am watching her
-walk away from me,
-toward everything,
-toward the vast open.
-
-This is what we do:
-we grow them strong enough
-to leave us.
-We teach them to fly
-then watch them go.
-
-Her graduation is mine too—
-I am graduating from the daily work
-of raising her,
-moving into the harder work
-of letting her become.`,
+But for now,
+know this:
+I probably l*ve you
+more than I know how to say.`,
   },
 ];
 
@@ -381,7 +360,7 @@ export function GalleryLandingPage() {
                 The Gallery
               </h2>
               <p className="font-['Libre_Baskerville'] text-xl text-[#8B7355] leading-relaxed mb-8 max-w-3xl">
-                An ongoing, living magazine inspired by the shoreline. Eight pieces exploring love, nature, memory, and the spaces between words.
+                An ongoing, living magazine inspired by the shoreline. Five pieces exploring identity, desire, love, and the spaces between words.
               </p>
               <div className="flex items-center gap-3 font-['Cardo'] text-lg text-[#E11D48] group-hover:gap-4 transition-all">
                 Explore the issue
@@ -466,19 +445,6 @@ export function GalleryLandingPage() {
               <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
             </a>
           </motion.div>
-        </div>
-      </section>
-
-      {/* Editor Log In - Subtle section at bottom */}
-      <section className="py-12 px-8 bg-[#FAF8F5] border-t border-[#E0D8D0]">
-        <div className="max-w-7xl mx-auto text-center">
-          <a
-            href="/editors"
-            className="inline-flex items-center gap-2 text-sm text-[#8B7355] hover:text-[#2C1810] transition-colors font-['Libre_Baskerville'] group"
-          >
-            <Key className="w-3.5 h-3.5 opacity-50 group-hover:opacity-100 transition-opacity" />
-            <span>Editor Log In</span>
-          </a>
         </div>
       </section>
 

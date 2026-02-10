@@ -2,6 +2,7 @@ import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import { GalleryNav } from '../components/GalleryNav';
 import { GalleryFooter } from '../components/GalleryFooter';
 import { Heart, BookOpen, Users, Mail, Send, Feather } from 'lucide-react';
+import { ContactForm } from '../components/ContactForm';
 
 export function AboutPage() {
   return (
@@ -189,56 +190,12 @@ export function AboutPage() {
 
       {/* Contact */}
       <section className="py-20 px-8 bg-white">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-3xl mx-auto">
           <h2 className="font-['Cardo'] text-5xl text-[#2C1810] mb-12 text-center italic">
             Get In Touch
           </h2>
           
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* General Contact */}
-            <div className="bg-[#F5F0EB] border-2 border-[#E0D8D0] rounded-lg p-8">
-              <div className="flex items-center gap-3 mb-4">
-                <Mail className="w-6 h-6 text-[#E11D48]" />
-                <h3 className="font-['Cardo'] text-2xl text-[#2C1810]">
-                  General Inquiries
-                </h3>
-              </div>
-              <a 
-                href="mailto:hello@thegallery.page" 
-                className="font-['Libre_Baskerville'] text-lg text-[#E11D48] hover:text-[#C01040] transition-colors"
-              >
-                hello@thegallery.page
-              </a>
-              <p className="font-[family-name:var(--font-ui)] text-sm text-[#8B7355] mt-4">
-                For questions about membership, technical support, or general inquiries
-              </p>
-            </div>
-
-            {/* Submissions */}
-            <div className="bg-[#F5F0EB] border-2 border-[#E0D8D0] rounded-lg p-8">
-              <div className="flex items-center gap-3 mb-4">
-                <Send className="w-6 h-6 text-[#C4A265]" />
-                <h3 className="font-['Cardo'] text-2xl text-[#2C1810]">
-                  Submissions
-                </h3>
-              </div>
-              <a 
-                href="mailto:submit@thegallery.page" 
-                className="font-['Libre_Baskerville'] text-lg text-[#E11D48] hover:text-[#C01040] transition-colors"
-              >
-                submit@thegallery.page
-              </a>
-              <p className="font-[family-name:var(--font-ui)] text-sm text-[#8B7355] mt-4">
-                For questions about the submission process or to inquire about submission status
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-12 text-center">
-            <p className="font-[family-name:var(--font-ui)] text-sm text-[#8B7355]">
-              We aim to respond to all inquiries within 2-3 business days
-            </p>
-          </div>
+          <ContactForm />
         </div>
       </section>
 

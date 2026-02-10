@@ -16,6 +16,7 @@ import {
   Clock, CheckCircle, XCircle, AlertCircle, Send, FileText,
   TrendingUp, TrendingDown, Minus, UserPlus, Copy
 } from 'lucide-react';
+import { InquiriesTab } from './InquiriesTab';
 
 // Comprehensive demo submissions with realistic content
 const demoSubmissions = [
@@ -213,7 +214,7 @@ const literaryQuotes = [
   "The role of a writer is not to say what we can all say, but what we are unable to say. - Anaïs Nin"
 ];
 
-type TabView = 'submissions' | 'queue' | 'issue' | 'activity';
+type TabView = 'submissions' | 'queue' | 'issue' | 'activity' | 'inquiries';
 type StatusFilter = 'all' | 'pending' | 'queued' | 'in_issue' | 'published' | 'revisions_requested' | 'rejected';
 type SortBy = 'date' | 'title' | 'rating';
 
@@ -578,7 +579,7 @@ export function EditorDashboard() {
 
           {/* Tab Navigation */}
           <div className="flex gap-8 border-t border-[#E8E0D8] pt-4 mt-4">
-            {(['submissions', 'queue', 'issue', 'activity'] as TabView[]).map(tab => (
+            {(['submissions', 'queue', 'issue', 'activity', 'inquiries'] as TabView[]).map(tab => (
               <button
                 key={tab}
                 onClick={() => setCurrentTab(tab)}
@@ -990,6 +991,11 @@ export function EditorDashboard() {
                 ))}
               </div>
             </div>
+          )}
+
+          {/* Inquiries View */}
+          {currentTab === 'inquiries' && (
+            <InquiriesTab />
           )}
         </div>
       </div>

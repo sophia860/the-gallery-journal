@@ -1,253 +1,137 @@
-@custom-variant dark (&:is(.dark *));
-
 /* 
- * THE PAGE - Design System
- * A literary garden where ideas grow in seasons, not feeds
- * 
- * Typography Philosophy: Two voices
- * - Libre Baskerville: The literary voice (body, reading)
- * - Cardo: The display voice (titles, emphasis, italic-forward)
- * - Monospace (system): The garden journal (metadata, timestamps)
+ * THE PAGE GALLERY - Design System
+ * A typewriter-literary-magazine aesthetic
+ * "a gallery, but online. a journal, but not academic."
  */
 
 :root {
-  /* TYPOGRAPHY - Two Families Only */
-  --font-size: 16px;
-  --font-literary: 'Libre Baskerville', serif;  /* Reading, body text */
-  --font-display: 'Cardo', serif;                /* Headlines, poetry */
-  --font-journal: 'Courier New', monospace;      /* Metadata, notes */
-  --font-dramatic: 'Playfair Display', serif;    /* Oversized, unapologetic headers */
+  /* COLORS - Paper & Ink Only */
+  --paper: #F5F0E8;           /* All page backgrounds */
+  --paper-dark: #EDE6D6;      /* Alternate sections, exhibits */
+  --ink: #1A1A1A;             /* All body text */
+  --ink-light: #4A4A4A;       /* Secondary text, captions */
+  --ribbon-red: #8B2500;      /* Links, accents - THE ONLY COLOR */
+  --white: #FFFDF8;           /* Cards/overlays */
   
-  /* For compatibility - all map to our two families */
-  --font-headline: 'Cardo', serif;
-  --font-body: 'Libre Baskerville', serif;
-  --font-ui: 'Inter', sans-serif;  /* Smaller, understated UI */
+  /* TYPOGRAPHY */
+  --font-display: 'Special Elite', 'Courier New', monospace;
+  --font-mono: 'Courier New', monospace;
+  --font-body: 'Source Serif Pro', 'Crimson Text', serif;
   
-  /* COLOR PALETTE - Emotional Roles */
-  /* Earth & Growth (Primary) */
-  --page-earth-dark: #2C1810;      /* Deep soil - body text */
-  --page-earth-medium: #8B7355;    /* Rich loam - secondary */
-  --page-earth-light: #E0D8D0;     /* Sandy paths - borders */
+  /* SIZES */
+  --text-h1: clamp(48px, 7vw, 64px);
+  --text-h2: clamp(28px, 4vw, 36px);
+  --text-h3: clamp(18px, 2.5vw, 20px);
+  --text-body: clamp(16px, 2vw, 18px);
+  --text-caption: clamp(12px, 1.5vw, 14px);
   
-  /* Growth States (Accent) */
-  --page-sprout: #8A9A7B;          /* Living green - growth */
-  --page-bloom: #E11D48;           /* Opening petals - emphasis */
-  --page-seed: #C4A265;            /* Golden potential - rewards */
+  /* NO RADIUS, NO SHADOWS */
+  --radius: 0;
   
-  /* Surfaces (Paper & Parchment) */
-  --page-gallery: #F5F0EB;         /* Warm gallery walls */
-  --page-studio: #FAF7F2;          /* Cream writing desk */
-  --page-canvas: #FFFFFF;          /* Fresh paper */
-  --page-parchment: #FAF8F5;       /* Aged paper */
-  
-  /* Legacy color names (mapped to new system) */
-  --page-ivory: var(--page-parchment);
-  --page-cream: var(--page-gallery);
-  --page-stone: var(--page-earth-light);
-  --page-border: var(--page-earth-light);
-  --page-charcoal: var(--page-earth-dark);
-  --page-charcoal-light: var(--page-earth-medium);
-  --page-sage: var(--page-sprout);
-  --page-gold: var(--page-seed);
-  --page-crimson: var(--page-bloom);
-  
-  /* Semantic mappings */
-  --background: var(--page-parchment);
-  --foreground: var(--page-earth-dark);
-  --card: var(--page-canvas);
-  --card-foreground: var(--page-earth-dark);
-  --popover: var(--page-canvas);
-  --popover-foreground: var(--page-earth-dark);
-  --primary: var(--page-sprout);
-  --primary-foreground: var(--page-canvas);
-  --secondary: var(--page-earth-light);
-  --secondary-foreground: var(--page-earth-dark);
-  --muted: var(--page-earth-light);
-  --muted-foreground: var(--page-earth-medium);
-  --accent: var(--page-seed);
-  --accent-foreground: var(--page-earth-dark);
-  --destructive: var(--page-bloom);
-  --destructive-foreground: var(--page-canvas);
-  --border: var(--page-earth-light);
-  --input: transparent;
-  --input-background: var(--page-earth-light);
-  --switch-background: #cbced4;
-  --ring: var(--page-sprout);
-  
-  /* Chart colors */
-  --chart-1: var(--page-sprout);
-  --chart-2: var(--page-seed);
-  --chart-3: var(--page-earth-medium);
-  --chart-4: var(--page-earth-light);
-  --chart-5: var(--page-bloom);
-  
-  /* Border radius - softer, more organic */
-  --radius: 0.75rem;
-  
-  /* Font weights - subtle hierarchy */
-  --font-weight-medium: 500;
-  --font-weight-normal: 400;
-  
-  /* Sidebar (for compatibility) */
-  --sidebar: var(--page-parchment);
-  --sidebar-foreground: var(--page-earth-dark);
-  --sidebar-primary: var(--page-sprout);
-  --sidebar-primary-foreground: var(--page-canvas);
-  --sidebar-accent: var(--page-earth-light);
-  --sidebar-accent-foreground: var(--page-earth-dark);
-  --sidebar-border: var(--page-earth-light);
-  --sidebar-ring: var(--page-sprout);
-}
-
-.dark {
-  /* Dark mode - deep muted navy */
-  --background: var(--page-navy);
-  --foreground: var(--page-ivory);
-  --card: #252A3A;
-  --card-foreground: var(--page-ivory);
-  --popover: #252A3A;
-  --popover-foreground: var(--page-ivory);
-  --primary: var(--page-ivory);
-  --primary-foreground: var(--page-navy);
-  --secondary: #2A3042;
-  --secondary-foreground: var(--page-ivory);
-  --muted: #2A3042;
-  --muted-foreground: #B5B0AA;
-  --accent: var(--page-rose);
-  --accent-foreground: var(--page-ivory);
-  --destructive: #d4183d;
-  --destructive-foreground: #ffffff;
-  --border: rgba(245, 240, 235, 0.1);
-  --input: #2A3042;
-  --ring: var(--page-rose);
-  --font-weight-medium: 500;
-  --font-weight-normal: 400;
-  
-  /* Charts in dark mode */
-  --chart-1: var(--page-rose);
-  --chart-2: var(--page-sage);
-  --chart-3: #B5A8A1;
-  --chart-4: #A8998F;
-  --chart-5: #8B8278;
-  
-  --sidebar: var(--page-navy);
-  --sidebar-foreground: var(--page-ivory);
-  --sidebar-primary: var(--page-rose);
-  --sidebar-primary-foreground: var(--page-ivory);
-  --sidebar-accent: #2A3042;
-  --sidebar-accent-foreground: var(--page-ivory);
-  --sidebar-border: rgba(245, 240, 235, 0.1);
-  --sidebar-ring: var(--page-rose);
+  /* Semantic mappings for compatibility */
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --primary: var(--ribbon-red);
+  --primary-foreground: var(--white);
+  --border: var(--ink-light);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
-  --color-input: var(--input);
-  --color-input-background: var(--input-background);
-  --color-switch-background: var(--switch-background);
-  --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    box-shadow: none !important;
+    border-radius: 0 !important;
   }
 
   body {
-    @apply bg-background text-foreground;
-  }
-
-  /**
-  * Default typography styles for HTML elements (h1-h4, p, label, button, input).
-  * These are in @layer base, so Tailwind utility classes (like text-sm, text-lg) automatically override them.
-  */
-
-  html {
-    font-size: var(--font-size);
+    background-color: var(--paper);
+    color: var(--ink);
     font-family: var(--font-body);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  body {
-    font-family: var(--font-body);
+    font-size: var(--text-body);
+    line-height: 1.6;
+    cursor: default;
   }
 
   h1 {
-    font-size: var(--text-2xl);
-    font-weight: var(--font-weight-medium);
-    line-height: 1.5;
-    font-family: var(--font-headline);
+    font-family: var(--font-display);
+    font-size: var(--text-h1);
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--ink);
   }
 
   h2 {
-    font-size: var(--text-xl);
-    font-weight: var(--font-weight-medium);
-    line-height: 1.5;
-    font-family: var(--font-headline);
+    font-family: var(--font-display);
+    font-size: var(--text-h2);
+    font-weight: 400;
+    line-height: 1.3;
+    color: var(--ink);
   }
 
   h3 {
-    font-size: var(--text-lg);
-    font-weight: var(--font-weight-medium);
-    line-height: 1.5;
-    font-family: var(--font-headline);
+    font-family: var(--font-mono);
+    font-size: var(--text-h3);
+    font-weight: 400;
+    line-height: 1.4;
+    color: var(--ink);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
   }
 
-  h4 {
-    font-size: var(--text-base);
-    font-weight: var(--font-weight-medium);
-    line-height: 1.5;
+  p {
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+    line-height: 1.6;
+    color: var(--ink);
   }
 
-  label {
-    font-size: var(--text-base);
-    font-weight: var(--font-weight-medium);
-    line-height: 1.5;
+  a {
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: var(--ribbon-red);
+  }
+
+  input, textarea, select {
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+    background-color: var(--white);
+    color: var(--ink);
+    border: 1px solid var(--ink);
+    padding: 0.75rem;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  input:focus, textarea:focus, select:focus {
+    outline: 2px solid var(--ribbon-red);
+    outline-offset: -2px;
   }
 
   button {
-    font-size: var(--text-base);
-    font-weight: var(--font-weight-medium);
-    line-height: 1.5;
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    background-color: var(--ribbon-red);
+    color: var(--white);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    border-radius: 0 !important;
+    box-shadow: none !important;
   }
 
-  input {
-    font-size: var(--text-base);
-    font-weight: var(--font-weight-normal);
-    line-height: 1.5;
+  button:hover {
+    background-color: #6B1D00;
   }
 }

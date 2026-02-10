@@ -1,38 +1,10 @@
-interface GalleryFooterProps {
-  variant?: 'light' | 'dark';
-}
-
-export function GalleryFooter({ variant = 'light' }: GalleryFooterProps) {
-  const isDark = variant === 'dark';
-  const bgColor = isDark ? 'bg-[#1A1F2E]' : 'bg-[#2C2C2C]';
-  const textColor = isDark ? 'text-[#E8E4DC]' : 'text-[#F5F0EB]';
-  const mutedTextColor = isDark ? 'text-[#E8E4DC]/60' : 'text-[#F5F0EB]/60';
-  const borderColor = isDark ? 'border-[#2C3347]' : 'border-[#F5F0EB]/20';
-
+export function GalleryFooter() {
   return (
-    <footer className={`py-16 px-8 ${bgColor} ${textColor}`}>
-      <div className="max-w-6xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-12">
-          <div>
-            <div className="font-['Cardo'] text-4xl italic mb-2">
-              The Gallery
-            </div>
-            <div className={`font-['Cardo'] text-lg italic ${mutedTextColor}`}>
-              "a room of one's own"
-            </div>
-          </div>
-          <nav className="flex gap-8 font-['Courier_New'] text-sm">
-            <a href="/collection-gallery" className="hover:text-[#E11D48] hover:underline transition-all">
-              The Collection
-            </a>
-            <a href="/about" className="hover:text-[#E11D48] hover:underline transition-all">
-              About
-            </a>
-          </nav>
-        </div>
-        <div className={`pt-8 border-t ${borderColor} font-['Courier_New'] text-xs ${mutedTextColor}`}>
-          © 2026 The Gallery. A space for contemporary writing.
-        </div>
+    <footer className="w-full bg-[#EDE6D6] border-t border-[#1A1A1A]/10 px-8 py-12">
+      <div className="max-w-7xl mx-auto text-center">
+        <p className="font-['Courier_New'] text-[12px] uppercase tracking-[0.2em] text-[#4A4A4A]">
+          Issue 01 / Winter 2026 / Lexington, KY
+        </p>
       </div>
     </footer>
   );

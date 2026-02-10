@@ -1,239 +1,173 @@
-import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import { GalleryNav } from '../components/GalleryNav';
 import { GalleryFooter } from '../components/GalleryFooter';
-import { Heart, BookOpen, Users, Mail, Send, Feather } from 'lucide-react';
-import { ContactForm } from '../components/ContactForm';
 
 export function AboutPage() {
   return (
-    <div className="min-h-screen bg-[#F5F0EB]">
+    <div className="min-h-screen bg-[#F5F0E8]">
       <GalleryNav />
 
-      {/* Hero Section */}
-      <section className="pt-40 pb-24 px-8 bg-gradient-to-b from-[#F5F0EB] to-[#FAF7F2]">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="font-['Cardo'] text-7xl md:text-8xl text-[#2C1810] mb-8 italic leading-tight">
-            Meet The Gallery
-          </h1>
-          <div className="flex items-center justify-center gap-4 mb-12">
-            <div className="h-px w-20 bg-[#C4A265]"></div>
-            <Feather className="w-6 h-6 text-[#C4A265]" />
-            <div className="h-px w-20 bg-[#C4A265]"></div>
-          </div>
-          <p className="font-['Libre_Baskerville'] text-2xl text-[#8B7355] leading-relaxed max-w-3xl mx-auto">
-            A digital sanctuary for contemporary writing, where literary excellence meets community, and every voice finds its room.
+      {/* Header */}
+      <section className="px-8 py-16 text-center">
+        <h1 className="font-['Special_Elite'] text-[#1A1A1A] mb-6" style={{ fontSize: 'clamp(48px, 7vw, 64px)', lineHeight: '1.2' }}>
+          ABOUT
+        </h1>
+      </section>
+
+      {/* Editor's Note - Letter Style */}
+      <section className="px-8 py-12 bg-[#EDE6D6]">
+        <div className="max-w-3xl mx-auto">
+          <p className="font-['Source_Serif_Pro'] italic text-[18px] text-[#1A1A1A] leading-relaxed mb-6">
+            Dear reader,
+          </p>
+          <p className="font-['Source_Serif_Pro'] text-[16px] text-[#1A1A1A] leading-relaxed mb-6">
+            PAGE is a literary journal that exists in the margins of traditional publishing. We believe in slow reading, in giving writers time to develop their voice, in creating space for work that doesn't fit neatly into categories.
+          </p>
+          <p className="font-['Source_Serif_Pro'] text-[16px] text-[#1A1A1A] leading-relaxed mb-6">
+            Every platform for writers seemed to prioritize metrics over meaning, engagement over experience. We watched as beautiful essays were flattened into inbox clutter, as poetry was scrolled past in algorithmic feeds, as the intimate act of reading became just another form of content consumption.
+          </p>
+          <p className="font-['Source_Serif_Pro'] text-[16px] text-[#1A1A1A] leading-relaxed mb-6">
+            We wanted something different. Not a newsletter service that takes 10% of your revenue. Not a social media feed that rewards frequency over quality. Not another platform optimized for "engagement."
+          </p>
+          <p className="font-['Source_Serif_Pro'] text-[16px] text-[#1A1A1A] leading-relaxed">
+            We imagined a digital space that felt more like a gallery than a feed—where each piece of writing could exist in its own room, with its own atmosphere. Where readers could wander rather than scroll. Where the quiet act of reading was honored, not gamified.
           </p>
         </div>
       </section>
 
-      {/* Mission Statement */}
-      <section className="py-20 px-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-white border-2 border-[#E0D8D0] rounded-lg p-12 md:p-16">
-            <div className="flex items-center justify-center mb-8">
-              <BookOpen className="w-8 h-8 text-[#E11D48]" />
-            </div>
-            <h2 className="font-['Cardo'] text-4xl text-[#2C1810] mb-8 text-center italic">
-              Our Mission
-            </h2>
-            <p className="font-['Libre_Baskerville'] text-xl text-[#2C1810] leading-loose text-center">
-              To create a space where writers can share their work with dignity and readers can engage with literature in the intimate, contemplative way it deserves. We believe good writing needs more than a platform—it needs a <em>place</em>: a room with atmosphere, care, and intentional design.
-            </p>
-          </div>
+      {/* Pull Quote */}
+      <section className="px-8 py-24">
+        <div className="max-w-3xl mx-auto text-center">
+          <blockquote className="font-['Special_Elite'] text-[28px] text-[#1A1A1A] leading-relaxed">
+            "There is no algorithm. Just a nervous system, a lot of tabs open, and a deep love for what people make when they are paying attention."
+          </blockquote>
         </div>
       </section>
 
-      {/* Our Story */}
-      <section className="py-20 px-8 bg-white">
+      {/* Editorial Team - Masthead */}
+      <section className="px-8 py-16 bg-[#EDE6D6]">
         <div className="max-w-4xl mx-auto">
-          <h2 className="font-['Cardo'] text-5xl text-[#2C1810] mb-12 text-center italic">
-            Our Story
-          </h2>
-          <div className="space-y-8 font-['Libre_Baskerville'] text-lg text-[#2C1810] leading-loose">
-            <p>
-              The Gallery was born from a simple frustration: every platform for writers seemed to prioritize metrics over meaning, engagement over experience. We watched as beautiful essays were flattened into inbox clutter, as poetry was scrolled past in algorithmic feeds, as the intimate act of reading became just another form of content consumption.
-            </p>
-            <p>
-              We wanted something different. Not a newsletter service that takes 10% of your revenue. Not a social media feed that rewards frequency over quality. Not another platform optimized for "engagement."
-            </p>
-            <p>
-              We imagined a digital space that felt more like a gallery than a feed—where each piece of writing could exist in its own room, with its own atmosphere. Where readers could wander rather than scroll. Where the quiet act of reading was honored, not gamified.
-            </p>
-            <p>
-              The Gallery launched in early 2026 as an experiment in what we call "calm technology for writers." No notification badges. No follower counts. No pressure to post daily. Just a beautiful space for writing to live and breathe, designed with the same care you'd give to a physical exhibition.
-            </p>
-            <p className="text-[#8B7355] italic pt-4">
-              "A room of one's own" isn't just our tagline—it's our founding principle.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Editorial Team */}
-      <section className="py-20 px-8 bg-[#FAF7F2]">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="font-['Cardo'] text-5xl text-[#2C1810] mb-16 text-center italic">
-            Editorial Team
+          <h2 className="font-['Courier_New'] text-[28px] uppercase tracking-[0.15em] text-[#1A1A1A] mb-12 text-center">
+            EDITORIAL TEAM
           </h2>
           
-          <div className="flex justify-center gap-8 max-w-3xl mx-auto">
-            {/* Editor-in-Chief */}
-            <div className="flex-1 bg-white border-2 border-[#E0D8D0] rounded-lg p-8 text-center hover:border-[#C4A265] transition-all">
-              <h3 className="font-['Cardo'] text-3xl text-[#2C1810] mb-2">
+          <div className="max-w-2xl mx-auto space-y-8">
+            <div className="pb-6 border-b border-[#1A1A1A]/10">
+              <p className="font-['Source_Serif_Pro'] text-[20px] text-[#1A1A1A] mb-1">
                 Bea Sophia
-              </h3>
-              <p className="font-['Courier_New'] text-xs text-[#E11D48] uppercase tracking-wider">
+              </p>
+              <p className="font-['Courier_New'] text-[12px] uppercase tracking-[0.15em] text-[#4A4A4A]">
                 Editor-in-Chief
               </p>
             </div>
 
-            {/* Head of Print */}
-            <div className="flex-1 bg-white border-2 border-[#E0D8D0] rounded-lg p-8 text-center hover:border-[#C4A265] transition-all">
-              <h3 className="font-['Cardo'] text-3xl text-[#2C1810] mb-2">
+            <div className="pb-6 border-b border-[#1A1A1A]/10">
+              <p className="font-['Source_Serif_Pro'] text-[20px] text-[#1A1A1A] mb-1">
                 Giove Pierra
-              </h3>
-              <p className="font-['Courier_New'] text-xs text-[#8B7355] uppercase tracking-wider">
+              </p>
+              <p className="font-['Courier_New'] text-[12px] uppercase tracking-[0.15em] text-[#4A4A4A]">
                 Head of Print
               </p>
             </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Values */}
-      <section className="py-20 px-8 bg-white">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="font-['Cardo'] text-5xl text-[#2C1810] mb-16 text-center italic">
-            What We Stand For
-          </h2>
-
-          <div className="grid md:grid-cols-3 gap-12">
-            {/* Literary Excellence */}
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-20 h-20 bg-[#E11D48]/10 rounded-full mb-6">
-                <Feather className="w-10 h-10 text-[#E11D48]" />
-              </div>
-              <h3 className="font-['Cardo'] text-3xl text-[#2C1810] mb-4">
-                Literary Excellence
-              </h3>
-              <p className="font-[family-name:var(--font-ui)] text-base text-[#8B7355] leading-relaxed">
-                We champion writing that takes risks, trusts its reader, and honors the craft. Quality over quantity, always. Every submission receives a careful, considered read from our editorial team.
+            <div className="pb-6 border-b border-[#1A1A1A]/10">
+              <p className="font-['Source_Serif_Pro'] text-[20px] text-[#1A1A1A] mb-1">
+                Marcus Chen
+              </p>
+              <p className="font-['Courier_New'] text-[12px] uppercase tracking-[0.15em] text-[#4A4A4A]">
+                Poetry Editor
               </p>
             </div>
 
-            {/* Community */}
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-20 h-20 bg-[#C4A265]/10 rounded-full mb-6">
-                <Users className="w-10 h-10 text-[#C4A265]" />
-              </div>
-              <h3 className="font-['Cardo'] text-3xl text-[#2C1810] mb-4">
-                Community
-              </h3>
-              <p className="font-[family-name:var(--font-ui)] text-base text-[#8B7355] leading-relaxed">
-                Writers and readers aren't metrics—they're people. We build connections through shared appreciation of good writing, not through algorithmic manipulation. Our community values generosity, curiosity, and respect.
+            <div className="pb-6">
+              <p className="font-['Source_Serif_Pro'] text-[20px] text-[#1A1A1A] mb-1">
+                Alicia Rivera
               </p>
-            </div>
-
-            {/* Accessibility */}
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-20 h-20 bg-[#8B7355]/10 rounded-full mb-6">
-                <BookOpen className="w-10 h-10 text-[#8B7355]" />
-              </div>
-              <h3 className="font-['Cardo'] text-3xl text-[#2C1810] mb-4">
-                Accessibility
-              </h3>
-              <p className="font-[family-name:var(--font-ui)] text-base text-[#8B7355] leading-relaxed">
-                Great writing should be discoverable regardless of the writer's platform size or social media following. We use editorial curation, not follower counts, to bring exceptional work to readers.
+              <p className="font-['Courier_New'] text-[12px] uppercase tracking-[0.15em] text-[#4A4A4A]">
+                Fiction Editor
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Our Principles */}
-      <section className="py-20 px-8 bg-[#F5F0EB]">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="font-['Cardo'] text-4xl text-[#2C1810] mb-12 text-center italic">
-            Design Principles
+      {/* Submission Guidelines */}
+      <section id="submit" className="px-8 py-16">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-['Courier_New'] text-[28px] uppercase tracking-[0.15em] text-[#1A1A1A] mb-8">
+            SUBMISSION GUIDELINES
           </h2>
           
-          <div className="bg-white border-2 border-[#E0D8D0] rounded-lg p-8 md:p-12">
-            <div className="space-y-6 font-[family-name:var(--font-ui)] text-base text-[#8B7355] leading-relaxed">
-              <div className="flex items-start gap-4">
-                <div className="w-2 h-2 bg-[#E11D48] rounded-full mt-2 flex-shrink-0"></div>
-                <p><strong className="text-[#2C1810]">No notification badges</strong> — Your attention belongs to you, not to an app.</p>
-              </div>
-              <div className="flex items-start gap-4">
-                <div className="w-2 h-2 bg-[#E11D48] rounded-full mt-2 flex-shrink-0"></div>
-                <p><strong className="text-[#2C1810]">No follower counts</strong> — We measure impact through engagement depth, not audience size.</p>
-              </div>
-              <div className="flex items-start gap-4">
-                <div className="w-2 h-2 bg-[#E11D48] rounded-full mt-2 flex-shrink-0"></div>
-                <p><strong className="text-[#2C1810]">No algorithmic feeds</strong> — Discovery happens through editorial curation and intentional browsing.</p>
-              </div>
-              <div className="flex items-start gap-4">
-                <div className="w-2 h-2 bg-[#E11D48] rounded-full mt-2 flex-shrink-0"></div>
-                <p><strong className="text-[#2C1810]">No pressure to post</strong> — Write when you have something to say, not to feed an algorithm.</p>
-              </div>
-              <div className="flex items-start gap-4">
-                <div className="w-2 h-2 bg-[#E11D48] rounded-full mt-2 flex-shrink-0"></div>
-                <p><strong className="text-[#2C1810]">No content extraction</strong> — Your work stays yours. We take 0% of your earnings.</p>
-              </div>
-              <div className="flex items-start gap-4">
-                <div className="w-2 h-2 bg-[#E11D48] rounded-full mt-2 flex-shrink-0"></div>
-                <p><strong className="text-[#2C1810]">Generous margins, slow transitions</strong> — The design respects the reading experience.</p>
-              </div>
-            </div>
+          <div className="space-y-6">
+            <p className="font-['Source_Serif_Pro'] text-[16px] text-[#1A1A1A] leading-relaxed">
+              We accept poetry, prose, essays, and hybrid forms. We're looking for work that takes risks, that doesn't fit neatly into categories, that makes us see the world differently.
+            </p>
+            <p className="font-['Source_Serif_Pro'] text-[16px] text-[#1A1A1A] leading-relaxed">
+              Submit up to 5 poems or one prose piece (up to 5,000 words). Simultaneous submissions are welcome—just let us know if your work is accepted elsewhere.
+            </p>
+            <p className="font-['Source_Serif_Pro'] text-[16px] text-[#1A1A1A] leading-relaxed">
+              Response time is typically 8-12 weeks. We read year-round.
+            </p>
+            <p className="font-['Source_Serif_Pro'] text-[16px] text-[#1A1A1A] leading-relaxed">
+              Send submissions to: <a href="mailto:submit@pagegallery.com" className="text-[#8B2500] hover:underline">submit@pagegallery.com</a>
+            </p>
           </div>
         </div>
       </section>
 
       {/* Contact */}
-      <section className="py-20 px-8 bg-white">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="font-['Cardo'] text-5xl text-[#2C1810] mb-12 text-center italic">
-            Get In Touch
+      <section className="px-8 py-16 bg-[#EDE6D6]">
+        <div className="max-w-2xl mx-auto">
+          <h2 className="font-['Courier_New'] text-[28px] uppercase tracking-[0.15em] text-[#1A1A1A] mb-8">
+            CONTACT
           </h2>
           
-          <ContactForm />
+          <form className="space-y-6">
+            <div>
+              <label className="block font-['Courier_New'] text-[14px] uppercase tracking-[0.1em] text-[#1A1A1A] mb-2">
+                Your Name
+              </label>
+              <input
+                type="text"
+                className="w-full px-4 py-3 bg-[#FFFDF8] border border-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#8B2500] font-['Source_Serif_Pro'] text-[16px] text-[#1A1A1A]"
+                style={{ borderRadius: 0 }}
+              />
+            </div>
+
+            <div>
+              <label className="block font-['Courier_New'] text-[14px] uppercase tracking-[0.1em] text-[#1A1A1A] mb-2">
+                Your Email
+              </label>
+              <input
+                type="email"
+                className="w-full px-4 py-3 bg-[#FFFDF8] border border-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#8B2500] font-['Source_Serif_Pro'] text-[16px] text-[#1A1A1A]"
+                style={{ borderRadius: 0 }}
+              />
+            </div>
+
+            <div>
+              <label className="block font-['Courier_New'] text-[14px] uppercase tracking-[0.1em] text-[#1A1A1A] mb-2">
+                Your Message
+              </label>
+              <textarea
+                rows={8}
+                className="w-full px-4 py-3 bg-[#FFFDF8] border border-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#8B2500] font-['Source_Serif_Pro'] text-[16px] text-[#1A1A1A] leading-relaxed resize-none"
+                placeholder="Dear Gallery..."
+                style={{ borderRadius: 0 }}
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="px-8 py-3 bg-[#8B2500] text-[#FFFDF8] hover:bg-[#6B1D00] transition-all font-['Courier_New'] text-[14px] uppercase tracking-[0.1em]"
+              style={{ borderRadius: 0 }}
+            >
+              Send Message
+            </button>
+          </form>
         </div>
       </section>
 
-      {/* Call to Action */}
-      <section className="py-24 px-8 bg-gradient-to-b from-[#2C1810] to-[#1A1F2E]">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="font-['Cardo'] text-5xl md:text-6xl text-[#F5F0EB] mb-8 italic">
-            Join The Gallery
-          </h2>
-          <p className="font-['Libre_Baskerville'] text-xl text-[#E8E4DC]/80 leading-relaxed mb-12 max-w-2xl mx-auto">
-            Whether you're a writer looking for your room or a reader seeking exceptional contemporary literature, there's a place for you here.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-            <a 
-              href="/submit"
-              className="group px-10 py-5 bg-[#E11D48] text-white hover:bg-[#C01040] transition-all font-['Cardo'] text-lg tracking-wide flex items-center gap-3"
-            >
-              <Send className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              Submit Your Work
-            </a>
-            <a 
-              href="/signup"
-              className="px-10 py-5 border-2 border-[#F5F0EB] text-[#F5F0EB] hover:bg-[#F5F0EB] hover:text-[#2C1810] transition-all font-['Cardo'] text-lg tracking-wide"
-            >
-              Become a Member
-            </a>
-          </div>
-
-          <div className="mt-16 pt-12 border-t border-[#F5F0EB]/20">
-            <p className="font-['Libre_Baskerville'] text-lg text-[#E8E4DC]/60 italic">
-              "A room of one's own"
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <GalleryFooter variant="dark" />
+      <GalleryFooter />
     </div>
   );
 }

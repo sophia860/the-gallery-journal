@@ -1,322 +1,86 @@
-import { useState } from 'react';
-import { Send, CheckCircle, AlertCircle } from 'lucide-react';
 import { GalleryNav } from '../components/GalleryNav';
 import { GalleryFooter } from '../components/GalleryFooter';
-import { useAuth } from '../contexts/AuthContext';
-
-const categories = [
-  { value: 'poetry', label: 'Poetry' },
-  { value: 'fiction', label: 'Fiction' },
-  { value: 'essay', label: 'Essay' },
-  { value: 'visual-art', label: 'Visual Art' },
-];
 
 export function SubmitPage() {
-  const { user, supabase } = useAuth();
-  const [formData, setFormData] = useState({
-    title: '',
-    category: 'poetry',
-    content: '',
-    authorBio: '',
-    email: user?.email || '',
-    tags: '',
-  });
-  const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState('');
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitting(true);
-    setError('');
-
-    try {
-      // Prepare submission data
-      const submission = {
-        title: formData.title,
-        content: formData.content,
-        genre: formData.category,
-        author_name: user?.user_metadata?.writerName || formData.email.split('@')[0],
-        author_email: formData.email,
-        author_bio: formData.authorBio,
-        tags: formData.tags,
-        status: 'pending',
-        submitted_at: new Date().toISOString(),
-        user_id: user?.id || 'guest',
-      };
-
-      // Try to save to Supabase
-      const { error: dbError } = await supabase
-        .from('submissions')
-        .insert(submission);
-
-      if (dbError) {
-        console.error('Database error:', dbError);
-        // Continue anyway - graceful degradation
-      }
-
-      // Show success
-      setSubmitted(true);
-      
-      // Reset form
-      setFormData({
-        title: '',
-        category: 'poetry',
-        content: '',
-        authorBio: '',
-        email: user?.email || '',
-        tags: '',
-      });
-
-      // Scroll to top to see success message
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-
-    } catch (err: any) {
-      console.error('Submission error:', err);
-      setError('There was an error submitting your work. Please try again or contact us directly.');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
   return (
-    <div className="min-h-screen bg-[#FAF8F5]">
+    <div className="min-h-screen bg-[#F5F0E8]">
       <GalleryNav />
 
-      {/* Hero Section */}
-      <section className="pt-40 pb-16 px-8 bg-gradient-to-b from-[#FAF8F5] to-[#F5F0E8]">
-        <div className="max-w-3xl mx-auto text-center">
-          <h1 className="font-['Cardo'] text-7xl text-[#2C1810] mb-6 italic">
-            Submit Your Work
+      {/* Header */}
+      <section className="px-8 py-24 text-center">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="font-['Special_Elite'] text-[56px] text-[#1A1A1A] mb-8" style={{ lineHeight: '1.2' }}>
+            SUBMIT
           </h1>
-          <div className="flex items-center justify-center gap-3 mb-8">
-            <div className="h-px w-16 bg-[#C4A265]"></div>
-            <div className="w-1 h-1 bg-[#C4A265] rotate-45"></div>
-            <div className="h-px w-16 bg-[#C4A265]"></div>
-          </div>
-          <p className="font-['Libre_Baskerville'] text-xl text-[#8B7355] leading-relaxed max-w-2xl mx-auto">
-            Share your literary work with our community. All submissions are carefully reviewed by our editorial team.
+          <p className="font-['Source_Serif_Pro'] italic text-[18px] text-[#4A4A4A] mb-12 leading-relaxed">
+            We accept poetry, prose, and hybrid forms
           </p>
+          <div className="w-[40%] h-px bg-[#4A4A4A] mx-auto"></div>
         </div>
       </section>
 
-      {/* Success Message */}
-      {submitted && (
-        <div className="max-w-3xl mx-auto px-8 py-8">
-          <div className="bg-[#059669]/10 border-2 border-[#059669] rounded-lg p-8 flex items-start gap-4">
-            <CheckCircle className="w-8 h-8 text-[#059669] flex-shrink-0 mt-1" />
-            <div>
-              <h3 className="font-['Cardo'] text-2xl text-[#059669] mb-2">
-                Submission Received
-              </h3>
-              <p className="font-[family-name:var(--font-ui)] text-sm text-[#2C1810] leading-relaxed">
-                Thank you for submitting your work to The Gallery. Our editorial team will review your submission and respond within 90 days. We appreciate your patience and your contribution to our literary community.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Error Message */}
-      {error && (
-        <div className="max-w-3xl mx-auto px-8 py-8">
-          <div className="bg-[#E11D48]/10 border-2 border-[#E11D48] rounded-lg p-8 flex items-start gap-4">
-            <AlertCircle className="w-8 h-8 text-[#E11D48] flex-shrink-0 mt-1" />
-            <div>
-              <h3 className="font-['Cardo'] text-2xl text-[#E11D48] mb-2">
-                Submission Error
-              </h3>
-              <p className="font-[family-name:var(--font-ui)] text-sm text-[#2C1810] leading-relaxed">
-                {error}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Submission Form */}
-      <section className="py-12 px-8">
+      {/* Submission Guidelines */}
+      <section className="px-8 py-16">
         <div className="max-w-3xl mx-auto">
-          {/* Editorial Note */}
-          <div className="bg-white border-2 border-[#E0D8D0] rounded-lg p-8 mb-8">
-            <h3 className="font-['Cardo'] text-2xl text-[#2C1810] mb-4">
-              Submission Guidelines
-            </h3>
-            <div className="font-[family-name:var(--font-ui)] text-sm text-[#8B7355] leading-relaxed space-y-3">
+          <h2 className="font-['Courier_New'] text-[28px] uppercase tracking-[0.15em] text-[#1A1A1A] mb-8">
+            GUIDELINES
+          </h2>
+
+          <div className="space-y-8 font-['Source_Serif_Pro'] text-[18px] text-[#1A1A1A] leading-relaxed">
+            <div>
+              <h3 className="font-['Courier_New'] text-[18px] uppercase tracking-[0.1em] text-[#1A1A1A] mb-3">
+                What We're Looking For
+              </h3>
               <p>
-                • All submissions are reviewed by our editorial team within 90 days
+                Work that doesn't fit neatly into categories. Writing that breathes. Pieces that stay with us after we close the tab.
               </p>
+            </div>
+
+            <div>
+              <h3 className="font-['Courier_New'] text-[18px] uppercase tracking-[0.1em] text-[#1A1A1A] mb-3">
+                Submission Format
+              </h3>
+              <ul className="list-disc pl-6 space-y-2">
+                <li>Send 3-5 poems or up to 3,000 words of prose</li>
+                <li>Include a brief bio (100 words or less)</li>
+                <li>Previously published work is welcome—just let us know where</li>
+                <li>Simultaneous submissions accepted</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="font-['Courier_New'] text-[18px] uppercase tracking-[0.1em] text-[#1A1A1A] mb-3">
+                Response Time
+              </h3>
               <p>
-                • We accept original, unpublished work in poetry, fiction, essays, and visual art
+                We read submissions on a rolling basis. Expect a response within 8-12 weeks.
               </p>
-              <p>
-                • Writers may submit up to 3 pieces at a time
+            </div>
+
+            <div>
+              <h3 className="font-['Courier_New'] text-[18px] uppercase tracking-[0.1em] text-[#1A1A1A] mb-3">
+                How to Submit
+              </h3>
+              <p className="mb-4">
+                Email your work to:{' '}
+                <a
+                  href="mailto:submissions@pagegalleryjournal.com"
+                  className="text-[#8B2500] hover:underline font-['Courier_New']"
+                >
+                  submissions@pagegalleryjournal.com
+                </a>
               </p>
-              <p>
-                • Please include a brief author bio and relevant tags/genres
-              </p>
-              <p>
-                • Simultaneous submissions are accepted; please notify us if your work is accepted elsewhere
+              <p className="text-[16px] italic text-[#4A4A4A]">
+                Subject line: [Genre] Submission - [Your Name]
               </p>
             </div>
           </div>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="bg-white border-2 border-[#E0D8D0] rounded-lg p-8 space-y-8">
-            {/* Title */}
-            <div>
-              <label htmlFor="title" className="block font-['Courier_New'] text-xs text-[#8B7355] mb-3 uppercase tracking-wider">
-                Title *
-              </label>
-              <input
-                id="title"
-                type="text"
-                required
-                value={formData.title}
-                onChange={(e) => handleChange('title', e.target.value)}
-                className="w-full px-4 py-4 border-2 border-[#E0D8D0] focus:border-[#C4A265] focus:outline-none rounded font-['Cardo'] text-2xl placeholder:text-[#C4B5A0]"
-                placeholder="The title of your work"
-              />
-            </div>
-
-            {/* Category */}
-            <div>
-              <label htmlFor="category" className="block font-['Courier_New'] text-xs text-[#8B7355] mb-3 uppercase tracking-wider">
-                Category *
-              </label>
-              <select
-                id="category"
-                required
-                value={formData.category}
-                onChange={(e) => handleChange('category', e.target.value)}
-                className="w-full px-4 py-4 border-2 border-[#E0D8D0] focus:border-[#C4A265] focus:outline-none rounded font-['Cardo'] text-lg cursor-pointer"
-              >
-                {categories.map((cat) => (
-                  <option key={cat.value} value={cat.value}>
-                    {cat.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Content */}
-            <div>
-              <label htmlFor="content" className="block font-['Courier_New'] text-xs text-[#8B7355] mb-3 uppercase tracking-wider">
-                Your Work *
-              </label>
-              <textarea
-                id="content"
-                required
-                rows={16}
-                value={formData.content}
-                onChange={(e) => handleChange('content', e.target.value)}
-                className="w-full px-4 py-4 border-2 border-[#E0D8D0] focus:border-[#C4A265] focus:outline-none rounded font-['Libre_Baskerville'] text-lg leading-loose resize-y placeholder:text-[#C4B5A0]"
-                placeholder="Paste your work here. For poetry, preserve your line breaks. For prose, include paragraph breaks as needed."
-              />
-              <p className="mt-2 font-[family-name:var(--font-ui)] text-xs text-[#8B7355] italic">
-                Word count: {formData.content.split(/\s+/).filter(w => w.length > 0).length}
-              </p>
-            </div>
-
-            {/* Author Bio */}
-            <div>
-              <label htmlFor="authorBio" className="block font-['Courier_New'] text-xs text-[#8B7355] mb-3 uppercase tracking-wider">
-                Author Bio *
-              </label>
-              <textarea
-                id="authorBio"
-                required
-                rows={4}
-                value={formData.authorBio}
-                onChange={(e) => handleChange('authorBio', e.target.value)}
-                className="w-full px-4 py-4 border-2 border-[#E0D8D0] focus:border-[#C4A265] focus:outline-none rounded font-[family-name:var(--font-ui)] text-sm leading-relaxed resize-y placeholder:text-[#C4B5A0]"
-                placeholder="A brief bio (2-3 sentences). Include any previous publications, awards, or relevant background."
-              />
-            </div>
-
-            {/* Email */}
-            <div>
-              <label htmlFor="email" className="block font-['Courier_New'] text-xs text-[#8B7355] mb-3 uppercase tracking-wider">
-                Contact Email *
-              </label>
-              <input
-                id="email"
-                type="email"
-                required
-                value={formData.email}
-                onChange={(e) => handleChange('email', e.target.value)}
-                className="w-full px-4 py-4 border-2 border-[#E0D8D0] focus:border-[#C4A265] focus:outline-none rounded font-[family-name:var(--font-ui)] text-sm placeholder:text-[#C4B5A0]"
-                placeholder="your@email.com"
-              />
-              <p className="mt-2 font-[family-name:var(--font-ui)] text-xs text-[#8B7355] italic">
-                We'll use this email to respond to your submission
-              </p>
-            </div>
-
-            {/* Tags/Genre */}
-            <div>
-              <label htmlFor="tags" className="block font-['Courier_New'] text-xs text-[#8B7355] mb-3 uppercase tracking-wider">
-                Genre / Tags (Optional)
-              </label>
-              <input
-                id="tags"
-                type="text"
-                value={formData.tags}
-                onChange={(e) => handleChange('tags', e.target.value)}
-                className="w-full px-4 py-4 border-2 border-[#E0D8D0] focus:border-[#C4A265] focus:outline-none rounded font-[family-name:var(--font-ui)] text-sm placeholder:text-[#C4B5A0]"
-                placeholder="e.g., lyric poetry, magical realism, nature writing, experimental"
-              />
-              <p className="mt-2 font-[family-name:var(--font-ui)] text-xs text-[#8B7355] italic">
-                Help us categorize your work (comma-separated)
-              </p>
-            </div>
-
-            {/* Divider */}
-            <div className="flex items-center justify-center py-4">
-              <div className="h-px w-full bg-[#E0D8D0]"></div>
-              <div className="px-4">
-                <div className="w-1.5 h-1.5 bg-[#C4A265] rotate-45"></div>
-              </div>
-              <div className="h-px w-full bg-[#E0D8D0]"></div>
-            </div>
-
-            {/* Editorial Review Note */}
-            <div className="bg-[#F5F0E8] border border-[#E0D8D0] rounded p-6">
-              <p className="font-['Libre_Baskerville'] text-sm text-[#8B7355] leading-relaxed italic text-center">
-                "We read every submission with care and attention. Our editorial team is committed to supporting emerging and established writers alike. Thank you for trusting us with your work."
-              </p>
-              <p className="font-['Courier_New'] text-xs text-[#8B7355] text-center mt-3 uppercase tracking-wider">
-                — The Editorial Team
-              </p>
-            </div>
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={submitting}
-              className="w-full py-6 bg-[#E11D48] text-white hover:bg-[#C01040] disabled:bg-[#8B7355] disabled:cursor-not-allowed transition-all font-['Cardo'] text-lg tracking-wider flex items-center justify-center gap-3 group"
-            >
-              {submitting ? (
-                <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                  SUBMITTING...
-                </>
-              ) : (
-                <>
-                  <Send className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  SUBMIT YOUR WORK
-                </>
-              )}
-            </button>
-
-            <p className="text-center font-[family-name:var(--font-ui)] text-xs text-[#8B7355]">
-              By submitting, you confirm this work is your original creation and you hold the rights to it.
+          <div className="mt-16 p-8 border border-[#1A1A1A]/10">
+            <p className="font-['Source_Serif_Pro'] italic text-[16px] text-[#4A4A4A] text-center">
+              "There is no algorithm. Just a nervous system, a lot of tabs open, and a deep love for what people make when they are paying attention."
             </p>
-          </form>
+          </div>
         </div>
       </section>
 

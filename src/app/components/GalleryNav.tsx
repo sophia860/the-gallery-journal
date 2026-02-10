@@ -14,6 +14,8 @@ export function GalleryNav({ currentPage = '', variant = 'light' }: GalleryNavPr
   // Check if user has editor role
   const userRole = user?.user_metadata?.role || 'writer';
   const isEditor = ['editor', 'eic', 'admin'].includes(userRole);
+  const editorLink = isEditor ? '/editor-dashboard' : '/signin?redirect=/editor-dashboard';
+  const editorLabel = isEditor ? 'Editor Dashboard' : 'Editor Login';
 
   const isActive = (page: string) => {
     if (!currentPage) {
@@ -86,16 +88,15 @@ export function GalleryNav({ currentPage = '', variant = 'light' }: GalleryNavPr
             <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#E11D48] group-hover:w-full transition-all duration-300"></span>
           </a>
           
-          {/* Editor Dashboard - only show for editors */}
-          {isEditor && (
-            <a 
-              href="/editor-dashboard" 
-              className={`${linkColor} ${linkHover} transition-all relative group ${isActive('editor-dashboard') ? activeColor : ''}`}
-            >
-              Editor Dashboard
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#E11D48] group-hover:w-full transition-all duration-300"></span>
-            </a>
-          )}
+          {/* Editor access */}
+          <a 
+            href={editorLink} 
+            className={`${linkColor} ${linkHover} transition-all relative group flex items-center gap-2 ${isActive('editor-dashboard') ? activeColor : ''}`}
+          >
+            {!isEditor && <Lock className="w-3 h-3" />}
+            {editorLabel}
+            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#E11D48] group-hover:w-full transition-all duration-300"></span>
+          </a>
           
           {user ? (
             <a 
@@ -225,16 +226,15 @@ export function GalleryNav({ currentPage = '', variant = 'light' }: GalleryNavPr
               Rooms
             </a>
             
-            {/* Editor Dashboard - only show for editors */}
-            {isEditor && (
-              <a 
-                href="/editor-dashboard" 
-                className={`block py-2 ${linkColor} ${linkHover} transition-colors ${isActive('editor-dashboard') ? activeColor : ''}`}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Editor Dashboard
-              </a>
-            )}
+            {/* Editor access */}
+            <a 
+              href={editorLink} 
+              className={`block py-2 flex items-center gap-2 ${linkColor} ${linkHover} transition-colors ${isActive('editor-dashboard') ? activeColor : ''}`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              {!isEditor && <Lock className="w-3 h-3" />}
+              {editorLabel}
+            </a>
             
             {user ? (
               <a 

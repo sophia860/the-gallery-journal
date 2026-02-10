@@ -1,92 +1,37 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { ArrowRight, X } from 'lucide-react';
 import { GalleryNav } from '../components/GalleryNav';
 import { Footer } from '../components/Footer';
 
-// Published demo pieces for the public gallery (NO DRAFTS)
-const publishedPieces = [
-  {
-    id: '1',
-    title: 'Love Letter at 3AM',
-    author: 'David Park',
-    category: 'Love & Relationships',
-    excerpt: "I'm writing this at 3am because I can't sleep without telling you: You are the answer to questions I didn't know I was asking.",
-    content: `I'm writing this at 3am\nbecause I can't sleep\nwithout telling you:\n\nYou are the answer\nto questions I didn't know\nI was asking.\n\nYour laugh is the sound\nof home,\nand I've been homeless\nfor so long.`,
-    publishedDate: '2026-01-25',
-    wallNumber: '09'
-  },
-  {
-    id: '2',
-    title: 'After the Funeral',
-    author: 'Sarah Williams',
-    category: 'Grief, Loss & Memory',
-    excerpt: 'We sit in the living room, talking about everything except the empty chair.',
-    content: `We sit in the living room,\ntalking about everything\nexcept the empty chair.\n\nSomeone makes coffee.\nSomeone tells a joke.\nWe laugh, then feel guilty\nfor laughing.\n\nThis is how grief works—\nin the pauses between words,\nin the ordinary tasks\nthat keep us moving forward.`,
-    publishedDate: '2026-01-23',
-    wallNumber: '12'
-  },
-  {
-    id: '3',
-    title: 'Winter Morning',
-    author: 'James Chen',
-    category: 'Nature & The Natural World',
-    excerpt: 'The city wakes slowly, frost on windows like lace, breath visible in the air.',
-    content: `The city wakes slowly,\nfrost on windows like lace,\nbreath visible in the air.\n\nI watch from my kitchen,\ncoffee warming my hands,\nthe sun still deciding\nwhether to show up today.\n\nEverything suspended\nin this quiet blue hour—\nthe world holding its breath\nbefore the day begins.`,
-    publishedDate: '2026-02-15',
-    wallNumber: '14'
-  },
-  {
-    id: '4',
-    title: 'Fragments of Home',
-    author: 'Maya Rodriguez',
-    category: 'Family & Identity',
-    excerpt: 'I carry fragments of home in my pockets—a worn coin, a pressed flower, my grandmother\'s recipe written in Spanish.',
-    content: `I carry fragments of home\nin my pockets—\na worn coin, a pressed flower,\nmy grandmother's recipe written in Spanish.\n\nThese small relics map\nthe distance between\nwhere I'm from\nand where I am.\n\nSometimes I forget\nwhich language I'm thinking in,\nwhich kitchen I'm standing in,\nwhich version of myself\nI'm supposed to be.`,
-    publishedDate: '2026-02-01',
-    wallNumber: '11'
-  },
-  {
-    id: '5',
-    title: 'The Space Between',
-    author: 'Luna Martinez',
-    category: 'Time & Mortality',
-    excerpt: 'There\'s a moment between sleeping and waking when I forget everything that\'s happened.',
-    content: `There's a moment\nbetween sleeping and waking\nwhen I forget\neverything that's happened.\n\nFor those three seconds,\nI am neither here nor there,\nneither grieving nor healed,\njust existing\nin the soft gray\nof almost-consciousness.`,
-    publishedDate: '2026-01-30',
-    wallNumber: '10'
-  },
-  {
-    id: '6',
-    title: 'Sunday Afternoon',
-    author: 'Robert Chen',
-    category: 'Self & Introspection',
-    excerpt: 'My son asks me why the sky is blue. I give him the scientific answer, but he looks disappointed.',
-    content: `My son asks me\nwhy the sky is blue.\n\nI give him the scientific answer—\nRayleigh scattering,\nwavelengths of light,\natmospheric particles.\n\nHe looks at me,\ndisappointed,\nand says:\n"I thought you'd say\nbecause it's happy."`,
-    publishedDate: '2026-02-06',
-    wallNumber: '13'
-  },
-  {
-    id: '7',
-    title: 'Monsoon Memory',
-    author: 'Aisha Patel',
-    category: 'Grief, Loss & Memory',
-    excerpt: 'My mother taught me to read the sky—the particular gray that means rain is coming.',
-    content: `My mother taught me\nto read the sky—\nthe particular gray\nthat means rain is coming.\n\nNow, an ocean away,\nI stand at my window\nwatching different clouds,\nremembering her hands\npointing at the horizon.\n\nThe rain here\nsounds nothing like home.`,
-    publishedDate: '2026-02-05',
-    wallNumber: '08'
-  },
-  {
-    id: '8',
-    title: "Father's Watch",
-    author: 'Thomas Wright',
-    category: 'Family & Identity',
-    excerpt: 'He left me his watch, the one that stopped the day he died.',
-    content: `He left me his watch,\nthe one that stopped\nthe day he died.\n\nI keep it in a drawer,\nrefusing to wind it,\nas if moving the hands forward\nwould somehow\nmove me forward too.\n\nTime doesn't heal.\nIt just accumulates.`,
-    publishedDate: '2026-01-22',
-    wallNumber: '07'
-  }
-];
+// Type for exhibit data
+interface Exhibit {
+  id: string;
+  userId: string;
+  title: string;
+  openingNote: string;
+  pieces: Array<{
+    id: string;
+    title: string;
+    content: string;
+    type: string;
+  }>;
+  coverImage: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Type for display piece
+interface DisplayPiece {
+  id: string;
+  title: string;
+  author: string;
+  category: string;
+  excerpt: string;
+  content: string;
+  publishedDate: string;
+  wallNumber: string;
+}
 
 const categories = [
   'All',
@@ -99,8 +44,92 @@ const categories = [
 ];
 
 export function CollectionGalleryPage() {
-  const [selectedPiece, setSelectedPiece] = useState<typeof publishedPieces[0] | null>(null);
+  const [publishedPieces, setPublishedPieces] = useState<DisplayPiece[]>([]);
+  const [selectedPiece, setSelectedPiece] = useState<DisplayPiece | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [loading, setLoading] = useState(true);
+
+  // Load poems from localStorage on mount
+  useEffect(() => {
+    loadPoemsFromLocalStorage();
+  }, []);
+
+  const loadPoemsFromLocalStorage = () => {
+    try {
+      const pieces: DisplayPiece[] = [];
+      
+      // Get all exhibit IDs
+      const exhibitAllData = localStorage.getItem('exhibit:all');
+      let exhibitIds: string[] = [];
+      
+      console.log('Loading poems from localStorage...');
+      console.log('exhibit:all data:', exhibitAllData);
+      
+      if (exhibitAllData) {
+        exhibitIds = JSON.parse(exhibitAllData);
+      } else {
+        // Fallback: scan localStorage for exhibit keys
+        console.log('No exhibit:all found, scanning localStorage...');
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('exhibit:') && key !== 'exhibit:all') {
+            exhibitIds.push(key.replace('exhibit:', ''));
+          }
+        }
+      }
+
+      console.log('Found exhibit IDs:', exhibitIds);
+
+      // Load each exhibit
+      exhibitIds.forEach((exhibitId, index) => {
+        const exhibitData = localStorage.getItem(`exhibit:${exhibitId}`);
+        console.log(`Loading exhibit:${exhibitId}`, exhibitData ? 'found' : 'not found');
+        
+        if (exhibitData) {
+          try {
+            const exhibit: Exhibit = JSON.parse(exhibitData);
+            console.log('Parsed exhibit:', exhibit);
+            
+            // Extract author name from opening note (assumes format "by Author Name")
+            const authorMatch = exhibit.openingNote.match(/by\s+([^\n]+)/);
+            const authorName = authorMatch ? authorMatch[1].trim() : 'Unknown Author';
+            
+            // Get the first piece (poem)
+            const firstPiece = exhibit.pieces[0];
+            if (firstPiece) {
+              // Create excerpt (first 100 characters)
+              const excerpt = firstPiece.content
+                .split('\n')
+                .filter(line => line.trim())
+                .slice(0, 2)
+                .join(' ')
+                .substring(0, 150) + '...';
+
+              pieces.push({
+                id: exhibit.id,
+                title: exhibit.title,
+                author: authorName,
+                category: 'Poetry', // Default category for now
+                excerpt: excerpt,
+                content: firstPiece.content,
+                publishedDate: exhibit.createdAt,
+                wallNumber: String(index + 1).padStart(2, '0')
+              });
+            }
+          } catch (error) {
+            console.error(`Error parsing exhibit ${exhibitId}:`, error);
+          }
+        }
+      });
+
+      console.log('Loaded pieces:', pieces);
+      setPublishedPieces(pieces);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error loading poems from localStorage:', error);
+      setLoading(false);
+    }
+  };
 
   const filteredPieces = selectedCategory === 'All'
     ? publishedPieces
@@ -192,81 +221,111 @@ export function CollectionGalleryPage() {
       {/* Poems - Alternating Editorial Layout */}
       <section className="py-20 px-8">
         <div className="max-w-5xl mx-auto">
-          {filteredPieces.map((piece, index) => (
-            <div key={piece.id}>
-              {/* Poem Entry */}
-              <motion.div
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: index * 0.1 }}
-                className={`relative py-16 ${
-                  index % 2 === 0 
-                    ? 'border-l-[3px] border-[#C4A265] pl-12 pr-0' 
-                    : 'border-r-[3px] border-[#C4A265] pr-12 pl-0 text-right'
-                }`}
-              >
-                {/* Decorative Wall Number */}
-                <div className={`absolute ${
-                  index % 2 === 0 ? 'left-16' : 'right-16'
-                } top-8 font-['Cardo'] text-8xl text-[#2C1810] opacity-5 pointer-events-none`}>
-                  {piece.wallNumber}
-                </div>
-
-                {/* Category Label */}
-                <div className={`text-xs uppercase tracking-[0.2em] text-[#C4A265] mb-3 font-['Cardo'] ${
-                  index % 2 === 0 ? 'text-left' : 'text-right'
-                }`}>
-                  {piece.category}
-                </div>
-
-                {/* Title */}
-                <button
-                  onClick={() => setSelectedPiece(piece)}
-                  className={`group block mb-3 ${index % 2 === 0 ? 'text-left' : 'text-right'}`}
-                >
-                  <h2 className="font-['Cardo'] text-5xl text-[#2C1810] hover:text-[#C4A265] transition-colors duration-300">
-                    {piece.title}
-                  </h2>
-                </button>
-
-                {/* Author */}
-                <p className={`text-sm uppercase tracking-[0.15em] text-[#8B7355] mb-6 font-['Cardo'] ${
-                  index % 2 === 0 ? 'text-left' : 'text-right'
-                }`}>
-                  by {piece.author}
-                </p>
-
-                {/* Excerpt */}
-                <p className={`font-['Libre_Baskerville'] text-lg text-[#2C1810] leading-relaxed italic mb-8 max-w-2xl ${
-                  index % 2 === 0 ? 'text-left' : 'text-right ml-auto'
-                }`}>
-                  {piece.excerpt}
-                </p>
-
-                {/* Read Link */}
-                <button
-                  onClick={() => setSelectedPiece(piece)}
-                  className={`group flex items-center gap-2 text-[#C4A265] hover:gap-4 transition-all font-['Cardo'] text-sm tracking-wider ${
-                    index % 2 === 0 ? 'text-left' : 'text-right ml-auto flex-row-reverse'
+          {loading ? (
+            /* Loading State */
+            <div className="text-center py-20">
+              <div className="font-['Cardo'] text-xl text-[#8B7355] mb-4">
+                Loading poems...
+              </div>
+              <div className="flex items-center justify-center">
+                <div className="h-px w-16 bg-[#C4A265]/30"></div>
+                <div className="w-1 h-1 bg-[#C4A265] mx-3 rotate-45 animate-pulse"></div>
+                <div className="h-px w-16 bg-[#C4A265]/30"></div>
+              </div>
+            </div>
+          ) : filteredPieces.length === 0 ? (
+            /* Empty State */
+            <div className="text-center py-20">
+              <div className="font-['Cardo'] text-6xl text-[#2C1810] mb-6 italic">
+                No poems found
+              </div>
+              <p className="font-['Libre_Baskerville'] text-lg text-[#8B7355] mb-8 italic">
+                Please visit the <a href="/admin/reset-gallery" className="text-[#C4A265] hover:underline">Reset Gallery</a> page to load the Nix Carlson collection.
+              </p>
+              <div className="flex items-center justify-center">
+                <div className="h-px w-16 bg-[#C4A265]/30"></div>
+                <div className="w-1 h-1 bg-[#C4A265] mx-3 rotate-45"></div>
+                <div className="h-px w-16 bg-[#C4A265]/30"></div>
+              </div>
+            </div>
+          ) : (
+            /* Poems List */
+            filteredPieces.map((piece, index) => (
+              <div key={piece.id}>
+                {/* Poem Entry */}
+                <motion.div
+                  initial={{ opacity: 0, y: 40 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: index * 0.1 }}
+                  className={`relative py-16 ${
+                    index % 2 === 0 
+                      ? 'border-l-[3px] border-[#C4A265] pl-12 pr-0' 
+                      : 'border-r-[3px] border-[#C4A265] pr-12 pl-0 text-right'
                   }`}
                 >
-                  <span>READ POEM</span>
-                  <ArrowRight className={`w-4 h-4 group-hover:translate-x-1 transition-transform ${
-                    index % 2 === 1 ? 'rotate-180' : ''
-                  }`} />
-                </button>
-              </motion.div>
+                  {/* Decorative Wall Number */}
+                  <div className={`absolute ${
+                    index % 2 === 0 ? 'left-16' : 'right-16'
+                  } top-8 font-['Cardo'] text-8xl text-[#2C1810] opacity-5 pointer-events-none`}>
+                    {piece.wallNumber}
+                  </div>
 
-              {/* Ornamental Divider (except after last poem) */}
-              {index < filteredPieces.length - 1 && (
-                <div className="flex items-center justify-center my-8">
-                  <div className="h-px w-16 bg-[#C4A265]/30"></div>
-                  <div className="w-1 h-1 bg-[#C4A265] mx-3 rotate-45"></div>
-                  <div className="h-px w-16 bg-[#C4A265]/30"></div>
-                </div>
-              )}
-            </div>
-          ))}
+                  {/* Category Label */}
+                  <div className={`text-xs uppercase tracking-[0.2em] text-[#C4A265] mb-3 font-['Cardo'] ${
+                    index % 2 === 0 ? 'text-left' : 'text-right'
+                  }`}>
+                    {piece.category}
+                  </div>
+
+                  {/* Title */}
+                  <button
+                    onClick={() => setSelectedPiece(piece)}
+                    className={`group block mb-3 ${index % 2 === 0 ? 'text-left' : 'text-right'}`}
+                  >
+                    <h2 className="font-['Cardo'] text-5xl text-[#2C1810] hover:text-[#C4A265] transition-colors duration-300">
+                      {piece.title}
+                    </h2>
+                  </button>
+
+                  {/* Author */}
+                  <p className={`text-sm uppercase tracking-[0.15em] text-[#8B7355] mb-6 font-['Cardo'] ${
+                    index % 2 === 0 ? 'text-left' : 'text-right'
+                  }`}>
+                    by {piece.author}
+                  </p>
+
+                  {/* Excerpt */}
+                  <p className={`font-['Libre_Baskerville'] text-lg text-[#2C1810] leading-relaxed italic mb-8 max-w-2xl ${
+                    index % 2 === 0 ? 'text-left' : 'text-right ml-auto'
+                  }`}>
+                    {piece.excerpt}
+                  </p>
+
+                  {/* Read Link */}
+                  <button
+                    onClick={() => setSelectedPiece(piece)}
+                    className={`group flex items-center gap-2 text-[#C4A265] hover:gap-4 transition-all font-['Cardo'] text-sm tracking-wider ${
+                      index % 2 === 0 ? 'text-left' : 'text-right ml-auto flex-row-reverse'
+                    }`}
+                  >
+                    <span>READ POEM</span>
+                    <ArrowRight className={`w-4 h-4 group-hover:translate-x-1 transition-transform ${
+                      index % 2 === 1 ? 'rotate-180' : ''
+                    }`} />
+                  </button>
+                </motion.div>
+
+                {/* Ornamental Divider (except after last poem) */}
+                {index < filteredPieces.length - 1 && (
+                  <div className="flex items-center justify-center my-8">
+                    <div className="h-px w-16 bg-[#C4A265]/30"></div>
+                    <div className="w-1 h-1 bg-[#C4A265] mx-3 rotate-45"></div>
+                    <div className="h-px w-16 bg-[#C4A265]/30"></div>
+                  </div>
+                )}
+              </div>
+            ))
+          )}
         </div>
       </section>
 
@@ -275,69 +334,157 @@ export function CollectionGalleryPage() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.3 }}
-          className="fixed inset-0 z-50 bg-[#2C1810]/80 backdrop-blur-sm flex items-center justify-center p-8"
-          onClick={() => setSelectedPiece(null)}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.6 }}
+          className="fixed inset-0 z-50 bg-[#FAF8F5] overflow-y-auto"
         >
-          <motion.div
-            initial={{ scale: 0.95, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.3 }}
-            onClick={(e) => e.stopPropagation()}
-            className="bg-[#FAF8F5] max-w-4xl w-full max-h-[85vh] overflow-y-auto p-16 relative shadow-2xl"
-          >
-            <button
+          {/* Atmospheric background */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#FAF8F5] via-[#F5F0EB] to-[#FAF8F5] opacity-60"></div>
+          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[radial-gradient(circle,_#C4A265_0%,_transparent_70%)] opacity-5"></div>
+          <div className="absolute bottom-0 left-0 w-[800px] h-[800px] bg-[radial-gradient(circle,_#8B7355_0%,_transparent_70%)] opacity-5"></div>
+          
+          <div className="relative">
+            {/* Close Button - Elegant */}
+            <motion.button
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
               onClick={() => setSelectedPiece(null)}
-              className="absolute top-8 right-8 p-2 hover:bg-[#F5F0E8] rounded-full transition-colors"
+              className="fixed top-8 right-8 z-10 group"
             >
-              <X className="w-6 h-6 text-[#8B7355]" />
-            </button>
+              <div className="flex items-center gap-3 px-6 py-3 bg-white/80 backdrop-blur-sm border border-[#E0D8D0] hover:border-[#C4A265] rounded-full transition-all shadow-lg hover:shadow-xl">
+                <X className="w-5 h-5 text-[#8B7355] group-hover:text-[#C4A265] transition-colors" />
+                <span className="font-['Cardo'] text-sm tracking-wider text-[#8B7355] group-hover:text-[#C4A265] transition-colors">CLOSE</span>
+              </div>
+            </motion.button>
 
-            {/* Category */}
-            <div className="text-xs uppercase tracking-[0.2em] text-[#C4A265] mb-4 font-['Cardo']">
-              {selectedPiece.category}
-            </div>
+            {/* Main Content Container */}
+            <div className="max-w-4xl mx-auto px-8 py-32">
+              {/* Wall Number - Large Decorative */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 0.03, scale: 1 }}
+                transition={{ duration: 1 }}
+                className="absolute top-24 left-1/2 -translate-x-1/2 font-['Cardo'] text-[20rem] text-[#2C1810] pointer-events-none select-none"
+                style={{ lineHeight: 1 }}
+              >
+                {selectedPiece.wallNumber}
+              </motion.div>
 
-            {/* Title */}
-            <h2 className="font-['Cardo'] text-6xl mb-4 text-[#2C1810] leading-tight">
-              {selectedPiece.title}
-            </h2>
+              {/* Category Badge */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+                className="text-center mb-8"
+              >
+                <span className="inline-block px-6 py-2 border-2 border-[#C4A265] text-xs uppercase tracking-[0.3em] text-[#C4A265] font-['Cardo'] bg-white/50 backdrop-blur-sm">
+                  {selectedPiece.category}
+                </span>
+              </motion.div>
 
-            {/* Author */}
-            <p className="text-sm uppercase tracking-[0.15em] text-[#8B7355] mb-12 font-['Cardo']">
-              by {selectedPiece.author}
-            </p>
-            
-            {/* Gold Divider */}
-            <div className="flex items-center mb-12">
-              <div className="h-px flex-1 bg-[#C4A265]/30"></div>
-              <div className="w-1 h-1 bg-[#C4A265] mx-4 rotate-45"></div>
-              <div className="h-px flex-1 bg-[#C4A265]/30"></div>
-            </div>
+              {/* Title */}
+              <motion.h1
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="font-['Cardo'] text-7xl md:text-8xl text-[#2C1810] text-center mb-6 italic leading-tight"
+              >
+                {selectedPiece.title}
+              </motion.h1>
 
-            {/* Full Poem Content */}
-            <div className="font-['Libre_Baskerville'] text-2xl leading-loose text-[#2C1810] whitespace-pre-wrap mb-16">
-              {selectedPiece.content.split('\n').map((line, idx) => (
-                <motion.div
-                  key={idx}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5, delay: idx * 0.03 }}
+              {/* Author */}
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+                className="text-center text-base uppercase tracking-[0.2em] text-[#8B7355] mb-16 font-['Cardo']"
+              >
+                by {selectedPiece.author}
+              </motion.p>
+
+              {/* Ornamental Divider */}
+              <motion.div
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ duration: 1, delay: 0.5 }}
+                className="flex items-center justify-center mb-20"
+              >
+                <div className="h-px w-32 bg-[#C4A265]"></div>
+                <div className="w-2 h-2 bg-[#C4A265] mx-6 rotate-45"></div>
+                <div className="h-px w-32 bg-[#C4A265]"></div>
+              </motion.div>
+
+              {/* Poem Content - Beautiful Typography */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.8, delay: 0.6 }}
+                className="relative"
+              >
+                <div className="font-['Libre_Baskerville'] text-3xl md:text-4xl leading-loose text-[#2C1810] text-center mb-20 max-w-3xl mx-auto">
+                  {selectedPiece.content.split('\n').map((line, idx) => (
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: 0.7 + idx * 0.05 }}
+                      className="mb-2"
+                    >
+                      {line || '\u00A0'}
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* Bottom Ornament */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.8, delay: 1 }}
+                className="flex items-center justify-center mb-12"
+              >
+                <div className="h-px w-24 bg-[#C4A265]/40"></div>
+                <div className="w-1.5 h-1.5 bg-[#C4A265] mx-4 rotate-45"></div>
+                <div className="h-px w-24 bg-[#C4A265]/40"></div>
+              </motion.div>
+
+              {/* Published Date & Meta */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6, delay: 1.2 }}
+                className="text-center"
+              >
+                <p className="font-['Cardo'] text-sm text-[#8B7355] italic mb-6">
+                  Published {new Date(selectedPiece.publishedDate).toLocaleDateString('en-US', { 
+                    month: 'long', 
+                    day: 'numeric', 
+                    year: 'numeric' 
+                  })}
+                </p>
+                <p className="font-['Cardo'] text-xs uppercase tracking-[0.3em] text-[#8B7355]/60">
+                  Wall {selectedPiece.wallNumber} • Winter 2026
+                </p>
+              </motion.div>
+
+              {/* Scroll hint */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6, delay: 1.4 }}
+                className="mt-20 text-center"
+              >
+                <button
+                  onClick={() => setSelectedPiece(null)}
+                  className="group inline-flex items-center gap-3 px-8 py-4 border-2 border-[#C4A265] text-[#C4A265] hover:bg-[#C4A265] hover:text-white transition-all font-['Cardo'] text-sm tracking-wider"
                 >
-                  {line}
-                </motion.div>
-              ))}
+                  <ArrowRight className="w-4 h-4 rotate-180 group-hover:-translate-x-1 transition-transform" />
+                  RETURN TO COLLECTION
+                </button>
+              </motion.div>
             </div>
-
-            {/* Published Date */}
-            <div className="text-sm text-[#8B7355] font-['Cardo'] italic mb-8">
-              Published {new Date(selectedPiece.publishedDate).toLocaleDateString('en-US', { 
-                month: 'long', 
-                day: 'numeric', 
-                year: 'numeric' 
-              })}
-            </div>
-          </motion.div>
+          </div>
         </motion.div>
       )}
 

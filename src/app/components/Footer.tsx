@@ -50,14 +50,8 @@ export function Footer() {
               <a href="/collection-gallery" className="block font-['Inter'] text-sm hover:text-white transition-colors">
                 The Collection
               </a>
-              <a href="/community-wall" className="block font-['Inter'] text-sm hover:text-white transition-colors">
-                Gallery Wall
-              </a>
-              <a href="/afterhours" className="block font-['Inter'] text-sm hover:text-white transition-colors">
-                Afterhours
-              </a>
-              <a href="/rooms" className="block font-['Inter'] text-sm hover:text-white transition-colors">
-                Rooms
+              <a href="/about" className="block font-['Inter'] text-sm hover:text-white transition-colors">
+                About
               </a>
             </nav>
           </div>

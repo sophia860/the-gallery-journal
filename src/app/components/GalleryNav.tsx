@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { Moon, Menu, X, Lock } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
+import { Menu, X } from 'lucide-react';
 
 interface GalleryNavProps {
   currentPage?: string;
@@ -8,12 +7,7 @@ interface GalleryNavProps {
 }
 
 export function GalleryNav({ currentPage = '', variant = 'light' }: GalleryNavProps) {
-  const { user } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  
-  // Check if user has editor role
-  const userRole = user?.user_metadata?.role || 'writer';
-  const isEditor = ['editor', 'eic', 'admin'].includes(userRole);
 
   const isActive = (page: string) => {
     if (!currentPage) {
@@ -51,77 +45,12 @@ export function GalleryNav({ currentPage = '', variant = 'light' }: GalleryNavPr
             <span className="absolute -bottom-2 left-0 w-0 h-0.5 bg-[#E11D48] group-hover:w-full transition-all duration-300"></span>
           </a>
           <a 
-            href="/community-wall" 
-            className={`${linkColor} ${linkHover} transition-all duration-300 relative group flex items-center gap-1.5 ${isActive('community') ? activeColor : ''}`}
+            href="/about" 
+            className={`${linkColor} ${linkHover} transition-all duration-300 relative group ${isActive('about') ? activeColor : ''}`}
           >
-            {!user && <Lock className="w-3 h-3 opacity-60" />}
-            Gallery Wall
-            {!user && (
-              <span className="ml-1 px-2 py-0.5 bg-[#C4918A]/10 text-[#8B7355] text-xs rounded-full">
-                Members
-              </span>
-            )}
+            About
             <span className="absolute -bottom-2 left-0 w-0 h-0.5 bg-[#E11D48] group-hover:w-full transition-all duration-300"></span>
           </a>
-          <a 
-            href="/afterhours" 
-            className={`${linkColor} ${linkHover} transition-all duration-300 relative group flex items-center gap-2 ${isActive('afterhours') ? activeColor : ''}`}
-          >
-            <Moon className="w-4 h-4 opacity-80" />
-            Afterhours
-            <span className="absolute -bottom-2 left-0 w-0 h-0.5 bg-[#E11D48] group-hover:w-full transition-all duration-300"></span>
-          </a>
-          <a 
-            href="/rooms" 
-            className={`${linkColor} ${linkHover} transition-all duration-300 relative group ${isActive('rooms') ? activeColor : ''}`}
-          >
-            Rooms
-            <span className="absolute -bottom-2 left-0 w-0 h-0.5 bg-[#E11D48] group-hover:w-full transition-all duration-300"></span>
-          </a>
-          
-          <a 
-            href="/pricing" 
-            className={`${linkColor} ${linkHover} transition-all duration-300 relative group ${isActive('pricing') ? activeColor : ''}`}
-          >
-            Pricing
-            <span className="absolute -bottom-2 left-0 w-0 h-0.5 bg-[#E11D48] group-hover:w-full transition-all duration-300"></span>
-          </a>
-          
-          {/* Editor Dashboard - only show for editors */}
-          {isEditor && (
-            <a 
-              href="/editor-dashboard" 
-              className={`${linkColor} ${linkHover} transition-all duration-300 relative group ${isActive('editor-dashboard') ? activeColor : ''}`}
-            >
-              Editor Dashboard
-              <span className="absolute -bottom-2 left-0 w-0 h-0.5 bg-[#E11D48] group-hover:w-full transition-all duration-300"></span>
-            </a>
-          )}
-          
-          {user ? (
-            <a 
-              href="/studio" 
-              className="px-8 py-3 bg-[#E11D48] text-white hover:bg-[#C01040] hover:scale-105 hover:shadow-lg transition-all duration-300 rounded-lg"
-            >
-              Your Studio
-            </a>
-          ) : (
-            <>
-              <a 
-                href="/signin" 
-                className={`${linkColor} ${linkHover} transition-all duration-300 relative group`}
-              >
-                Log In
-                <span className="absolute -bottom-2 left-0 w-0 h-0.5 bg-[#E11D48] group-hover:w-full transition-all duration-300"></span>
-              </a>
-              <a 
-                href="/signup" 
-                className="px-8 py-3 bg-[#E11D48] text-white hover:bg-[#C01040] hover:scale-105 hover:shadow-lg transition-all duration-300 rounded-lg"
-              >
-                Join
-              </a>
-            </>
-          )}
         </nav>
 
         {/* Mobile Hamburger */}
@@ -149,121 +78,13 @@ export function GalleryNav({ currentPage = '', variant = 'light' }: GalleryNavPr
             >
               The Collection
             </a>
-            <div className="block py-2">
-              <a 
-                href="/gallery-wall" 
-                className={`flex items-center gap-2 ${linkColor} ${linkHover} transition-colors ${isActive('gallery-wall') ? activeColor : ''}`}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {/* Inline Lock SVG - 16x16 */}
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="text-[#8B7355] flex-shrink-0"
-                >
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                </svg>
-                <span className="flex-1">Gallery Wall</span>
-              </a>
-              <div className="pl-6 mt-1">
-                <span className="text-xs text-[#8B7355] font-['Inter']">Members</span>
-              </div>
-            </div>
-            <div className="block py-2">
-              <a 
-                href="/community-wall" 
-                className={`flex items-center gap-2 ${linkColor} ${linkHover} transition-colors ${isActive('community-wall') ? activeColor : ''}`}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {/* Inline Lock SVG - 16x16 */}
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="text-[#8B7355] flex-shrink-0"
-                >
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                </svg>
-                <span className="flex-1">Community Wall</span>
-              </a>
-              <div className="pl-6 mt-1">
-                <span className="text-xs text-[#8B7355] font-['Inter']">Members</span>
-              </div>
-            </div>
             <a 
-              href="/afterhours" 
-              className={`block py-2 ${linkColor} ${linkHover} transition-colors flex items-center gap-2 ${isActive('afterhours') ? activeColor : ''}`}
+              href="/about" 
+              className={`block py-2 ${linkColor} ${linkHover} transition-colors ${isActive('about') ? activeColor : ''}`}
               onClick={() => setMobileMenuOpen(false)}
             >
-              <Moon className="w-4 h-4" />
-              Afterhours
+              About
             </a>
-            <a 
-              href="/rooms" 
-              className={`block py-2 ${linkColor} ${linkHover} transition-colors ${isActive('rooms') ? activeColor : ''}`}
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Rooms
-            </a>
-            
-            <a 
-              href="/pricing" 
-              className={`block py-2 ${linkColor} ${linkHover} transition-colors ${isActive('pricing') ? activeColor : ''}`}
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Pricing
-            </a>
-            
-            {/* Editor Dashboard - only show for editors */}
-            {isEditor && (
-              <a 
-                href="/editor-dashboard" 
-                className={`block py-2 ${linkColor} ${linkHover} transition-colors ${isActive('editor-dashboard') ? activeColor : ''}`}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Editor Dashboard
-              </a>
-            )}
-            
-            {user ? (
-              <a 
-                href="/studio" 
-                className="block py-3 px-6 bg-[#E11D48] text-white text-center hover:bg-[#C01040] transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Your Studio
-              </a>
-            ) : (
-              <>
-                <a 
-                  href="/signin" 
-                  className={`block py-2 ${linkColor} ${linkHover} transition-colors`}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Log In
-                </a>
-                <a 
-                  href="/signup" 
-                  className="block py-3 px-6 bg-[#E11D48] text-white text-center hover:bg-[#C01040] transition-colors"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Join
-                </a>
-              </>
-            )}
           </div>
         </nav>
       )}

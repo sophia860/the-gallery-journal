@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { projectId, publicAnonKey } from '/utils/supabase/info';
+import { projectId } from '/utils/supabase/info';
 import { RefreshCw, Sparkles } from 'lucide-react';
 
 const NIX_CARLSON_POEMS = [
@@ -174,86 +174,85 @@ export function ResetGalleryPage() {
     setLogs([]);
 
     try {
-      // Step 1: Clear all existing exhibits
+      // Step 1: Clear all existing exhibits from localStorage
       setCurrentStep('Clearing existing poems...');
-      addLog('🗑️ Starting to clear existing exhibits...');
-
-      const clearResponse = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-07dc516a/admin/clear-exhibits`,
-        {
-          method: 'DELETE',
-          headers: {
-            'apikey': publicAnonKey,
-          },
+      addLog('🗑️ Clearing existing exhibits from localStorage...');
+      
+      // Clear all exhibit-related keys
+      const keysToRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith('exhibit:') || key.startsWith('user:exhibits:'))) {
+          keysToRemove.push(key);
         }
-      );
-
-      if (clearResponse.ok) {
-        const clearData = await clearResponse.json();
-        addLog(`✅ Cleared ${clearData.count} existing exhibits`);
-      } else {
-        throw new Error('Failed to clear exhibits');
       }
-
-      // Wait a moment
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+      addLog(`✅ Cleared ${keysToRemove.length} existing items from localStorage`);
 
       // Step 2: Add Nix Carlson's poems
       setCurrentStep('Adding Nix Carlson poems...');
       addLog('📚 Starting to add Nix Carlson\'s poems...');
 
       let successCount = 0;
+      const demoUserId = 'demo-user-nix-carlson';
 
-      for (const poem of NIX_CARLSON_POEMS) {
+      for (let i = 0; i < NIX_CARLSON_POEMS.length; i++) {
+        const poem = NIX_CARLSON_POEMS[i];
+        const exhibitId = `exhibit-nix-${i + 1}`;
+        
         addLog(`📝 Adding: "${poem.title}"`);
 
         try {
-          const exhibitResponse = await fetch(
-            `https://${projectId}.supabase.co/functions/v1/make-server-07dc516a/exhibits`,
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'apikey': publicAnonKey,
-              },
-              body: JSON.stringify({
-                title: poem.title,
-                openingNote: `by Nix Carlson
+          const exhibitData = {
+            id: exhibitId,
+            userId: demoUserId,
+            title: poem.title,
+            openingNote: `by Nix Carlson
 
 Nix Carlson (she/they) is a queer, polyamorous, and neurodivergent poet and sign language interpreter based in Lexington, KY, with strong ties to Milwaukee, WI. Their work has appeared or is forthcoming in Wildscape, Voicemail Poems, Orange Rose, Vellichor Literary, Broken Stone Review, Coming Up Short, and Eunoia Review, among others.
 
 Instagram: @bynixec`,
-                pieces: [
-                  {
-                    id: crypto.randomUUID(),
-                    title: poem.title,
-                    content: poem.content,
-                    type: poem.genre,
-                  }
-                ],
-                coverImage: null,
-              }),
-            }
-          );
+            pieces: [
+              {
+                id: crypto.randomUUID(),
+                title: poem.title,
+                content: poem.content,
+                type: poem.genre,
+              }
+            ],
+            coverImage: null,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          };
 
-          if (exhibitResponse.ok) {
-            successCount++;
-            addLog(`✅ Successfully added: "${poem.title}"`);
-          } else {
-            const error = await exhibitResponse.json();
-            addLog(`❌ Failed to add: "${poem.title}" - ${error.error || 'Unknown error'}`);
-          }
-        } catch (err) {
-          addLog(`❌ Network error adding: "${poem.title}"`);
+          // Store in localStorage
+          localStorage.setItem(`exhibit:${exhibitId}`, JSON.stringify(exhibitData));
+          localStorage.setItem(`user:exhibits:${demoUserId}:${exhibitId}`, exhibitId);
+          
+          successCount++;
+          addLog(`✅ Successfully added: "${poem.title}"`);
+        } catch (error: any) {
+          addLog(`❌ Error adding: "${poem.title}" - ${error.message}`);
         }
 
-        // Small delay between requests
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // Small delay between operations
+        await new Promise(resolve => setTimeout(resolve, 200));
       }
+
+      // Store exhibit list
+      const exhibitIds = Array.from({ length: NIX_CARLSON_POEMS.length }, (_, i) => `exhibit-nix-${i + 1}`);
+      localStorage.setItem('exhibit:all', JSON.stringify(exhibitIds));
+      localStorage.setItem(`user:${demoUserId}:name`, 'Nix Carlson');
+      
+      addLog(`📝 Stored ${successCount} exhibits in local storage`);
 
       setCurrentStep('Complete!');
       addLog(`\n🎉 COMPLETE! Added ${successCount} of ${NIX_CARLSON_POEMS.length} poems`);
       addLog('✨ Gallery has been reset with Nix Carlson\'s work');
+      addLog('');
+      addLog('💡 Note: Poems are stored in browser localStorage for demo purposes');
+      addLog('   The gallery will display these poems when you visit /collection-gallery');
       setComplete(true);
 
     } catch (error: any) {
@@ -264,11 +263,6 @@ Instagram: @bynixec`,
       setProcessing(false);
     }
   };
-
-  if (!user) {
-    window.location.href = '/signin';
-    return null;
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#FAF8F5] to-[#F5F0EB] pt-32 pb-24">
@@ -370,7 +364,7 @@ Instagram: @bynixec`,
               The gallery now features Nix Carlson's powerful poetry
             </p>
             <a
-              href="/rooms"
+              href="/collection-gallery"
               className="inline-flex items-center gap-2 px-8 py-4 bg-[#8A9A7B] text-white hover:bg-[#6F7D62] transition-all font-['Cardo'] text-lg rounded-lg"
             >
               View Gallery

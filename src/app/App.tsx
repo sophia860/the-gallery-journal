@@ -1,38 +1,18 @@
 import { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { Header } from './components/Header';
 
-// Public Pages
+// Gallery Pages - ONLY
 import { GalleryLandingPage } from './pages/GalleryLandingPage';
 import { AboutPage } from './pages/AboutPage';
-import { RoomsPage } from './pages/RoomsPage';
-import { PricingPage } from './pages/PricingPage';
-import { RoomPage } from './pages/RoomPage';
 import { ExhibitPage } from './pages/ExhibitPage';
-
-// Auth Pages
-import { SignUpPage } from './pages/SignUpPage';
-import { SignInPage } from './pages/SignInPage';
-
-// Studio Pages (Writer Tools)
-import { StudioHub } from './studio/StudioHub';
-import { FreewritePage } from './studio/FreewritePage';
-import { MyGarden } from './studio/MyGarden';
-import { MyWorkPage } from './studio/MyWorkPage';
-import { RoomSettingsPage } from './studio/RoomSettingsPage';
-import { NewExhibitPage } from './pages/NewExhibitPage';
-
-// Editor Pages (Editorial Team)
-import { EditorDashboardPage } from './pages/EditorDashboardPage';
-import { EditorialSubmissionsPage } from './pages/EditorialSubmissionsPage';
-
-// Community Pages
 import { CollectionGalleryPage } from './pages/CollectionGalleryPage';
-import { CommunityWallPage } from './pages/CommunityWallPage';
 
-// Admin Pages
+// Editor Pages
+import { EditorLoginPage } from './pages/EditorLoginPage';
+import { EditorDashboard } from './editor/EditorDashboard';
+
+// Admin Pages (for demo setup)
 import { AdminPage } from './pages/AdminPage';
-import { AddPoemsPage } from './pages/AddPoemsPage';
 import { ResetGalleryPage } from './pages/ResetGalleryPage';
 import { DemoModePage } from './pages/DemoModePage';
 import { DesignSystemDemo } from './pages/DesignSystemDemo';
@@ -77,14 +57,8 @@ function AppContent() {
   const pagesWithOwnNav = [
     '/',
     '/about',
-    '/rooms',
-    '/signin',
-    '/signup',
-    '/pricing',
     '/collection-gallery',
-    '/community-wall',
-    '/editor-dashboard',
-    '/editorial-submissions'
+    '/collection'
   ];
   const showDefaultHeader = !pagesWithOwnNav.includes(route);
 
@@ -98,67 +72,31 @@ function AppContent() {
     );
   }
 
-  // Route matching - cleaned and organized
+  // Route matching - Gallery focused ONLY
   let pageContent;
   
-  // Public Pages
+  // Gallery Pages
   if (route === '/') {
     pageContent = <GalleryLandingPage />;
   } else if (route === '/about') {
     pageContent = <AboutPage />;
-  } else if (route === '/rooms' || route === '/gallery') {
-    pageContent = <RoomsPage />;
-  } else if (route === '/pricing') {
-    pageContent = <PricingPage />;
-  } else if (route.startsWith('/room/')) {
-    const userId = route.split('/room/')[1];
-    pageContent = <RoomPage userId={userId} />;
   } else if (route.startsWith('/exhibit/')) {
     const exhibitId = route.split('/exhibit/')[1];
     pageContent = <ExhibitPage exhibitId={exhibitId} />;
-  }
-  
-  // Auth Pages
-  else if (route === '/signup') {
-    pageContent = <SignUpPage />;
-  } else if (route === '/signin') {
-    pageContent = <SignInPage />;
-  }
-  
-  // Studio Pages (Writer Tools)
-  else if (route === '/studio') {
-    pageContent = <StudioHub />;
-  } else if (route === '/studio/freewrite') {
-    pageContent = <FreewritePage />;
-  } else if (route === '/studio/my-garden') {
-    pageContent = <MyGarden />;
-  } else if (route === '/studio/work') {
-    pageContent = <MyWorkPage />;
-  } else if (route === '/studio/room-settings') {
-    pageContent = <RoomSettingsPage />;
-  } else if (route === '/studio/new-exhibit') {
-    pageContent = <NewExhibitPage />;
-  }
-  
-  // Editor Pages (Editorial Team)
-  else if (route === '/editor-dashboard') {
-    pageContent = <EditorDashboardPage />;
-  } else if (route === '/editorial-submissions') {
-    pageContent = <EditorialSubmissionsPage />;
-  }
-  
-  // Community Pages
-  else if (route === '/collection-gallery') {
+  } else if (route === '/collection-gallery' || route === '/collection') {
     pageContent = <CollectionGalleryPage />;
-  } else if (route === '/community-wall') {
-    pageContent = <CommunityWallPage />;
   }
   
-  // Admin Pages
+  // Editor Pages
+  else if (route === '/editors') {
+    pageContent = <EditorLoginPage />;
+  } else if (route === '/editors/dashboard') {
+    pageContent = <EditorDashboard />;
+  }
+  
+  // Admin Pages (for demo setup)
   else if (route === '/admin') {
     pageContent = <AdminPage />;
-  } else if (route === '/admin/add-poems') {
-    pageContent = <AddPoemsPage />;
   } else if (route === '/admin/reset-gallery') {
     pageContent = <ResetGalleryPage />;
   } else if (route === '/admin/demo-mode') {
@@ -174,7 +112,6 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {showDefaultHeader && <Header />}
       {pageContent}
     </div>
   );

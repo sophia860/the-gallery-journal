@@ -1,9 +1,20 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import {
+  getSubmissions,
+  getDashboardStats,
+  updateSubmissionStatus,
+  addInternalNotes,
+  rateSubmission,
+  scheduleSubmission,
+  requestRevisions,
+  type Submission,
+  type DashboardStats
+} from '../../services/editorService';
 import { 
   X, Star, Calendar, GripVertical, Search, ChevronDown,
   Clock, CheckCircle, XCircle, AlertCircle, Send, FileText,
-  TrendingUp, TrendingDown, Minus
+  TrendingUp, TrendingDown, Minus, UserPlus, Copy
 } from 'lucide-react';
 
 // Comprehensive demo submissions with realistic content
@@ -230,7 +241,8 @@ export function EditorDashboard() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [sortBy, setSortBy] = useState<SortBy>('date');
   const [searchQuery, setSearchQuery] = useState('');
-  const [submissions, setSubmissions] = useState(demoSubmissions);
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const [loading, setLoading] = useState(true);
   const [expandedPoem, setExpandedPoem] = useState<string | null>(null);
   const [detailModal, setDetailModal] = useState<string | null>(null);
   const [publishModal, setPublishModal] = useState<string | null>(null);
@@ -246,6 +258,28 @@ export function EditorDashboard() {
   const [issueTitle, setIssueTitle] = useState('Winter 2026 - Issue 02');
   const [issueSeason, setIssueSeason] = useState('Winter 2026');
   const [currentQuote] = useState(literaryQuotes[Math.floor(Math.random() * literaryQuotes.length)]);
+  const [inviteModal, setInviteModal] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteRole, setInviteRole] = useState<'editor' | 'managing_editor'>('editor');
+  const [generatedInviteLink, setGeneratedInviteLink] = useState('');
+  const [copied, setCopied] = useState(false);
+
+  // Load submissions on mount
+  useEffect(() => {
+    loadSubmissions();
+  }, []);
+
+  const loadSubmissions = async () => {
+    try {
+      setLoading(true);
+      const data = await getSubmissions();
+      setSubmissions(data);
+    } catch (error) {
+      console.error('Failed to load submissions:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const stats = {
     total: submissions.length,
@@ -288,59 +322,139 @@ export function EditorDashboard() {
     { id: 'a8', action: "Added \"Father's Watch\" to Issue Builder", timestamp: '2026-01-24T14:00:00Z', type: 'issue' },
   ];
 
-  const handleRating = (submissionId: string, rating: number) => {
-    setSubmissions(prev => prev.map(s =>
-      s.id === submissionId ? { ...s, rating } : s
-    ));
+  const handleRating = async (submissionId: string, rating: number) => {
+    try {
+      await rateSubmission(submissionId, rating);
+      setSubmissions(prev => prev.map(s =>
+        s.id === submissionId ? { ...s, rating } : s
+      ));
+    } catch (error) {
+      console.error('Failed to rate submission:', error);
+    }
   };
 
-  const handleAcceptAndPublish = (id: string) => {
+  const handleAcceptAndPublish = async (id: string) => {
     if (!selectedCategory || !wallNumber) return;
-    setSubmissions(prev => prev.map(s =>
-      s.id === id
-        ? { 
-            ...s, 
-            status: 'published', 
-            category: selectedCategory, 
-            wallNumber, 
-            publishedAt: new Date().toISOString(),
-            history: [...s.history, { action: 'Published', timestamp: new Date().toISOString(), user: 'Editor' }]
-          }
-        : s
-    ));
-    setPublishModal(null);
-    setSelectedCategory('');
-    setWallNumber('');
+    try {
+      await updateSubmissionStatus(id, 'published');
+      setSubmissions(prev => prev.map(s =>
+        s.id === id
+          ? { 
+              ...s, 
+              status: 'published', 
+              category: selectedCategory, 
+              wallNumber, 
+              publishedAt: new Date().toISOString(),
+              history: [...s.history, { action: 'Published', timestamp: new Date().toISOString(), user: 'Editor' }]
+            }
+          : s
+      ));
+      setPublishModal(null);
+      setSelectedCategory('');
+      setWallNumber('');
+    } catch (error) {
+      console.error('Failed to publish submission:', error);
+    }
   };
 
-  const handleAddToQueue = (id: string) => {
+  const handleAddToQueue = async (id: string) => {
     if (!scheduledDate || !selectedCategory) return;
-    setSubmissions(prev => prev.map(s =>
-      s.id === id
-        ? { 
-            ...s, 
-            status: 'queued', 
-            scheduledDate, 
-            category: selectedCategory,
-            history: [...s.history, { action: 'Added to Queue', timestamp: new Date().toISOString(), user: 'Editor' }]
-          }
-        : s
-    ));
-    setQueueModal(null);
-    setScheduledDate('');
-    setSelectedCategory('');
+    try {
+      await scheduleSubmission(id, scheduledDate);
+      await updateSubmissionStatus(id, 'queued');
+      setSubmissions(prev => prev.map(s =>
+        s.id === id
+          ? { 
+              ...s, 
+              status: 'queued', 
+              scheduledDate, 
+              category: selectedCategory,
+              history: [...s.history, { action: 'Added to Queue', timestamp: new Date().toISOString(), user: 'Editor' }]
+            }
+          : s
+      ));
+      setQueueModal(null);
+      setScheduledDate('');
+      setSelectedCategory('');
+    } catch (error) {
+      console.error('Failed to add to queue:', error);
+    }
   };
 
-  const handleAddToIssue = (id: string) => {
-    setSubmissions(prev => prev.map(s =>
-      s.id === id 
-        ? { 
-            ...s, 
-            status: 'in_issue',
-            history: [...s.history, { action: 'Added to Issue', timestamp: new Date().toISOString(), user: 'Editor' }]
-          } 
-        : s
-    ));
+  const handleAddToIssue = async (id: string) => {
+    try {
+      await updateSubmissionStatus(id, 'in_issue');
+      setSubmissions(prev => prev.map(s =>
+        s.id === id 
+          ? { 
+              ...s, 
+              status: 'in_issue',
+              history: [...s.history, { action: 'Added to Issue', timestamp: new Date().toISOString(), user: 'Editor' }]
+            } 
+          : s
+      ));
+    } catch (error) {
+      console.error('Failed to add to issue:', error);
+    }
+  };
+
+  const handleGenerateInvite = () => {
+    if (!inviteEmail) return;
+    
+    // Generate unique token
+    const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    
+    // Create invite object
+    const invite = {
+      token,
+      email: inviteEmail,
+      role: inviteRole,
+      used: false,
+      createdAt: new Date().toISOString()
+    };
+    
+    // Store in localStorage
+    const invites = JSON.parse(localStorage.getItem('editor_invites') || '[]');
+    invites.push(invite);
+    localStorage.setItem('editor_invites', JSON.stringify(invites));
+    
+    // Generate invite link
+    const link = `${window.location.origin}/editors?invite=${token}`;
+    setGeneratedInviteLink(link);
+    
+    // Reset form
+    setInviteEmail('');
+  };
+
+  const handleCopyInviteLink = () => {
+    // Fallback copy method that works in all contexts
+    const textArea = document.createElement('textarea');
+    textArea.value = generatedInviteLink;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+      document.execCommand('copy');
+      textArea.remove();
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+      textArea.remove();
+      // Try modern API as fallback
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(generatedInviteLink)
+          .then(() => {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+          })
+          .catch(err => console.error('Clipboard API failed:', err));
+      }
+    }
   };
 
   const handleReject = (id: string) => {
@@ -438,11 +552,20 @@ export function EditorDashboard() {
                 Manage submissions, curate issues, and publish to the gallery.
               </p>
             </div>
-            <div className="text-right">
-              <p className="text-sm text-[#0D0D0D] font-['Inter'] mb-1">{currentDate}</p>
-              <a href="/" className="text-sm text-[#C41E3A] hover:text-[#A01030] transition-colors font-['Inter']">
-                Exit to Gallery →
-              </a>
+            <div className="flex items-center gap-4">
+              <div className="text-right">
+                <p className="text-sm text-[#0D0D0D] font-['Inter'] mb-1">{currentDate}</p>
+                <a href="/" className="text-sm text-[#C41E3A] hover:text-[#A01030] transition-colors font-['Inter']">
+                  Exit to Gallery →
+                </a>
+              </div>
+              <button
+                onClick={() => setInviteModal(true)}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-[#8A9A7B] text-white hover:bg-[#7A8A6B] transition-all font-['Inter'] text-sm font-medium rounded-lg"
+              >
+                <UserPlus className="w-4 h-4" />
+                Invite Editor
+              </button>
             </div>
           </div>
 
@@ -1239,6 +1362,122 @@ export function EditorDashboard() {
           </div>
         );
       })()}
+
+      {/* Invite Editor Modal */}
+      {inviteModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-8 animate-in fade-in duration-300">
+          <div className="bg-white max-w-lg w-full p-8 relative shadow-2xl animate-in slide-in-from-bottom duration-300 rounded-2xl">
+            <button
+              onClick={() => {
+                setInviteModal(false);
+                setGeneratedInviteLink('');
+                setCopied(false);
+              }}
+              className="absolute top-4 right-4 p-2 hover:bg-[#E8E0D8] transition-colors rounded-lg"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 rounded-xl bg-[#8A9A7B]/10 flex items-center justify-center">
+                <UserPlus className="w-6 h-6 text-[#8A9A7B]" />
+              </div>
+              <div>
+                <h3 className="font-['Cardo'] text-2xl text-[#2C1810]">Invite Editor</h3>
+                <p className="text-sm text-[#8B7355] font-['Inter']">Grant access to The Gallery editorial system</p>
+              </div>
+            </div>
+
+            {!generatedInviteLink ? (
+              <div className="space-y-5">
+                <div>
+                  <label className="block text-sm font-medium text-[#2C1810] mb-2 font-['Inter']">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    value={inviteEmail}
+                    onChange={(e) => setInviteEmail(e.target.value)}
+                    placeholder="editor@example.com"
+                    className="w-full px-4 py-3 border-2 border-[#E0D8D0] rounded-xl focus:border-[#8A9A7B] focus:outline-none font-['Inter'] text-sm"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-[#2C1810] mb-2 font-['Inter']">
+                    Role
+                  </label>
+                  <select
+                    value={inviteRole}
+                    onChange={(e) => setInviteRole(e.target.value as 'editor' | 'managing_editor')}
+                    className="w-full px-4 py-3 border-2 border-[#E0D8D0] rounded-xl focus:border-[#8A9A7B] focus:outline-none font-['Inter'] text-sm"
+                  >
+                    <option value="editor">Editor</option>
+                    <option value="managing_editor">Managing Editor</option>
+                  </select>
+                </div>
+
+                <div className="pt-2">
+                  <button
+                    onClick={handleGenerateInvite}
+                    disabled={!inviteEmail}
+                    className="w-full px-6 py-3 bg-[#2C1810] text-white hover:bg-[#1A1A1A] transition-all font-['Cardo'] text-lg tracking-wide disabled:opacity-50 disabled:cursor-not-allowed rounded-xl"
+                  >
+                    Generate Invite Link
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="p-4 bg-[#8A9A7B]/10 border-2 border-[#8A9A7B]/20 rounded-xl">
+                  <p className="text-sm text-[#2C1810] font-['Inter'] mb-2 font-medium">
+                    Invite link generated!
+                  </p>
+                  <p className="text-xs text-[#8B7355] font-['Inter']">
+                    Share this link with the new editor. It can only be used once.
+                  </p>
+                </div>
+
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={generatedInviteLink}
+                    readOnly
+                    className="w-full px-4 py-3 pr-24 border-2 border-[#E0D8D0] rounded-xl bg-[#F5F0EB] font-['Courier_New'] text-xs text-[#2C1810]"
+                  />
+                  <button
+                    onClick={handleCopyInviteLink}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 bg-[#2C1810] text-white hover:bg-[#1A1A1A] transition-all font-['Inter'] text-xs font-medium rounded-lg inline-flex items-center gap-2"
+                  >
+                    {copied ? (
+                      <>
+                        <CheckCircle className="w-3.5 h-3.5" />
+                        Copied!
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" />
+                        Copy
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                <button
+                  onClick={() => {
+                    setGeneratedInviteLink('');
+                    setInviteEmail('');
+                    setCopied(false);
+                  }}
+                  className="w-full px-4 py-2 border-2 border-[#E0D8D0] text-[#2C1810] hover:bg-[#F5F0EB] transition-all font-['Inter'] text-sm rounded-xl"
+                >
+                  Generate Another Invite
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

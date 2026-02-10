@@ -22,17 +22,11 @@ export function GalleryFooter({ variant = 'light' }: GalleryFooterProps) {
             </div>
           </div>
           <nav className="flex gap-8 font-['Courier_New'] text-sm">
+            <a href="/collection-gallery" className="hover:text-[#E11D48] hover:underline transition-all">
+              The Collection
+            </a>
             <a href="/about" className="hover:text-[#E11D48] hover:underline transition-all">
               About
-            </a>
-            <a href="/submit" className="hover:text-[#E11D48] hover:underline transition-all">
-              Submit
-            </a>
-            <a href="/pricing" className="hover:text-[#E11D48] hover:underline transition-all">
-              Pricing
-            </a>
-            <a href="#" className="hover:text-[#E11D48] hover:underline transition-all">
-              Contact
             </a>
           </nav>
         </div>

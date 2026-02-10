@@ -424,8 +424,399 @@ app.get(
   }
 );
 
-// ============ SUBMISSIONS ROUTES ============
+// ============ EDITOR SUBMISSION ROUTES ============
 
+// Get all submissions (with filtering and search)
+app.get(
+  "/make-server-07dc516a/editor/submissions",
+  requireAuth,
+  requireEditor,
+  async (c: AuthContext) => {
+    try {
+      const { status, search, sort } = c.req.query();
+      
+      // Get all submission IDs
+      const submissionIds = await kv.get('submissions:all') || [];
+      
+      // Fetch all submissions
+      const submissions = [];
+      for (const id of submissionIds) {
+        const submission = await kv.get(`submission:${id}`);
+        if (submission) {
+          submissions.push(submission);
+        }
+      }
+      
+      // Apply filters
+      let filtered = submissions;
+      
+      if (status && status !== 'all') {
+        filtered = filtered.filter(s => s.status === status);
+      }
+      
+      if (search) {
+        const query = search.toLowerCase();
+        filtered = filtered.filter(s => 
+          s.title?.toLowerCase().includes(query) ||
+          s.authorName?.toLowerCase().includes(query) ||
+          s.content?.toLowerCase().includes(query)
+        );
+      }
+      
+      // Apply sorting
+      if (sort === 'title') {
+        filtered.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+      } else if (sort === 'rating') {
+        filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+      } else {
+        // Default: sort by date (newest first)
+        filtered.sort((a, b) => 
+          new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime()
+        );
+      }
+      
+      logInfo('editor:list-submissions', `Fetched ${filtered.length} submissions (filtered from ${submissions.length})`);
+      
+      return successResponse(c, { submissions: filtered });
+    } catch (err: any) {
+      logError('editor:list-submissions', err);
+      return errorResponse(c, 'Failed to fetch submissions', 'INTERNAL_ERROR', 500);
+    }
+  }
+);
+
+// Get single submission
+app.get(
+  "/make-server-07dc516a/editor/submissions/:id",
+  requireAuth,
+  requireEditor,
+  async (c: AuthContext) => {
+    try {
+      const id = c.req.param('id');
+      const submission = await kv.get(`submission:${id}`);
+      
+      if (!submission) {
+        return errorResponse(c, 'Submission not found', 'NOT_FOUND', 404);
+      }
+      
+      return successResponse(c, { submission });
+    } catch (err: any) {
+      logError('editor:get-submission', err);
+      return errorResponse(c, 'Failed to fetch submission', 'INTERNAL_ERROR', 500);
+    }
+  }
+);
+
+// Update submission status
+app.put(
+  "/make-server-07dc516a/editor/submissions/:id/status",
+  requireAuth,
+  requireEditor,
+  async (c: AuthContext) => {
+    try {
+      const id = c.req.param('id');
+      const body = await c.req.json();
+      const { status, notes } = body;
+      
+      // Validate status
+      const validStatuses = ['pending', 'queued', 'in_issue', 'published', 'revisions_requested', 'rejected'];
+      if (!validStatuses.includes(status)) {
+        return validationErrorResponse(c, ['Invalid status value']);
+      }
+      
+      const submission = await kv.get(`submission:${id}`);
+      if (!submission) {
+        return errorResponse(c, 'Submission not found', 'NOT_FOUND', 404);
+      }
+      
+      // Update submission
+      submission.status = status;
+      if (notes !== undefined) {
+        submission.internalNotes = sanitizeString(notes);
+      }
+      
+      // Add history entry
+      submission.history = submission.history || [];
+      submission.history.push({
+        action: `Status changed to ${status}`,
+        timestamp: new Date().toISOString(),
+        user: c.user!.email || 'Editor'
+      });
+      
+      await kv.set(`submission:${id}`, submission);
+      
+      logInfo('editor:update-status', `Updated submission ${id} to ${status}`);
+      
+      return successResponse(c, { submission });
+    } catch (err: any) {
+      logError('editor:update-status', err);
+      return errorResponse(c, 'Failed to update status', 'INTERNAL_ERROR', 500);
+    }
+  }
+);
+
+// Update internal notes
+app.put(
+  "/make-server-07dc516a/editor/submissions/:id/notes",
+  requireAuth,
+  requireEditor,
+  async (c: AuthContext) => {
+    try {
+      const id = c.req.param('id');
+      const body = await c.req.json();
+      const { notes } = body;
+      
+      const submission = await kv.get(`submission:${id}`);
+      if (!submission) {
+        return errorResponse(c, 'Submission not found', 'NOT_FOUND', 404);
+      }
+      
+      submission.internalNotes = sanitizeString(notes || '');
+      
+      // Add history entry
+      submission.history = submission.history || [];
+      submission.history.push({
+        action: 'Internal notes updated',
+        timestamp: new Date().toISOString(),
+        user: c.user!.email || 'Editor'
+      });
+      
+      await kv.set(`submission:${id}`, submission);
+      
+      return successResponse(c, { submission });
+    } catch (err: any) {
+      logError('editor:update-notes', err);
+      return errorResponse(c, 'Failed to update notes', 'INTERNAL_ERROR', 500);
+    }
+  }
+);
+
+// Update rating
+app.put(
+  "/make-server-07dc516a/editor/submissions/:id/rating",
+  requireAuth,
+  requireEditor,
+  async (c: AuthContext) => {
+    try {
+      const id = c.req.param('id');
+      const body = await c.req.json();
+      const { rating } = body;
+      
+      // Validate rating
+      if (typeof rating !== 'number' || rating < 0 || rating > 5) {
+        return validationErrorResponse(c, ['Rating must be between 0 and 5']);
+      }
+      
+      const submission = await kv.get(`submission:${id}`);
+      if (!submission) {
+        return errorResponse(c, 'Submission not found', 'NOT_FOUND', 404);
+      }
+      
+      submission.rating = rating;
+      
+      // Add history entry
+      submission.history = submission.history || [];
+      submission.history.push({
+        action: `Rated ${rating} stars`,
+        timestamp: new Date().toISOString(),
+        user: c.user!.email || 'Editor'
+      });
+      
+      await kv.set(`submission:${id}`, submission);
+      
+      return successResponse(c, { submission });
+    } catch (err: any) {
+      logError('editor:update-rating', err);
+      return errorResponse(c, 'Failed to update rating', 'INTERNAL_ERROR', 500);
+    }
+  }
+);
+
+// Schedule submission
+app.put(
+  "/make-server-07dc516a/editor/submissions/:id/schedule",
+  requireAuth,
+  requireManagingEditor,
+  async (c: AuthContext) => {
+    try {
+      const id = c.req.param('id');
+      const body = await c.req.json();
+      const { scheduledDate, category } = body;
+      
+      if (!scheduledDate) {
+        return validationErrorResponse(c, ['scheduledDate is required']);
+      }
+      
+      const submission = await kv.get(`submission:${id}`);
+      if (!submission) {
+        return errorResponse(c, 'Submission not found', 'NOT_FOUND', 404);
+      }
+      
+      submission.scheduledDate = scheduledDate;
+      if (category) {
+        submission.category = sanitizeString(category);
+      }
+      
+      // Add history entry
+      submission.history = submission.history || [];
+      submission.history.push({
+        action: `Scheduled for ${scheduledDate}`,
+        timestamp: new Date().toISOString(),
+        user: c.user!.email || 'Managing Editor'
+      });
+      
+      await kv.set(`submission:${id}`, submission);
+      
+      return successResponse(c, { submission });
+    } catch (err: any) {
+      logError('editor:schedule', err);
+      return errorResponse(c, 'Failed to schedule submission', 'INTERNAL_ERROR', 500);
+    }
+  }
+);
+
+// Request revisions
+app.post(
+  "/make-server-07dc516a/editor/submissions/:id/revisions",
+  requireAuth,
+  requireEditor,
+  async (c: AuthContext) => {
+    try {
+      const id = c.req.param('id');
+      const body = await c.req.json();
+      const { feedback } = body;
+      
+      if (!feedback) {
+        return validationErrorResponse(c, ['feedback is required']);
+      }
+      
+      const submission = await kv.get(`submission:${id}`);
+      if (!submission) {
+        return errorResponse(c, 'Submission not found', 'NOT_FOUND', 404);
+      }
+      
+      submission.status = 'revisions_requested';
+      submission.feedback = feedback;
+      
+      // Add history entry
+      submission.history = submission.history || [];
+      submission.history.push({
+        action: 'Revisions requested',
+        timestamp: new Date().toISOString(),
+        user: c.user!.email || 'Editor'
+      });
+      
+      await kv.set(`submission:${id}`, submission);
+      
+      // TODO: Send notification to author (when notification system is implemented)
+      
+      logInfo('editor:request-revisions', `Requested revisions for submission ${id}`);
+      
+      return successResponse(c, { submission });
+    } catch (err: any) {
+      logError('editor:request-revisions', err);
+      return errorResponse(c, 'Failed to request revisions', 'INTERNAL_ERROR', 500);
+    }
+  }
+);
+
+// Get submission history
+app.get(
+  "/make-server-07dc516a/editor/submissions/:id/history",
+  requireAuth,
+  requireEditor,
+  async (c: AuthContext) => {
+    try {
+      const id = c.req.param('id');
+      const submission = await kv.get(`submission:${id}`);
+      
+      if (!submission) {
+        return errorResponse(c, 'Submission not found', 'NOT_FOUND', 404);
+      }
+      
+      return successResponse(c, { history: submission.history || [] });
+    } catch (err: any) {
+      logError('editor:get-history', err);
+      return errorResponse(c, 'Failed to fetch history', 'INTERNAL_ERROR', 500);
+    }
+  }
+);
+
+// Assign editor to submission
+app.post(
+  "/make-server-07dc516a/editor/submissions/:id/assign",
+  requireAuth,
+  requireManagingEditor,
+  async (c: AuthContext) => {
+    try {
+      const id = c.req.param('id');
+      const body = await c.req.json();
+      const { editorId } = body;
+      
+      if (!editorId) {
+        return validationErrorResponse(c, ['editorId is required']);
+      }
+      
+      const submission = await kv.get(`submission:${id}`);
+      if (!submission) {
+        return errorResponse(c, 'Submission not found', 'NOT_FOUND', 404);
+      }
+      
+      submission.assignedTo = editorId;
+      
+      // Add history entry
+      submission.history = submission.history || [];
+      submission.history.push({
+        action: `Assigned to editor ${editorId}`,
+        timestamp: new Date().toISOString(),
+        user: c.user!.email || 'Managing Editor'
+      });
+      
+      await kv.set(`submission:${id}`, submission);
+      
+      return successResponse(c, { submission });
+    } catch (err: any) {
+      logError('editor:assign', err);
+      return errorResponse(c, 'Failed to assign editor', 'INTERNAL_ERROR', 500);
+    }
+  }
+);
+
+// Get dashboard statistics
+app.get(
+  "/make-server-07dc516a/editor/stats",
+  requireAuth,
+  requireEditor,
+  async (c: AuthContext) => {
+    try {
+      const submissionIds = await kv.get('submissions:all') || [];
+      
+      const submissions = [];
+      for (const id of submissionIds) {
+        const submission = await kv.get(`submission:${id}`);
+        if (submission) {
+          submissions.push(submission);
+        }
+      }
+      
+      const stats = {
+        totalSubmissions: submissions.length,
+        pendingCount: submissions.filter(s => s.status === 'pending').length,
+        queuedCount: submissions.filter(s => s.status === 'queued').length,
+        publishedCount: submissions.filter(s => s.status === 'published').length,
+        inIssueCount: submissions.filter(s => s.status === 'in_issue').length,
+        revisionsCount: submissions.filter(s => s.status === 'revisions_requested').length,
+      };
+      
+      return successResponse(c, { stats });
+    } catch (err: any) {
+      logError('editor:stats', err);
+      return errorResponse(c, 'Failed to fetch stats', 'INTERNAL_ERROR', 500);
+    }
+  }
+);
+
+// Create new submission (writers submit their work)
 app.post(
   "/make-server-07dc516a/submissions",
   rateLimit({ requests: 10, windowMs: 60000, keyPrefix: 'create_submission' }),
@@ -433,506 +824,50 @@ app.post(
   async (c: AuthContext) => {
     try {
       const body = await c.req.json();
+      const { title, content, type } = body;
       
-      const validationErrors = validateRequired({
-        draftId: body.draftId,
-      });
-      if (validationErrors.length > 0) {
-        return validationErrorResponse(c, validationErrors);
+      // Validate required fields
+      if (!title || !content || !type) {
+        return validationErrorResponse(c, ['title, content, and type are required']);
       }
-
-      const { draftId, openCallId } = body;
-      
-      const draft = await kv.get(`draft:${draftId}`);
-      if (!draft || draft.userId !== c.user!.id) {
-        return errorResponse(c, 'Draft not found or unauthorized', 'NOT_FOUND', 404);
-      }
-
-      const room = await kv.get(`room:${c.user!.id}`);
       
       const submissionId = crypto.randomUUID();
       const submission = {
         id: submissionId,
-        draftId,
         userId: c.user!.id,
-        authorName: room?.writerName || 'Unknown',
-        title: draft.title,
-        content: draft.content,
-        type: draft.type,
+        authorName: c.user!.user_metadata?.name || c.user!.email || 'Anonymous',
+        title: sanitizeString(title),
+        content: sanitizeString(content),
+        type: sanitizeString(type),
         status: 'pending',
-        openCallId: openCallId || null,
-        editorNotes: '',
         submittedAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        rating: 0,
+        internalNotes: '',
+        history: [
+          {
+            action: 'Submitted',
+            timestamp: new Date().toISOString(),
+            user: c.user!.user_metadata?.name || c.user!.email || 'Anonymous'
+          }
+        ]
       };
-
+      
+      // Store submission
       await kv.set(`submission:${submissionId}`, submission);
       
-      const allSubmissions = await kv.get('all_submissions') || [];
-      allSubmissions.unshift(submissionId);
-      await kv.set('all_submissions', allSubmissions);
+      // Add to submissions list
+      const allSubmissions = await kv.get('submissions:all') || [];
+      allSubmissions.push(submissionId);
+      await kv.set('submissions:all', allSubmissions);
       
-      const userSubmissions = await kv.get(`user_submissions:${c.user!.id}`) || [];
-      userSubmissions.unshift(submissionId);
-      await kv.set(`user_submissions:${c.user!.id}`, userSubmissions);
-
-      logInfo('submissions:create', `Submission created: ${submissionId}`);
-
-      return successResponse(c, submission, undefined, 201);
+      logInfo('submissions:create', `Created submission ${submissionId} by ${c.user!.id}`);
+      
+      return successResponse(c, { submission }, undefined, 201);
     } catch (err: any) {
       logError('submissions:create', err);
-      return errorResponse(c, 'Failed to submit', 'INTERNAL_ERROR', 500);
+      return errorResponse(c, 'Failed to create submission', 'INTERNAL_ERROR', 500);
     }
   }
 );
-
-app.get(
-  "/make-server-07dc516a/submissions",
-  requireAuth,
-  requireEditor,
-  async (c: AuthContext) => {
-    try {
-      const limit = c.req.query('limit');
-      const offset = c.req.query('offset');
-      
-      const { limit: parsedLimit, offset: parsedOffset, errors } = validatePagination(limit, offset);
-      if (errors.length > 0) {
-        return validationErrorResponse(c, errors);
-      }
-
-      const submissionIds = await kv.get('all_submissions') || [];
-      const submissions = [];
-      
-      for (const id of submissionIds) {
-        const submission = await kv.get(`submission:${id}`);
-        if (submission) submissions.push(submission);
-      }
-
-      const { items, total } = paginate(submissions, parsedOffset, parsedLimit);
-
-      return successResponse(c, items, {
-        offset: parsedOffset,
-        limit: parsedLimit,
-        total,
-      });
-    } catch (err: any) {
-      logError('submissions:list', err);
-      return errorResponse(c, 'Failed to fetch submissions', 'INTERNAL_ERROR', 500);
-    }
-  }
-);
-
-app.put(
-  "/make-server-07dc516a/submissions/:submissionId",
-  rateLimit({ requests: 30, windowMs: 60000, keyPrefix: 'update_submission' }),
-  requireAuth,
-  requireEditor,
-  async (c: AuthContext) => {
-    try {
-      const submissionId = c.req.param('submissionId');
-      const updates = await c.req.json();
-      
-      const submission = await kv.get(`submission:${submissionId}`);
-      if (!submission) {
-        return errorResponse(c, 'Submission not found', 'NOT_FOUND', 404);
-      }
-
-      const updatedSubmission = {
-        ...submission,
-        ...updates,
-        updatedAt: new Date().toISOString(),
-      };
-      
-      await kv.set(`submission:${submissionId}`, updatedSubmission);
-
-      // Log activity
-      const activityId = crypto.randomUUID();
-      const activity = {
-        id: activityId,
-        editorId: c.user!.id,
-        editorName: c.user!.user_metadata?.name || 'Editor',
-        action: `Updated "${submission.title}" to ${updates.status || 'updated'}`,
-        submissionId,
-        timestamp: new Date().toISOString(),
-      };
-      
-      await kv.set(`activity:${activityId}`, activity);
-      
-      const allActivities = await kv.get('all_activities') || [];
-      allActivities.unshift(activityId);
-      await kv.set('all_activities', allActivities.slice(0, 50));
-
-      logInfo('submissions:update', `Submission updated: ${submissionId}`);
-
-      return successResponse(c, updatedSubmission);
-    } catch (err: any) {
-      logError('submissions:update', err);
-      return errorResponse(c, 'Failed to update submission', 'INTERNAL_ERROR', 500);
-    }
-  }
-);
-
-// ============ ISSUES ROUTES ============
-
-app.post(
-  "/make-server-07dc516a/issues",
-  rateLimit({ requests: 10, windowMs: 60000, keyPrefix: 'create_issue' }),
-  requireAuth,
-  requireEditor,
-  async (c: AuthContext) => {
-    try {
-      const body = await c.req.json();
-      
-      const validationErrors = validateRequired({
-        title: body.title,
-        issueNumber: body.issueNumber,
-      });
-      if (validationErrors.length > 0) {
-        return validationErrorResponse(c, validationErrors);
-      }
-
-      const { title, issueNumber, season, coverNote, sections } = body;
-      
-      const issueId = crypto.randomUUID();
-      const issue = {
-        id: issueId,
-        title: sanitizeString(title),
-        issueNumber,
-        season: sanitizeString(season || ''),
-        coverNote: sanitizeString(coverNote || ''),
-        sections: sections || [],
-        published: false,
-        publishedAt: null,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-
-      await kv.set(`issue:${issueId}`, issue);
-      
-      const allIssues = await kv.get('all_issues') || [];
-      allIssues.unshift(issueId);
-      await kv.set('all_issues', allIssues);
-
-      logInfo('issues:create', `Issue created: ${issueId}`);
-
-      return successResponse(c, issue, undefined, 201);
-    } catch (err: any) {
-      logError('issues:create', err);
-      return errorResponse(c, 'Failed to create issue', 'INTERNAL_ERROR', 500);
-    }
-  }
-);
-
-app.get("/make-server-07dc516a/issues", async (c) => {
-  try {
-    const issueIds = await kv.get('all_issues') || [];
-    const issues = [];
-    
-    for (const id of issueIds) {
-      const issue = await kv.get(`issue:${id}`);
-      if (issue) issues.push(issue);
-    }
-
-    return successResponse(c, issues);
-  } catch (err: any) {
-    logError('issues:list', err);
-    return errorResponse(c, 'Failed to fetch issues', 'INTERNAL_ERROR', 500);
-  }
-});
-
-app.get("/make-server-07dc516a/issues/current", async (c) => {
-  try {
-    const issueIds = await kv.get('all_issues') || [];
-    
-    for (const id of issueIds) {
-      const issue = await kv.get(`issue:${id}`);
-      if (issue && issue.published) {
-        return successResponse(c, issue);
-      }
-    }
-
-    return successResponse(c, null);
-  } catch (err: any) {
-    logError('issues:current', err);
-    return errorResponse(c, 'Failed to fetch current issue', 'INTERNAL_ERROR', 500);
-  }
-});
-
-app.put(
-  "/make-server-07dc516a/issues/:issueId",
-  rateLimit({ requests: 30, windowMs: 60000, keyPrefix: 'update_issue' }),
-  requireAuth,
-  requireEditor,
-  async (c: AuthContext) => {
-    try {
-      const issueId = c.req.param('issueId');
-      const updates = await c.req.json();
-      
-      const issue = await kv.get(`issue:${issueId}`);
-      if (!issue) {
-        return errorResponse(c, 'Issue not found', 'NOT_FOUND', 404);
-      }
-
-      const updatedIssue = {
-        ...issue,
-        ...updates,
-        updatedAt: new Date().toISOString(),
-        publishedAt: updates.published && !issue.published ? new Date().toISOString() : issue.publishedAt,
-      };
-      
-      await kv.set(`issue:${issueId}`, updatedIssue);
-
-      logInfo('issues:update', `Issue updated: ${issueId}`);
-
-      return successResponse(c, updatedIssue);
-    } catch (err: any) {
-      logError('issues:update', err);
-      return errorResponse(c, 'Failed to update issue', 'INTERNAL_ERROR', 500);
-    }
-  }
-);
-
-// ============ OPEN CALLS ROUTES ============
-
-app.post(
-  "/make-server-07dc516a/open-calls",
-  rateLimit({ requests: 10, windowMs: 60000, keyPrefix: 'create_open_call' }),
-  requireAuth,
-  requireEditor,
-  async (c: AuthContext) => {
-    try {
-      const body = await c.req.json();
-      
-      const validationErrors = validateRequired({
-        title: body.title,
-        theme: body.theme,
-      });
-      if (validationErrors.length > 0) {
-        return validationErrorResponse(c, validationErrors);
-      }
-
-      const { title, theme, description, deadline, guidelines } = body;
-      
-      const openCallId = crypto.randomUUID();
-      const openCall = {
-        id: openCallId,
-        title: sanitizeString(title),
-        theme: sanitizeString(theme),
-        description: sanitizeString(description || ''),
-        deadline,
-        guidelines: sanitizeString(guidelines || ''),
-        active: true,
-        createdAt: new Date().toISOString(),
-      };
-
-      await kv.set(`open_call:${openCallId}`, openCall);
-      
-      const allOpenCalls = await kv.get('all_open_calls') || [];
-      allOpenCalls.unshift(openCallId);
-      await kv.set('all_open_calls', allOpenCalls);
-
-      logInfo('openCalls:create', `Open call created: ${openCallId}`);
-
-      return successResponse(c, openCall, undefined, 201);
-    } catch (err: any) {
-      logError('openCalls:create', err);
-      return errorResponse(c, 'Failed to create open call', 'INTERNAL_ERROR', 500);
-    }
-  }
-);
-
-app.get("/make-server-07dc516a/open-calls", async (c) => {
-  try {
-    const openCallIds = await kv.get('all_open_calls') || [];
-    const openCalls = [];
-    
-    for (const id of openCallIds) {
-      const openCall = await kv.get(`open_call:${id}`);
-      if (openCall && openCall.active) {
-        openCalls.push(openCall);
-      }
-    }
-
-    return successResponse(c, openCalls);
-  } catch (err: any) {
-    logError('openCalls:list', err);
-    return errorResponse(c, 'Failed to fetch open calls', 'INTERNAL_ERROR', 500);
-  }
-});
-
-// ============ FEATURED ROOMS ROUTES ============
-
-app.post(
-  "/make-server-07dc516a/featured",
-  rateLimit({ requests: 10, windowMs: 60000, keyPrefix: 'create_featured' }),
-  requireAuth,
-  requireEditor,
-  async (c: AuthContext) => {
-    try {
-      const body = await c.req.json();
-      
-      const validationErrors = validateRequired({
-        userId: body.userId,
-        editorial: body.editorial,
-      });
-      if (validationErrors.length > 0) {
-        return validationErrorResponse(c, validationErrors);
-      }
-
-      const { userId, editorial } = body;
-      
-      const featuredId = crypto.randomUUID();
-      const featured = {
-        id: featuredId,
-        userId,
-        editorial: sanitizeString(editorial),
-        featuredAt: new Date().toISOString(),
-      };
-
-      await kv.set(`featured:${featuredId}`, featured);
-      
-      const allFeatured = await kv.get('all_featured') || [];
-      allFeatured.unshift(featuredId);
-      await kv.set('all_featured', allFeatured.slice(0, 3));
-
-      logInfo('featured:create', `Room featured: ${userId}`);
-
-      return successResponse(c, featured, undefined, 201);
-    } catch (err: any) {
-      logError('featured:create', err);
-      return errorResponse(c, 'Failed to feature room', 'INTERNAL_ERROR', 500);
-    }
-  }
-);
-
-app.get("/make-server-07dc516a/featured", async (c) => {
-  try {
-    const featuredIds = await kv.get('all_featured') || [];
-    const featured = [];
-    
-    for (const id of featuredIds) {
-      const item = await kv.get(`featured:${id}`);
-      if (item) {
-        const room = await kv.get(`room:${item.userId}`);
-        featured.push({ ...item, room });
-      }
-    }
-
-    return successResponse(c, featured);
-  } catch (err: any) {
-    logError('featured:list', err);
-    return errorResponse(c, 'Failed to fetch featured rooms', 'INTERNAL_ERROR', 500);
-  }
-});
-
-// ============ ACTIVITIES ROUTES ============
-
-app.get(
-  "/make-server-07dc516a/activities",
-  requireAuth,
-  requireEditor,
-  async (c: AuthContext) => {
-    try {
-      const activityIds = await kv.get('all_activities') || [];
-      const activities = [];
-      
-      for (const id of activityIds) {
-        const activity = await kv.get(`activity:${id}`);
-        if (activity) activities.push(activity);
-      }
-
-      return successResponse(c, activities);
-    } catch (err: any) {
-      logError('activities:list', err);
-      return errorResponse(c, 'Failed to fetch activities', 'INTERNAL_ERROR', 500);
-    }
-  }
-);
-
-// ============ DISCOVERY ROUTES (legacy compatibility) ============
-
-app.get("/make-server-07dc516a/discover/rooms", async (c) => {
-  try {
-    const allRooms = await kv.getByPrefix('room:');
-    
-    const rooms = allRooms.map(room => ({
-      id: room.id,
-      writerName: room.writerName,
-      bio: room.bio,
-      atmosphere: room.atmosphere,
-    }));
-
-    return successResponse(c, rooms);
-  } catch (err: any) {
-    logError('discover:rooms', err);
-    return errorResponse(c, 'Failed to fetch rooms', 'INTERNAL_ERROR', 500);
-  }
-});
-
-// ============ MARGINALIA ROUTES (legacy compatibility) ============
-
-app.post(
-  "/make-server-07dc516a/marginalia",
-  requireAuth,
-  async (c: AuthContext) => {
-    try {
-      const body = await c.req.json();
-      
-      const validationErrors = validateRequired({
-        pieceId: body.pieceId,
-        selectedText: body.selectedText,
-        note: body.note,
-      });
-      if (validationErrors.length > 0) {
-        return validationErrorResponse(c, validationErrors);
-      }
-
-      const { pieceId, selectedText, note, position } = body;
-      
-      const marginaliaId = crypto.randomUUID();
-      const marginalia = {
-        id: marginaliaId,
-        pieceId,
-        userId: c.user!.id,
-        selectedText: sanitizeString(selectedText),
-        note: sanitizeString(note),
-        position: position || 0,
-        isPublic: false,
-        createdAt: new Date().toISOString(),
-      };
-
-      await kv.set(`marginalia:${marginaliaId}`, marginalia);
-      
-      const pieceMarginalia = await kv.get(`piece_marginalia:${pieceId}`) || [];
-      pieceMarginalia.push(marginaliaId);
-      await kv.set(`piece_marginalia:${pieceId}`, pieceMarginalia);
-
-      return successResponse(c, marginalia, undefined, 201);
-    } catch (err: any) {
-      logError('marginalia:create', err);
-      return errorResponse(c, 'Failed to add marginalia', 'INTERNAL_ERROR', 500);
-    }
-  }
-);
-
-app.get("/make-server-07dc516a/marginalia/piece/:pieceId", async (c) => {
-  try {
-    const pieceId = c.req.param('pieceId');
-    const marginaliaIds = await kv.get(`piece_marginalia:${pieceId}`) || [];
-    
-    const marginalia = [];
-    for (const id of marginaliaIds) {
-      const note = await kv.get(`marginalia:${id}`);
-      if (note && note.isPublic) {
-        marginalia.push(note);
-      }
-    }
-
-    return successResponse(c, marginalia);
-  } catch (err: any) {
-    logError('marginalia:get', err);
-    return errorResponse(c, 'Failed to fetch marginalia', 'INTERNAL_ERROR', 500);
-  }
-});
 
 } // end registerAdditionalRoutes

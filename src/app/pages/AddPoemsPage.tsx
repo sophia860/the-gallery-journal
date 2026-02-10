@@ -188,7 +188,7 @@ export function AddPoemsPage() {
                 title: poem.title,
                 openingNote: `by Nix Carlson
 
-Nix Carlson (she/they) is a queer, polyamorous, and neurodivergent poet and sign language interpreter based in Lexington, KY, with strong ties to Milwaukee, WI. Their work has appeared or is forthcoming in Wildscape, Voicemail Poems, Orange Rose, Vellichor Literary, Broken Stone Review, Coming Up Short, and Eunoia Review, among others.`,
+Nix Carlson (she/they) is a queer, polyamorous, and neurodivergent poet and sign language interpreter based in Lexington, KY, with strong ties to Milwaukee, WI. Their work has appeared or is forthcoming in Wildscape, Voicemail Poems, Orange Rose, Vellichor Literary, Broken Stone Review, Coming Up Short, and Eunoia Review, among others. You can find them on Instagram at @bynixec.`,
                 pieces: [
                   {
                     id: crypto.randomUUID(),
@@ -247,10 +247,7 @@ Nix Carlson (she/they) is a queer, polyamorous, and neurodivergent poet and sign
             About Nix Carlson
           </h2>
           <p className="font-[family-name:var(--font-ui)] text-sm text-[#8B7355] leading-relaxed mb-4">
-            Nix Carlson (she/they) is a queer, polyamorous, and neurodivergent poet and sign language interpreter based in Lexington, KY, with strong ties to Milwaukee, WI. Their work has appeared or is forthcoming in Wildscape, Voicemail Poems, Orange Rose, Vellichor Literary, Broken Stone Review, Coming Up Short, and Eunoia Review, among others.
-          </p>
-          <p className="font-[family-name:var(--font-ui)] text-sm text-[#8B7355]">
-            Instagram: @bynixec
+            Nix Carlson (she/they) is a queer, polyamorous, and neurodivergent poet and sign language interpreter based in Lexington, KY, with strong ties to Milwaukee, WI. Their work has appeared or is forthcoming in Wildscape, Voicemail Poems, Orange Rose, Vellichor Literary, Broken Stone Review, Coming Up Short, and Eunoia Review, among others. You can find them on Instagram at @bynixec.
           </p>
         </div>
 

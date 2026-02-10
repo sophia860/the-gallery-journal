@@ -18,30 +18,30 @@ interface PricingTier {
 
 const tiers: PricingTier[] = [
   {
-    id: 'reader',
-    name: 'Reader',
+    id: 'community',
+    name: 'Community',
     price: 0,
     interval: 'month',
-    description: 'For those who love to discover great writing',
+    description: 'Read, discover, and share your work',
     features: [
       'Access to The Collection Gallery',
+      '3 free submissions/month',
       'Read all published works',
       'Follow favorite writers',
       'Bookmark pieces',
-      '3 free submissions/month',
       'Monthly newsletter',
     ],
-    cta: 'Start Reading',
+    cta: 'Join Free',
     icon: <BookOpen className="w-6 h-6" />,
   },
   {
-    id: 'writer',
-    name: 'Writer',
+    id: 'member',
+    name: 'Member',
     price: 12,
     interval: 'month',
-    description: 'For writers ready to share their voice',
+    description: 'Go deeper with your craft and community',
     features: [
-      'Everything in Reader',
+      'Everything in Community',
       'Your own Writer\'s Studio',
       'Unlimited submissions',
       'Priority editorial response',
@@ -50,7 +50,7 @@ const tiers: PricingTier[] = [
       'Gallery Wall publication',
       'Analytics dashboard',
     ],
-    cta: 'Start Writing',
+    cta: 'Become a Member',
     popular: true,
     icon: <Sparkles className="w-6 h-6" />,
   },
@@ -59,9 +59,9 @@ const tiers: PricingTier[] = [
     name: 'Patron',
     price: 30,
     interval: 'month',
-    description: 'Support the literary arts & get exclusive access',
+    description: 'Champion the literary arts and fellow writers',
     features: [
-      'Everything in Writer',
+      'Everything in Member',
       'Unlimited submissions',
       'Priority editorial response',
       'Quarterly editorial feedback',
@@ -145,10 +145,10 @@ export function PricingPage() {
       <section className="pt-40 pb-20 px-8">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="font-['Cardo'] text-7xl text-[#2C1810] mb-6 italic">
-            Invest in Literary Excellence
+            Everyone Has a Voice
           </h1>
           <p className="font-['Libre_Baskerville'] text-xl text-[#8B7355] leading-relaxed max-w-2xl mx-auto">
-            Choose the plan that supports your creative journey. Every membership supports writers and keeps the literary arts thriving.
+            Join our literary community for free. Submit your work, discover great writing, and connect with fellow readers and writers. Memberships support deeper involvement—not access.
           </p>
         </div>
       </section>
@@ -195,8 +195,10 @@ export function PricingPage() {
               }`}
             >
               {tier.popular && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#E11D48] text-white px-4 py-1 rounded-full text-xs font-['Courier_New'] tracking-wider">
-                  MOST POPULAR
+                <div className="mb-3 text-center">
+                  <span className="text-xs text-[#8B7355] font-[family-name:var(--font-ui)] italic">
+                    Most chosen by writers
+                  </span>
                 </div>
               )}
 
@@ -329,10 +331,10 @@ export function PricingPage() {
         <div className="space-y-6">
           <div className="bg-white border border-[#E0D8D0] rounded-lg p-6">
             <h3 className="font-['Cardo'] text-xl text-[#2C1810] mb-2">
-              Can I switch plans anytime?
+              Can everyone really submit for free?
             </h3>
             <p className="font-[family-name:var(--font-ui)] text-sm text-[#8B7355] leading-relaxed">
-              Yes! Upgrade or downgrade at any time. Changes take effect immediately, and we'll prorate any differences.
+              Yes! Every community member gets 3 free submissions per month. Paid memberships simply add unlimited submissions and faster editorial responses—they're about going deeper, not getting access.
             </p>
           </div>
 

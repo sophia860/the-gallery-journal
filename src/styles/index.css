@@ -4,34 +4,24 @@
 @import './design-system.css';
 @import './components.css';
 
-/* Global styles - Sleep Well Creatives aesthetic */
+/* Global styles - Dual System: Gallery + Garden */
 body {
   background-color: #F5F0E8;
-  cursor: default;
-  font-family: 'Inter', sans-serif;
+  color: #1B1B8F;
+  font-family: 'Cardo', serif;
 }
 
-/* Override cursor for interactive elements */
-button, a {
-  cursor: pointer;
+/* Headings in Cardo */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Cardo', serif;
 }
 
-input[type="text"], 
-input[type="email"], 
-input[type="password"], 
-input[type="search"], 
-textarea {
-  cursor: text;
+/* Nav, labels, buttons, inputs in Courier New */
+nav, button, input, textarea, select, label {
+  font-family: 'Courier New', monospace;
 }
 
-/* Clean, no shadows anywhere */
+/* Clean design */
 * {
   box-shadow: none !important;
-}
-
-/* Headings in Playfair Display italic */
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Playfair Display', serif;
-  font-style: italic;
-  font-weight: 400;
 }

@@ -51,6 +51,13 @@ export function GalleryNav({ currentPage = '', variant = 'light' }: GalleryNavPr
             <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#E11D48] group-hover:w-full transition-all duration-300"></span>
           </a>
           <a 
+            href="/meet-the-page" 
+            className={`${linkColor} ${linkHover} transition-all relative group ${isActive('meet-the-page') ? activeColor : ''}`}
+          >
+            The Page
+            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#E11D48] group-hover:w-full transition-all duration-300"></span>
+          </a>
+          <a 
             href="/community-wall" 
             className={`${linkColor} ${linkHover} transition-all relative group flex items-center gap-1.5 ${isActive('community') ? activeColor : ''}`}
           >
@@ -140,6 +147,13 @@ export function GalleryNav({ currentPage = '', variant = 'light' }: GalleryNavPr
               onClick={() => setMobileMenuOpen(false)}
             >
               The Collection
+            </a>
+            <a 
+              href="/meet-the-page" 
+              className={`block py-2 ${linkColor} ${linkHover} transition-colors ${isActive('meet-the-page') ? activeColor : ''}`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              The Page
             </a>
             <div className="block py-2">
               <a 

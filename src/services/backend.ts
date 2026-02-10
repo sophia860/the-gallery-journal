@@ -2,8 +2,10 @@ import { apiRequest } from '../utils/api';
 
 // Demo mode check
 export function isDemoMode(): boolean {
-  return false;
+  if (typeof window === 'undefined') return false;
+  return localStorage.getItem('demoMode') === 'true';
 }
+
 // Local storage keys
 const STORAGE_KEYS = {
   DRAFTS: 'page_drafts',
@@ -14,8 +16,6 @@ const STORAGE_KEYS = {
 // Types
 export interface Draft {
   id?: string;
-  userId?: string;
-  authorName?: string;
   title: string;
   content: string;
   category: string;
@@ -23,11 +23,6 @@ export interface Draft {
   shareToCommunity: boolean;
   createdAt?: string;
   updatedAt?: string;
-  // Author bio and social links (optional, captured during draft creation/submission)
-  authorBio?: string;
-  authorInstagramUrl?: string;
-  authorTwitterUrl?: string;
-  authorWebsiteUrl?: string;
 }
 
 export interface Submission {
@@ -39,7 +34,6 @@ export interface Submission {
   type: string;
   status: 'pending' | 'queued' | 'in_issue' | 'published' | 'revisions_requested' | 'rejected';
   submittedAt: string;
-  createdAt?: string;
   category?: string;
   tags?: string[];
   rating?: number;
@@ -54,22 +48,14 @@ export interface Submission {
 
 export async function saveDraft(draft: Draft): Promise<{ success: boolean; error?: string }> {
   try {
-    const now = new Date().toISOString();
-    const draftWithMeta: Draft = {
-      ...draft,
-      id: draft.id || crypto.randomUUID(),
-      createdAt: draft.createdAt || now,
-      updatedAt: now,
-    };
-
     // Always save to localStorage for demo mode and persistence
     const drafts = getDraftsFromStorage();
-    const existingIndex = drafts.findIndex(d => d.id === draftWithMeta.id);
+    const existingIndex = drafts.findIndex(d => d.id === draft.id);
     
     if (existingIndex >= 0) {
-      drafts[existingIndex] = draftWithMeta;
+      drafts[existingIndex] = draft;
     } else {
-      drafts.unshift(draftWithMeta);
+      drafts.push(draft);
     }
     
     localStorage.setItem(STORAGE_KEYS.DRAFTS, JSON.stringify(drafts));
@@ -79,7 +65,7 @@ export async function saveDraft(draft: Draft): Promise<{ success: boolean; error
       try {
         await apiRequest('/drafts', {
           method: 'POST',
-          body: JSON.stringify(draftWithMeta),
+          body: JSON.stringify(draft),
         });
       } catch (err) {
         console.warn('Backend save failed, using localStorage only:', err);
@@ -110,9 +96,7 @@ export async function getDrafts(): Promise<Draft[]> {
     const response = await apiRequest('/drafts');
     if (response.ok) {
       const data = await response.json();
-      const drafts = data.data || [];
-      localStorage.setItem(STORAGE_KEYS.DRAFTS, JSON.stringify(drafts));
-      return drafts;
+      return data.data || [];
     }
   } catch (err) {
     console.warn('Failed to fetch drafts from backend:', err);
@@ -124,25 +108,18 @@ export async function getDrafts(): Promise<Draft[]> {
 // ============ SUBMISSIONS ============
 
 export async function submitToGallery(draft: Draft): Promise<{ success: boolean; error?: string }> {
-  const now = new Date().toISOString();
   const submission: Submission = {
-    id: draft.id || crypto.randomUUID(),
-    userId: draft.userId || 'demo-user',
-    authorName: draft.authorName || 'Demo Writer',
+    id: crypto.randomUUID(),
+    userId: 'demo-user',
+    authorName: 'Demo Writer',
     title: draft.title,
     content: draft.content,
     type: 'poetry',
     status: 'pending',
-    submittedAt: now,
-    createdAt: draft.createdAt || now,
+    submittedAt: new Date().toISOString(),
     category: draft.category,
     tags: draft.tags,
     shareToCommunity: draft.shareToCommunity,
-    // Include author bio and social links if provided
-    authorBio: draft.authorBio,
-    authorInstagramUrl: draft.authorInstagramUrl,
-    authorTwitterUrl: draft.authorTwitterUrl,
-    authorWebsiteUrl: draft.authorWebsiteUrl,
   };
 
   try {
@@ -183,8 +160,8 @@ export async function getSubmissions(): Promise<Submission[]> {
     return getSubmissionsFromStorage();
   }
 
-try {
-  const response = await apiRequest('/submissions');
+  try {
+    const response = await apiRequest('/submissions');
     if (response.ok) {
       const data = await response.json();
       return data.data || [];
@@ -321,9 +298,9 @@ export async function getPublishedPieces(): Promise<Submission[]> {
 
 export async function getCommunityPieces(): Promise<Submission[]> {
   const submissions = await getSubmissions();
-  // Only show published work explicitly shared with the community
+  // Only show submitted or published works, NEVER drafts
   return submissions.filter(s => 
     s.shareToCommunity !== false && 
-    s.status === 'published'
+    (s.status === 'submitted' || s.status === 'pending' || s.status === 'published')
   );
 }

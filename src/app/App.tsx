@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { SubscriptionProvider } from './contexts/SubscriptionContext';
 import { Header } from './components/Header';
 import { LandingPage } from './pages/LandingPage';
 import { SignUpPage } from './pages/SignUpPage';
@@ -17,8 +16,6 @@ import { GalleryLandingPage } from './pages/GalleryLandingPage';
 import { GalleryWallPage } from './pages/GalleryWallPage';
 import { AfterhoursPage } from './pages/AfterhoursPage';
 import { RoomsPage } from './pages/RoomsPage';
-import { PricingPage } from './pages/PricingPage';
-import { MeetThePagePage } from './pages/MeetThePagePage';
 
 // Studio pages
 import { StudioHub } from './studio/StudioHub';
@@ -28,7 +25,9 @@ import { MyWorkPage } from './studio/MyWorkPage';
 import { RoomSettingsPage } from './studio/RoomSettingsPage';
 
 // Editor pages
+import { EditorDashboard } from './editor/EditorDashboard';
 import { EditorDashboardPage } from './pages/EditorDashboardPage';
+import { EditorialSubmissionsPage } from './pages/EditorialSubmissionsPage';
 
 // Collection page
 import { CollectionPage } from './pages/CollectionPage';
@@ -39,8 +38,12 @@ import { WriterEditorPage } from './pages/WriterEditorPage';
 // Collection Gallery and Community Wall
 import { CollectionGalleryPage } from './pages/CollectionGalleryPage';
 import { CommunityWallPage } from './pages/CommunityWallPage';
-import { SubmitToGalleryPage } from './pages/SubmitToGalleryPage';
-import { EditorialSubmissionsPage } from './editorial/EditorialSubmissionsPage';
+
+// Pricing
+import { PricingPage } from './pages/PricingPage';
+
+// Submit Page
+import { SubmitPage } from './pages/SubmitPage';
 
 // 404 Page
 import { NotFoundPage } from './pages/NotFoundPage';
@@ -50,6 +53,9 @@ import { WriterProfilePage } from './pages/WriterProfilePage';
 
 // Writers' Studio Page
 import { WritersStudioPage } from './pages/WritersStudioPage';
+
+// Author Bio Card Demo
+import { AuthorBioCardDemo } from './pages/AuthorBioCardDemo';
 
 // AppContent component that uses auth - MUST be inside AuthProvider
 function AppContent() {
@@ -69,15 +75,8 @@ function AppContent() {
       const link = target.closest('a');
       
       if (link && link.href && link.origin === window.location.origin) {
-        const url = new URL(link.href);
-
-        // Allow default browser behavior for in-page anchor links
-        if (url.hash && url.pathname === window.location.pathname) {
-          return;
-        }
-
         e.preventDefault();
-        const path = url.pathname;
+        const path = new URL(link.href).pathname;
         window.history.pushState({}, '', path);
         setRoute(path);
       }
@@ -92,7 +91,7 @@ function AppContent() {
   }, []);
 
   // Pages that use their own navigation (don't show the default Header)
-  const pagesWithOwnNav = ['/', '/gallery-wall', '/afterhours', '/collection', '/rooms', '/signin', '/signup', '/writer-editor', '/collection-gallery', '/community-wall', '/editor-dashboard', '/meet-the-page'];
+  const pagesWithOwnNav = ['/', '/gallery-wall', '/afterhours', '/collection', '/rooms', '/signin', '/signup', '/writer-editor', '/collection-gallery', '/community-wall', '/editor-dashboard', '/about', '/meet-the-page', '/submit', '/editorial-submissions'];
   const showDefaultHeader = !pagesWithOwnNav.includes(route);
 
   if (loading) {
@@ -114,18 +113,16 @@ function AppContent() {
     pageContent = <RoomsPage />;
   } else if (route === '/gallery-wall') {
     pageContent = <GalleryWallPage />;
-  } else if (route === '/meet-the-page') {
-    pageContent = <MeetThePagePage />;
   } else if (route === '/afterhours') {
     pageContent = <AfterhoursPage />;
   } else if (route === '/about') {
+    pageContent = <AboutPage />;
+  } else if (route === '/meet-the-page') {
     pageContent = <AboutPage />;
   } else if (route === '/signup') {
     pageContent = <SignUpPage />;
   } else if (route === '/signin') {
     pageContent = <SignInPage />;
-  } else if (route === '/pricing') {
-    pageContent = <PricingPage />;
   } else if (route === '/dashboard') {
     pageContent = <DashboardPage />;
   } else if (route === '/dashboard/new-exhibit' || route === '/studio/new-exhibit') {
@@ -151,9 +148,11 @@ function AppContent() {
   } else if (route === '/studio/room-settings') {
     pageContent = <RoomSettingsPage />;
   } else if (route === '/editor') {
-    pageContent = <EditorDashboardPage />;
+    pageContent = <EditorDashboard />;
   } else if (route === '/editor-dashboard') {
     pageContent = <EditorDashboardPage />;
+  } else if (route === '/editorial-submissions') {
+    pageContent = <EditorialSubmissionsPage />;
   } else if (route === '/collection') {
     pageContent = <CollectionPage />;
   } else if (route === '/writer-editor') {
@@ -162,15 +161,17 @@ function AppContent() {
     pageContent = <CollectionGalleryPage />;
   } else if (route === '/community-wall') {
     pageContent = <CommunityWallPage />;
-  } else if (route === '/submit-to-gallery') {
-    pageContent = <SubmitToGalleryPage />;
-  } else if (route === '/editorial/submissions') {
-    pageContent = <EditorialSubmissionsPage />;
+  } else if (route === '/pricing') {
+    pageContent = <PricingPage />;
+  } else if (route === '/submit') {
+    pageContent = <SubmitPage />;
   } else if (route.startsWith('/writer/')) {
     const writerId = route.split('/writer/')[1];
     pageContent = <WriterProfilePage writerId={writerId} />;
   } else if (route === '/writers-studio') {
     pageContent = <WritersStudioPage />;
+  } else if (route === '/author-bio-card-demo') {
+    pageContent = <AuthorBioCardDemo />;
   } else {
     // 404
     pageContent = <NotFoundPage />;
@@ -184,13 +185,11 @@ function AppContent() {
   );
 }
 
-// Main App component - wraps everything in AuthProvider and SubscriptionProvider
+// Main App component - wraps everything in AuthProvider
 export default function App() {
   return (
     <AuthProvider>
-      <SubscriptionProvider>
-        <AppContent />
-      </SubscriptionProvider>
+      <AppContent />
     </AuthProvider>
   );
 }

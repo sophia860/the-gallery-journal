@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Moon } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { GalleryNav } from '../components/GalleryNav';
 import { GalleryFooter } from '../components/GalleryFooter';
@@ -201,40 +201,6 @@ const categories = [
   'Family & Identity',
   'Time & Mortality',
   'Self & Introspection',
-];
-
-const joinFeatures = [
-  {
-    title: 'Your Page',
-    description: 'A personal space for your pieces, drafts, and bio.',
-  },
-  {
-    title: 'Submit & Track',
-    description: 'Send work to The Gallery and follow it through the editorial queue.',
-  },
-  {
-    title: 'Follow Writers',
-    description: 'Stay close to the writers you love.',
-  },
-];
-
-const submitSteps = [
-  {
-    title: 'Create Your Page',
-    description: 'Create your page',
-  },
-  {
-    title: 'Upload a Draft',
-    description: 'Upload a draft',
-  },
-  {
-    title: 'Submit',
-    description: 'Hit submit',
-  },
-  {
-    title: 'Track It',
-    description: 'Track it through',
-  },
 ];
 
 export function GalleryLandingPage() {
@@ -473,116 +439,6 @@ export function GalleryLandingPage() {
               VIEW COMPLETE ISSUE
               <ArrowRight className="w-5 h-5" />
             </a>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Join Page Section */}
-      <section className="py-20 px-8 bg-[#F5F0EB]">
-        <div className="max-w-6xl mx-auto space-y-16">
-          {/* Part A — Hero band */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center space-y-10 bg-gradient-to-r from-[#1A1F2E] to-[#0F1318] text-white px-8 py-16 md:py-20"
-          >
-            <h2 className="font-['Cardo'] italic text-7xl md:text-8xl lg:text-9xl leading-none">
-              Join <span className="text-[#C4A265] italic">page</span>
-            </h2>
-            <p className="font-[family-name:var(--font-body)] text-lg md:text-xl text-white/80 italic">
-              — "Where writers gather, share, and become."
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-              <a
-                href="/signup"
-                className="inline-flex items-center justify-center px-8 py-3 border border-[#C4A265] text-[#C4A265] font-['Courier_New'] text-sm tracking-[0.25em] uppercase hover:bg-[#C4A265] hover:text-[#0F1318] transition-colors"
-              >
-                Join Now
-              </a>
-              <a
-                href="/meet-the-page"
-                className="text-[#C4A265] underline underline-offset-4 font-['Cardo'] italic text-lg hover:text-[#E6D5B8]"
-              >
-                Learn More
-              </a>
-            </div>
-          </motion.div>
-
-          {/* Part B — Why Join grid */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="space-y-10"
-          >
-            <div className="text-center space-y-4">
-              <h3 className="font-['Cardo'] italic text-5xl text-[#1A1F2E]">
-                Why <span className="text-[#8B7355] italic">page</span>?
-              </h3>
-            </div>
-            <div className="grid gap-10 md:grid-cols-3">
-              {joinFeatures.map((feature, index) => (
-                <motion.div
-                  key={feature.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  viewport={{ once: true }}
-                  className="space-y-4"
-                >
-                  <div className="flex items-center gap-3 text-[#8B7355]">
-                    <span className="text-lg leading-none">—</span>
-                    <span className="font-['Courier_New'] text-xs tracking-[0.25em] uppercase">
-                      {feature.title}
-                    </span>
-                  </div>
-                  <p className="font-[family-name:var(--font-body)] text-base text-[#1A1F2E]/80 leading-relaxed">
-                    {feature.description}
-                  </p>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Part C — How to Submit */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="space-y-10"
-          >
-            <div className="text-center space-y-4">
-              <h3 className="font-['Cardo'] italic text-4xl md:text-5xl text-[#1A1F2E]">
-                From draft to gallery
-              </h3>
-            </div>
-            <div className="relative grid gap-8 md:grid-cols-4">
-              <div className="hidden md:block absolute top-2 left-0 right-0 h-px bg-[#8B7355]/30"></div>
-              {submitSteps.map((step, index) => (
-                <motion.div
-                  key={step.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  viewport={{ once: true }}
-                  className="space-y-3 relative"
-                >
-                  <div className="font-['Courier_New'] text-sm tracking-[0.25em] text-[#8B7355] inline-block bg-[#F5F0EB] px-2">
-                    {`0${index + 1}`.slice(-2)}
-                  </div>
-                  <h4 className="font-[family-name:var(--font-display)] text-xl text-[#1A1F2E]">
-                    {step.title}
-                  </h4>
-                  <p className="font-[family-name:var(--font-body)] text-base text-[#1A1F2E]/75 leading-relaxed">
-                    {step.description}
-                  </p>
-                </motion.div>
-              ))}
-            </div>
           </motion.div>
         </div>
       </section>

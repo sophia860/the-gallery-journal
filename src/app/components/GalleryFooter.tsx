@@ -25,11 +25,11 @@ export function GalleryFooter({ variant = 'light' }: GalleryFooterProps) {
             <a href="/about" className="hover:text-[#E11D48] hover:underline transition-all">
               About
             </a>
-            <a href="/studio" className="hover:text-[#E11D48] hover:underline transition-all">
+            <a href="/submit" className="hover:text-[#E11D48] hover:underline transition-all">
               Submit
             </a>
-            <a href="#" className="hover:text-[#E11D48] hover:underline transition-all">
-              Subscribe
+            <a href="/pricing" className="hover:text-[#E11D48] hover:underline transition-all">
+              Pricing
             </a>
             <a href="#" className="hover:text-[#E11D48] hover:underline transition-all">
               Contact

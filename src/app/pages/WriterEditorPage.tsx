@@ -5,8 +5,7 @@ import {
   ChevronUp, Tag, FileImage, X, Lock
 } from 'lucide-react';
 import { GalleryNav } from '../components/GalleryNav';
-import { saveDraft, submitToGallery, getDrafts, type Draft } from '../../services/backend';
-import { useAuth } from '../contexts/AuthContext';
+import { saveDraft, submitToGallery, type Draft } from '../../services/backend';
 
 const categories = [
   { name: 'Poetry', description: 'Verse, free form, or structured poetry' },
@@ -29,7 +28,7 @@ export function WriterEditorPage() {
   const [tagInput, setTagInput] = useState('');
   const [showPreview, setShowPreview] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [showPublishing, setShowPublishing] = useState(true);
+  const [showPublishing, setShowPublishing] = useState(false);
   const [wordCount, setWordCount] = useState(0);
   const [readingTime, setReadingTime] = useState(0);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
@@ -37,15 +36,7 @@ export function WriterEditorPage() {
   const [shareToCommunity, setShareToCommunity] = useState(true); // Default ON
   const [showSuccessMessage, setShowSuccessMessage] = useState<string | null>(null);
   const [currentDraftId] = useState(crypto.randomUUID());
-  
-  // Author bio and social fields
-  const [authorBio, setAuthorBio] = useState('');
-  const [instagramUrl, setInstagramUrl] = useState('');
-  const [twitterUrl, setTwitterUrl] = useState('');
-  const [websiteUrl, setWebsiteUrl] = useState('');
-  
   const contentRef = useRef<HTMLTextAreaElement>(null);
-  const { user } = useAuth();
 
   // Calculate word count and reading time
   useEffect(() => {
@@ -53,30 +44,6 @@ export function WriterEditorPage() {
     setWordCount(words);
     setReadingTime(Math.ceil(words / 200)); // Average reading speed
   }, [content]);
-
-  // Load most recent draft
-  useEffect(() => {
-    const loadDraft = async () => {
-      try {
-        const drafts = await getDrafts();
-        if (drafts.length === 0) return;
-        const [latest] = [...drafts].sort((a, b) => {
-          const aTime = a.updatedAt || a.createdAt || '';
-          const bTime = b.updatedAt || b.createdAt || '';
-          return bTime.localeCompare(aTime);
-        });
-        setTitle(latest.title || '');
-        setContent(latest.content || '');
-        setSelectedCategory(latest.category || '');
-        setTags(latest.tags || []);
-        setShareToCommunity(latest.shareToCommunity !== false);
-        if (latest.id) setCurrentDraftId(latest.id);
-      } catch (err) {
-        console.warn('[WriterEditor] Failed to load drafts', err);
-      }
-    };
-    loadDraft();
-  }, []);
 
   // Auto-save simulation
   useEffect(() => {
@@ -102,55 +69,28 @@ export function WriterEditorPage() {
   };
 
   const handleSaveDraft = async () => {
-    const draftId = currentDraftId || crypto.randomUUID();
     const draft: Draft = {
-      id: draftId,
-      userId: user?.id,
-      authorName: user?.user_metadata?.name,
       title,
       content,
       category: selectedCategory,
       tags,
       shareToCommunity,
-      authorBio,
-      authorInstagramUrl: instagramUrl,
-      authorTwitterUrl: twitterUrl,
-      authorWebsiteUrl: websiteUrl,
     };
-    const result = await saveDraft(draft);
-    if (result.success) {
-      setCurrentDraftId(draftId);
-      setLastSaved(new Date());
-      setShowSuccessMessage('Draft saved successfully!');
-    } else {
-      setShowSuccessMessage('Could not save draft. Please try again.');
-    }
+    await saveDraft(draft);
+    setShowSuccessMessage('Draft saved successfully!');
     setTimeout(() => setShowSuccessMessage(null), 3000);
   };
 
   const handleSubmitToGallery = async () => {
-    const draftId = currentDraftId || crypto.randomUUID();
     const draft: Draft = {
-      id: draftId,
-      userId: user?.id,
-      authorName: user?.user_metadata?.name,
       title,
       content,
       category: selectedCategory,
       tags,
       shareToCommunity,
-      authorBio,
-      authorInstagramUrl: instagramUrl,
-      authorTwitterUrl: twitterUrl,
-      authorWebsiteUrl: websiteUrl,
     };
-    const result = await submitToGallery(draft);
-    if (result.success) {
-      setCurrentDraftId(draftId);
-      setShowSuccessMessage('Submitted to The Gallery successfully!');
-    } else {
-      setShowSuccessMessage('Submission failed. Please try again.');
-    }
+    await submitToGallery(draft);
+    setShowSuccessMessage('Submitted to The Gallery successfully!');
     setTimeout(() => setShowSuccessMessage(null), 3000);
   };
 
@@ -385,76 +325,6 @@ export function WriterEditorPage() {
                           + {tag}
                         </button>
                       ))}
-                    </div>
-                  </div>
-
-                  {/* Author Bio & Social Links */}
-                  <div className="pt-6 pb-2 border-t border-[#E8E0D8]">
-                    <label className="block text-xs uppercase tracking-wider text-[#717171] mb-3 font-['Inter']">
-                      Author Bio & Social Links
-                    </label>
-                    <p className="text-xs text-[#717171] font-['Inter'] mb-4 leading-relaxed">
-                      Share a bit about yourself. This will appear alongside your published work in The Collection.
-                    </p>
-                    
-                    {/* Bio */}
-                    <div className="mb-4">
-                      <label className="block text-xs text-[#717171] mb-2 font-['Inter']">
-                        Bio (optional)
-                      </label>
-                      <textarea
-                        value={authorBio}
-                        onChange={(e) => setAuthorBio(e.target.value)}
-                        placeholder="Write a brief bio about yourself..."
-                        className="w-full px-3 py-2 border border-[#E8E0D8] bg-white text-[#2C2C2C] font-['Inter'] text-sm resize-none"
-                        rows={3}
-                        maxLength={250}
-                      />
-                      <div className="text-xs text-[#717171] mt-1 text-right">
-                        {authorBio.length}/250
-                      </div>
-                    </div>
-
-                    {/* Instagram URL */}
-                    <div className="mb-3">
-                      <label className="block text-xs text-[#717171] mb-2 font-['Inter']">
-                        Instagram URL (optional)
-                      </label>
-                      <input
-                        type="url"
-                        value={instagramUrl}
-                        onChange={(e) => setInstagramUrl(e.target.value)}
-                        placeholder="https://instagram.com/yourhandle"
-                        className="w-full px-3 py-2 border border-[#E8E0D8] bg-white text-[#2C2C2C] font-['Inter'] text-sm"
-                      />
-                    </div>
-
-                    {/* Twitter URL */}
-                    <div className="mb-3">
-                      <label className="block text-xs text-[#717171] mb-2 font-['Inter']">
-                        Twitter URL (optional)
-                      </label>
-                      <input
-                        type="url"
-                        value={twitterUrl}
-                        onChange={(e) => setTwitterUrl(e.target.value)}
-                        placeholder="https://twitter.com/yourhandle"
-                        className="w-full px-3 py-2 border border-[#E8E0D8] bg-white text-[#2C2C2C] font-['Inter'] text-sm"
-                      />
-                    </div>
-
-                    {/* Website URL */}
-                    <div className="mb-3">
-                      <label className="block text-xs text-[#717171] mb-2 font-['Inter']">
-                        Website URL (optional)
-                      </label>
-                      <input
-                        type="url"
-                        value={websiteUrl}
-                        onChange={(e) => setWebsiteUrl(e.target.value)}
-                        placeholder="https://yourwebsite.com"
-                        className="w-full px-3 py-2 border border-[#E8E0D8] bg-white text-[#2C2C2C] font-['Inter'] text-sm"
-                      />
                     </div>
                   </div>
 

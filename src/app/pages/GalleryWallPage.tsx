@@ -16,19 +16,18 @@ const allPoems = [
     wallNumber: '01',
     firstLines: 'In your eyes I see / a universe unfolding...',
     content: `In your eyes I see
-  a universe unfolding,
-  galaxies that spiral soft,
-  constellations only we can read.
+a universe unfolding,
+galaxies that spiral soft,
+constellations only we can read.
 
-  Your gaze holds summer evenings,
-  the weight of August heat,
-  the promise of October rain.
+Your gaze holds summer evenings,
+the weight of August heat,
+the promise of October rain.
 
-  When you look at me like that,
-  time folds into itself—
-  past and future collapse
-  into this one perfect now.`,
-    status: 'published' as const,
+When you look at me like that,
+time folds into itself—
+past and future collapse
+into this one perfect now.`,
   },
   {
     id: '2',
@@ -38,7 +37,6 @@ const allPoems = [
     category: 'Love & Relationships',
     wallNumber: '02',
     firstLines: 'The air is thick with wanting...',
-    status: 'published' as const,
     content: `The air is thick with wanting,
 humidity that clings like memory.
 We are melting into each other,
@@ -63,7 +61,6 @@ brief and brilliant.`,
     category: 'Nature & The Natural World',
     wallNumber: '03',
     firstLines: 'I keep finding ocean in my pockets...',
-    status: 'published' as const,
     content: `I keep finding ocean in my pockets—
 salt-crusted shells, smooth stones,
 evidence of the tide's attention.
@@ -86,7 +83,6 @@ and the next.`,
     category: 'Nature & The Natural World',
     wallNumber: '04',
     firstLines: 'After the storm, such clarity...',
-    status: 'published' as const,
     content: `After the storm, such clarity—
 the sky washed clean,
 clouds scattered like old thoughts
@@ -110,7 +106,6 @@ another word for beginning.`,
     category: 'Time & Mortality',
     wallNumber: '05',
     firstLines: 'Bless the small things...',
-    status: 'published' as const,
     content: `Bless the small things:
 coffee still warm at noon,
 the dog's greeting at the door,
@@ -134,7 +129,6 @@ the holy routine.`,
     category: 'Self & Introspection',
     wallNumber: '06',
     firstLines: 'Standing still in the rush...',
-    status: 'published' as const,
     content: `Standing still in the rush,
 I am an island in the stream.
 Thousands pass. None see me.
@@ -158,7 +152,6 @@ and nothing at all.`,
     category: 'Grief, Loss & Memory',
     wallNumber: '07',
     firstLines: 'The sound of ice in glasses...',
-    status: 'published' as const,
     content: `The sound of ice in glasses—
 that's what brings you back.
 Not photographs, not letters,
@@ -182,7 +175,6 @@ ringing you gone.`,
     category: 'Family & Identity',
     wallNumber: '08',
     firstLines: 'She walks across the stage...',
-    status: 'published' as const,
     content: `She walks across the stage
 and I am watching her
 walk away from me,
@@ -218,7 +210,6 @@ export function GalleryWallPage() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [expandedPoem, setExpandedPoem] = useState<string | null>(null);
   const [hasAccess, setHasAccess] = useState(false);
-  const publishedPoems = allPoems.filter(poem => poem.status === 'published');
 
   // Check authentication with getSession() - DO NOT rely on user from context
   useEffect(() => {
@@ -281,8 +272,8 @@ export function GalleryWallPage() {
   }, [supabase]);
 
   const filteredPoems = selectedCategory === 'All' 
-    ? publishedPoems 
-    : publishedPoems.filter(p => p.category === selectedCategory);
+    ? allPoems 
+    : allPoems.filter(p => p.category === selectedCategory);
 
   // Members Only Gate
   if (!hasAccess) {

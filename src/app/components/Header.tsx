@@ -10,7 +10,6 @@ export function Header() {
     const { user, signOut } = useAuth();
     const userRole = user?.user_metadata?.role || 'writer';
     const isEditor = userRole === 'editor' || userRole === 'managing_editor';
-    const editorHref = isEditor ? '/editor-dashboard' : '/signin?redirect=/editor-dashboard';
 
     return (
       <>
@@ -51,7 +50,7 @@ export function Header() {
                   Letters
                 </a>
                 {isEditor && (
-                  <a href={editorHref} className="hover:text-accent transition-colors font-medium text-[#E11D48]">
+                  <a href="/editor" className="hover:text-accent transition-colors font-medium text-[#E11D48]">
                     Editor
                   </a>
                 )}
@@ -69,10 +68,6 @@ export function Header() {
               <>
                 <a href="/signin" className="hover:text-accent transition-colors">
                   Sign In
-                </a>
-                <a href={editorHref} className="hover:text-accent transition-colors flex items-center gap-1">
-                  <span className="inline-block w-1 h-1 rounded-full bg-current" />
-                  Editor Login
                 </a>
                 <a href="/signup" className="px-4 py-2 bg-accent text-accent-foreground hover:bg-accent/90 transition-colors">
                   Join PAGE

@@ -20,7 +20,6 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, name: string, writerName: string) => Promise<void>;
   signOut: () => Promise<void>;
-  signInWithGitHub: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -35,9 +34,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Check for existing session on mount
   useEffect(() => {
     const initAuth = async () => {
       try {
+        // Check for demo mode first
+        const isDemoMode = typeof window !== 'undefined' && localStorage.getItem('demoMode') === 'true';
+        
+        if (isDemoMode) {
+          console.log('[AuthContext] Demo mode detected, creating demo user');
+          // Create a demo user
+          const demoUser: User = {
+            id: 'demo-user',
+            email: 'demo@page.com',
+            user_metadata: {
+              name: 'Demo User',
+              role: 'writer',
+              writerName: 'Demo Writer'
+            }
+          };
+          setUser(demoUser);
+          setAccessToken('demo-token');
+          setLoading(false);
+          return;
+        }
+
+        // Regular auth flow
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
           setUser(session.user);
@@ -52,8 +74,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     initAuth();
 
+    // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
+        // Don't override demo mode
+        const isDemoMode = typeof window !== 'undefined' && localStorage.getItem('demoMode') === 'true';
+        if (isDemoMode) return;
+        
         setUser(session?.user ?? null);
         setAccessToken(session?.access_token ?? null);
         setLoading(false);
@@ -70,21 +97,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       email,
       password,
     });
-    if (error) throw new Error(error.message);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
     if (data.session) {
       setUser(data.user);
       setAccessToken(data.session.access_token);
     }
-  };
-
-  const signInWithGitHub = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'github',
-      options: {
-        redirectTo: `${window.location.origin}/editor-dashboard`,
-      },
-    });
-    if (error) throw new Error(error.message);
   };
 
   const signUp = async (email: string, password: string, name: string, writerName: string) => {
@@ -99,12 +120,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify({ email, password, name, writerName }),
       }
     );
+
     const data = await response.json();
-    if (!response.ok) throw new Error(data.error || 'Failed to sign up');
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to sign up');
+    }
+
+    // Now sign them in
     await signIn(email, password);
   };
 
   const signOut = async () => {
+    // Clear demo mode if active
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('demoMode');
+    }
+    
     await supabase.auth.signOut();
     setUser(null);
     setAccessToken(null);
@@ -118,7 +150,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signIn,
     signUp,
     signOut,
-    signInWithGitHub,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -127,7 +158,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    console.error('useAuth must be used within an AuthProvider');
+    console.error('useAuth must be used within an AuthProvider. Make sure your component is wrapped in <AuthProvider>');
+    // Return a default context to prevent crashes
     return {
       user: null,
       accessToken: null,
@@ -136,7 +168,6 @@ export function useAuth() {
       signIn: async () => { throw new Error('Auth not initialized'); },
       signUp: async () => { throw new Error('Auth not initialized'); },
       signOut: async () => { throw new Error('Auth not initialized'); },
-      signInWithGitHub: async () => { throw new Error('Auth not initialized'); },
     };
   }
   return context;

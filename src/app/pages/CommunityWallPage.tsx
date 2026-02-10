@@ -1,7 +1,6 @@
-import { useState } from 'react';
-import { Heart, Lock, CreditCard } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Heart, Lock } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { useSubscription } from '../contexts/SubscriptionContext';
 import { GalleryNav } from '../components/GalleryNav';
 import { Footer } from '../components/Footer';
 
@@ -39,7 +38,7 @@ const communityPieces = [
     author: 'Chen Wei',
     authorInitials: 'CW',
     authorColor: '#8A9A7B',
-    status: 'published',
+    status: 'submitted',
     category: 'Time & Mortality',
     excerpt: 'Each day I wake and wonder if today will be the day I become the person I imagine.',
     sharedAt: '2026-02-07T08:00:00Z',
@@ -65,9 +64,9 @@ const communityPieces = [
     author: 'Luna Martinez',
     authorInitials: 'LM',
     authorColor: '#8A9A7B',
-    status: 'published',
+    status: 'under_review',
     category: 'Time & Mortality',
-    excerpt: "There's a moment between sleeping and waking when I forget everything.",
+    excerpt: 'There\'s a moment between sleeping and waking when I forget everything.',
     sharedAt: '2026-01-30T12:00:00Z',
     hearts: 20,
     hasHearted: true
@@ -90,20 +89,72 @@ const statusLabels = {
 };
 
 export function CommunityWallPage() {
-  const { user } = useAuth();
-  const { hasActiveSubscription, loading: subscriptionLoading } = useSubscription();
+  const { supabase } = useAuth();
+  const [hasAccess, setHasAccess] = useState(false);
   const [sortBy, setSortBy] = useState<SortBy>('newest');
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('published');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [pieces, setPieces] = useState(communityPieces);
 
-  // Auth Gate - Unauthenticated users
-  if (!user) {
+  // Check authentication with getSession() - DO NOT rely on user from context
+  useEffect(() => {
+    let mounted = true;
+
+    const checkAccess = async () => {
+      console.log('[CommunityWall] Checking access with getSession()...');
+      
+      try {
+        // Get current session directly from Supabase
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        console.log('[CommunityWall] Session result:', session ? 'exists' : 'null', error);
+
+        if (!mounted) return;
+
+        if (session) {
+          console.log('[CommunityWall] Access granted - user:', session.user.email);
+          setHasAccess(true);
+        } else {
+          console.log('[CommunityWall] No session - access denied');
+          setHasAccess(false);
+        }
+      } catch (err) {
+        console.error('[CommunityWall] Error checking session:', err);
+        if (mounted) {
+          setHasAccess(false);
+        }
+      }
+    };
+
+    checkAccess();
+
+    // Subscribe to auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('[CommunityWall] Auth state changed:', event, session ? 'has session' : 'no session');
+      
+      if (!mounted) return;
+
+      if (event === 'SIGNED_OUT') {
+        setHasAccess(false);
+      } else if (event === 'SIGNED_IN' && session) {
+        setHasAccess(true);
+      }
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, [supabase]);
+
+  // Members Only Gate - Check if user is authenticated
+  if (!hasAccess) {
     return (
       <div className="min-h-screen bg-[#FAF8F5] flex flex-col">
         <GalleryNav />
         
         <div className="flex-1 flex items-center justify-center px-8 py-32">
           <div className="max-w-2xl text-center">
+            {/* Lock Icon SVG */}
             <svg
               className="w-20 h-20 mx-auto mb-8 text-[#E11D48]"
               fill="none"
@@ -117,20 +168,28 @@ export function CommunityWallPage() {
                 d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
               />
             </svg>
+
+            {/* Heading */}
             <h1 className="font-['Cardo'] text-6xl text-[#2C2C2C] mb-4 italic">
               The Writers' Salon
             </h1>
+
+            {/* Subtitle */}
             <p className="font-['Libre_Baskerville'] text-xl text-[#717171] mb-8 italic">
               A Private Community Space
             </p>
+
+            {/* Message */}
             <div className="border-t border-b border-[#E0D8D0] py-8 mb-12">
               <p className="font-['Libre_Baskerville'] text-base text-[#717171] leading-relaxed">
-                Welcome to our writers' salon-a private, intimate space where community members share work, offer appreciation, and grow together.
+                Welcome to our writers' salon—a private, intimate space where community members share work, offer appreciation, and grow together.
                 <br />
                 <br />
                 Sign in to join the conversation.
               </p>
             </div>
+
+            {/* Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
               <a
                 href="/signin?redirect=/community-wall"
@@ -145,70 +204,12 @@ export function CommunityWallPage() {
                 RETURN TO THE GALLERY
               </a>
             </div>
+
             <p className="text-xs text-[#717171] font-['Inter'] italic">
               A velvet rope at an intimate literary salon
             </p>
           </div>
         </div>
-      </div>
-    );
-  }
-
-  // Subscription Gate - Authenticated but not subscribed
-  if (!subscriptionLoading && !hasActiveSubscription) {
-    return (
-      <div className="min-h-screen bg-[#FAF8F5] flex flex-col">
-        <GalleryNav />
-        
-        <div className="flex-1 flex items-center justify-center px-8 py-32">
-          <div className="max-w-2xl text-center">
-            <CreditCard className="w-16 h-16 mx-auto mb-8 text-[#C4918A]" />
-            <h1 className="font-['Cardo'] text-5xl text-[#2C2C2C] mb-4 italic">
-              Become a Member
-            </h1>
-            <p className="font-['Libre_Baskerville'] text-xl text-[#717171] mb-2 italic">
-              Welcome, {user?.user_metadata?.name || 'Writer'}!
-            </p>
-            <div className="border-t border-[#E0D8D0] w-24 mx-auto my-8" />
-            <p className="font-['Libre_Baskerville'] text-base text-[#717171] leading-relaxed max-w-lg mx-auto mb-12">
-              The Community Wall is an exclusive space for our members. Join today to share your work, appreciate others' writing, and become part of our intimate literary community.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-              <a
-                href="/pricing"
-                className="px-8 py-4 bg-[#E11D48] text-white hover:bg-[#C01040] transition-colors font-['Courier_New'] text-sm tracking-wider shadow-lg hover:shadow-xl inline-block"
-              >
-                VIEW MEMBERSHIP PLANS
-              </a>
-              <a
-                href="/"
-                className="px-8 py-4 border-2 border-[#E0D8D0] text-[#2C2C2C] hover:border-[#C4918A] transition-colors font-['Courier_New'] text-sm tracking-wider inline-block"
-              >
-                RETURN TO THE GALLERY
-              </a>
-            </div>
-            <div className="bg-white border border-[#E0D8D0] rounded-lg p-6 max-w-md mx-auto">
-              <h3 className="font-['Libre_Baskerville'] text-lg text-[#2C2C2C] mb-3">
-                What's included:
-              </h3>
-              <ul className="text-left space-y-2 text-sm text-[#717171] font-['Inter']">
-                <li className="flex items-center gap-2">
-                  <span className="text-[#8A9A7B]">&#10003;</span>
-                  Share your writing with the community
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-[#8A9A7B]">&#10003;</span>
-                  Appreciate and engage with others' work
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-[#8A9A7B]">&#10003;</span>
-                  Join our intimate writers' salon
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <Footer />
       </div>
     );
   }
@@ -226,9 +227,8 @@ export function CommunityWallPage() {
     }));
   };
 
-  const publishedPieces = pieces.filter(p => p.status === 'published');
-
-  const filteredPieces = publishedPieces
+  const filteredPieces = pieces
+    .filter(p => statusFilter === 'all' || p.status === statusFilter)
     .sort((a, b) => {
       if (sortBy === 'newest') {
         return new Date(b.sharedAt).getTime() - new Date(a.sharedAt).getTime();
@@ -288,9 +288,9 @@ export function CommunityWallPage() {
               </select>
             </div>
 
-            {/* Status Filter - published only */}
+            {/* Status Filter */}
             <div className="flex gap-2 flex-wrap">
-              {(['all', 'published'] as StatusFilter[]).map(status => (
+              {(['all', 'submitted', 'under_review', 'published'] as StatusFilter[]).map(status => (
                 <button
                   key={status}
                   onClick={() => setStatusFilter(status)}
@@ -369,7 +369,7 @@ export function CommunityWallPage() {
                       <span className="text-sm font-['Inter'] font-medium">{piece.hearts}</span>
                     </button>
                     <button className="text-sm text-[#717171] hover:text-[#2C2C2C] font-['Inter'] transition-colors">
-                      Read full piece &rarr;
+                      Read full piece →
                     </button>
                   </div>
                 </div>

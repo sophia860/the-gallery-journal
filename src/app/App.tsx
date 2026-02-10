@@ -16,6 +16,7 @@ import { GalleryLandingPage } from './pages/GalleryLandingPage';
 import { GalleryWallPage } from './pages/GalleryWallPage';
 import { AfterhoursPage } from './pages/AfterhoursPage';
 import { RoomsPage } from './pages/RoomsPage';
+import { MeetThePagePage } from './pages/MeetThePagePage';
 
 // Studio pages
 import { StudioHub } from './studio/StudioHub';
@@ -83,7 +84,7 @@ function AppContent() {
   }, []);
 
   // Pages that use their own navigation (don't show the default Header)
-  const pagesWithOwnNav = ['/', '/gallery-wall', '/afterhours', '/collection', '/rooms', '/signin', '/signup', '/writer-editor', '/collection-gallery', '/community-wall', '/editor-dashboard'];
+  const pagesWithOwnNav = ['/', '/gallery-wall', '/afterhours', '/collection', '/rooms', '/signin', '/signup', '/writer-editor', '/collection-gallery', '/community-wall', '/editor-dashboard', '/meet-the-page'];
   const showDefaultHeader = !pagesWithOwnNav.includes(route);
 
   if (loading) {
@@ -105,6 +106,8 @@ function AppContent() {
     pageContent = <RoomsPage />;
   } else if (route === '/gallery-wall') {
     pageContent = <GalleryWallPage />;
+  } else if (route === '/meet-the-page') {
+    pageContent = <MeetThePagePage />;
   } else if (route === '/afterhours') {
     pageContent = <AfterhoursPage />;
   } else if (route === '/about') {

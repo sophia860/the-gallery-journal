@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 // Gallery Pages - ONLY
 import { GalleryLandingPage } from './pages/GalleryLandingPage';
@@ -11,10 +12,17 @@ import { CollectionGalleryPage } from './pages/CollectionGalleryPage';
 import { EditorLoginPage } from './pages/EditorLoginPage';
 import { EditorDashboard } from './editor/EditorDashboard';
 
+// Writer Platform Pages
+import { SignInPage } from './pages/SignInPage';
+import { SignUpPage } from './pages/SignUpPage';
+import { MyGarden } from './studio/MyGarden';
+import { WriterProfilePage } from './pages/WriterProfilePage';
+
 // Admin Pages (for demo setup)
 import { AdminPage } from './pages/AdminPage';
 import { DemoModePage } from './pages/DemoModePage';
 import { DesignSystemDemo } from './pages/DesignSystemDemo';
+import { DebugPage } from './pages/DebugPage';
 
 // 404 Page
 import { NotFoundPage } from './pages/NotFoundPage';
@@ -93,6 +101,17 @@ function AppContent() {
     pageContent = <EditorDashboard />;
   }
   
+  // Writer Platform Pages
+  else if (route === '/signin') {
+    pageContent = <SignInPage />;
+  } else if (route === '/signup') {
+    pageContent = <SignUpPage />;
+  } else if (route === '/garden') {
+    pageContent = <MyGarden />;
+  } else if (route.startsWith('/profile/')) {
+    pageContent = <WriterProfilePage />;
+  }
+  
   // Admin Pages (for demo setup)
   else if (route === '/admin') {
     pageContent = <AdminPage />;
@@ -100,6 +119,8 @@ function AppContent() {
     pageContent = <DemoModePage />;
   } else if (route === '/admin/design-system-demo') {
     pageContent = <DesignSystemDemo />;
+  } else if (route === '/admin/debug') {
+    pageContent = <DebugPage />;
   }
   
   // 404 Page
@@ -118,7 +139,9 @@ function AppContent() {
 export default function App() {
   return (
     <AuthProvider>
-      <AppContent />
+      <ErrorBoundary>
+        <AppContent />
+      </ErrorBoundary>
     </AuthProvider>
   );
 }

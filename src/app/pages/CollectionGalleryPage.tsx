@@ -33,26 +33,8 @@ const PUBLISHED_POEMS: DisplayPiece[] = [
     title: 'I THOUGHT YOU\'D BEEN QUEER LONGER THAN THAT',
     author: 'Nix Carlson',
     category: 'Self & Introspection',
-    excerpt: 'I thought you\'d been queer longer than that, you said, like it was a compliment...',
-    content: `I thought you'd been queer longer than that,
-you said, like it was a compliment,
-like I'd earned some invisible badge
-by wearing the right shoes
-or knowing the right songs.
-
-But I've been queer since before
-I had the words for it—
-in the way I looked at girls in seventh grade,
-in the way I couldn't explain
-why I felt more myself
-in borrowed clothes,
-in spaces between.
-
-You don't measure queerness
-in years or coming-out stories.
-You measure it in the quiet knowing,
-the way you finally exhale
-when you stop pretending.`,
+    excerpt: 'Perhaps because I have been. My gay card came in the mail at 14 years...',
+    content: `Perhaps because I have been. My gay card came in the mail at 14 years. Back when I had scabbed knees, living in a house painted all red, cross on the front door. Back when blue and pink and purple simply looked pretty next to each other. It's in my wallet. Haven't I shown it to you? How dare you insinuate that my past of lying to with men means that my queerness is young. It was born long before a man in pretentious sweaters taught me how to use my mouth for more than just running it. It was born long before women in dyke boots hand-fed me cherries and taught me to lick out the pit with my tongue. I don't need to hold space for the chance that you might want to fuck a man in a year or ten, you know the boundaries of your desire (though we are kaleidoscopes, so if the light ever shifts, I will remain by your side). But I do hold space for the way our pedestal of male proximity taints Sappho-sanctioned homes, turns comrades to enemies. I am not your enemy - nor are the men I decide to take to bed. The hands that pin you with fear are the same that keep me pinned, spread-eagle, to the dissection table. The tools of scrutiny they use to slice into your heart and diagnose disorder are the same that interrogate mine for beating in two directions. You claim that I am the one performing your dissection (and perhaps I am complicit, as humans often are), but look to your hands and see the bloodied scalpel you hold. This is not the moral failing of you or I, it is the fault of a world addicted to conformity, snorting identical lines of ideological lies. I do not need you to link arms with me; my arms are heavy with the bricks of liberation. I do not need you to take my hand, tell me my sexuality is valid; my hands are busy writing this poem of resistance. I know I have a seat at our table; I need you to let me take it. Regardless of whose bed I'm leaving.`,
     publishedDate: '2026-01-15',
     wallNumber: '01'
   },
@@ -61,32 +43,8 @@ when you stop pretending.`,
     title: 'POLYAMORY',
     author: 'Nix Carlson',
     category: 'Love & Relationships',
-    excerpt: 'They ask how it works, like love is a math problem with only one solution...',
-    content: `They ask how it works,
-like love is a math problem
-with only one solution.
-
-But love isn't division—
-it's multiplication.
-My heart doesn't split
-into smaller pieces;
-it grows larger rooms.
-
-Yes, it's complicated.
-So is a symphony.
-So is a garden.
-So is anything worth doing.
-
-I'm learning that jealousy
-isn't a proof of love—
-it's a question to ask yourself.
-Compersion is the answer:
-joy in the joy of those you love.
-
-We're making it up as we go,
-writing our own instruction manual,
-and isn't that what love
-has always been?`,
+    excerpt: 'i know i look to you like a child / never quite loved right...',
+    content: `i know i look to you like a child / never quite loved right. / numb fingers turning over loose stones / searching for the beetle-husk of validation. / hands pulling up fistfuls of weeds / set carefully in vases / mistook for wildflowers. / starved / for scraps of proof / that i am of any importance. / needed by anyone. / i know i seem to be collecting illicit scandals / lovers / like pennies in my pocket. / forever scouring the pavement for something shiny and new / to toss in with the rest / to forget as tarnish sets in / to trade for sweets / or paints / or triple-a batteries / the next time i'm bored. / greedy girl / jangling my loose change for all to hear. / as if i might even be proud of my earnings. / i'm sure you think i'm afraid / of the color white / and diamond rings / and anything deep enough to drown in. / sprinting towards dust bowls at the sight of a puddle. / the wind blows / leaves me dirt-streaked / sand-mouthed / but breathing. / no shackled weights on my fingers. / i confess, i am a little scared of vows / but only because i haven't learned to write about love / without loss. / i know jealousy's branding iron sizzles through your lungs. / i know you'd prefer your desires only unearthed on a new moon. / i know you could never.`,
     publishedDate: '2026-01-20',
     wallNumber: '02'
   },
@@ -95,32 +53,8 @@ has always been?`,
     title: 'YES',
     author: 'Nix Carlson',
     category: 'Love & Relationships',
-    excerpt: 'Yes to the first kiss that tasted like coffee and courage...',
-    content: `Yes to the first kiss
-that tasted like coffee and courage.
-
-Yes to the second date
-where we talked until the restaurant
-closed around us.
-
-Yes to the third month
-when I stopped counting
-and started believing.
-
-Yes to moving in together,
-to learning how you fold towels
-(wrong, but I love you anyway).
-
-Yes to the hard conversations,
-the ones that start with
-"we need to talk"
-and end with
-"I'm not going anywhere."
-
-Yes to forever,
-whatever shape it takes.
-Yes to us.
-Yes.`,
+    excerpt: 'gravity wraps my hair in its fist and pulls me on top...',
+    content: `gravity wraps my hair in its fist and pulls me on top, breaks all his rules (all my rules, too) to look down on me from below i hold his breath against my tongue: spearmint orbiting teeth notes of nicotine and soured sleep, drink every last drop of rum from his lips as if I could drink him sober fingers flex prints into the flesh of my waist he climbs my ribcage until i arch to my breasts skin supple and giving into his will grab me by the throat like a rabid dog and feel my life, ruinous and red, rushing past your fingers star burst vision and rusted breath my fingers sprinting to hold yours in place tighter, tighter. time slows the yes before palm connects with the side of my face, knocks my moan to the floor with a sting soothed by restraint eyes on me. stay.`,
     publishedDate: '2026-01-25',
     wallNumber: '03'
   },
@@ -129,32 +63,8 @@ Yes.`,
     title: 'REASONS YOU REFUSE TO DATE ME',
     author: 'Nix Carlson',
     category: 'Love & Relationships',
-    excerpt: 'You say I\'m too intense, like it\'s a warning label on a bottle of something dangerous...',
-    content: `You say I'm too intense,
-like it's a warning label
-on a bottle of something dangerous.
-
-You say you need space,
-but I see the way you orbit
-everyone else's gravity.
-
-You say timing is everything,
-but I've been waiting
-for the right moment
-since before we met.
-
-You say you're not ready,
-and maybe that's true,
-or maybe I'm just not
-the one you want to be ready for.
-
-Either way,
-I'm learning to accept
-that sometimes
-the door is closed
-not because it's locked,
-but because it was never
-meant for me to open.`,
+    excerpt: 'my nose is too big. so are my thighs. my tits are too small...',
+    content: `my nose is too big. so are my thighs. my tits are too small. my haircut is queer. i'm blind without contacts, so i'll never truly see you wracked with sobs in the kitchen at three in the morning. i believe silence is made to be broken. so are mugs. but i refuse to believe people are. my heart is too soft, a squishy thing oozing through your fingers. my blood contains over the legal limit of ink. i'll stain your hands. one day i'll call you a narcissistic drunk. then sober up over the toilet, sick with remorse, useless to you. when you smash the porcelain vase masquerading as my body, i'll sit down with gold and glue, fix the cracks to glisten. i'll immortalize you, clad in cheap metaphor. i love too many people, and they've all undressed me. in one way or another. my heart has turned blind to suffering. i invite death in for tea, slide an envelope across the table, stuffed with rival's names yours at the top and a wad of cash to seal the deal. i'll tell you i'm not a liar and i'll be lying.`,
     publishedDate: '2026-01-30',
     wallNumber: '04'
   },
@@ -163,33 +73,8 @@ meant for me to open.`,
     title: 'I PROBABLY L*VE YOU',
     author: 'Nix Carlson',
     category: 'Love & Relationships',
-    excerpt: 'I can\'t say it yet, not out loud, not with all four letters in the right order...',
-    content: `I can't say it yet,
-not out loud,
-not with all four letters
-in the right order.
-
-But I probably l*ve you
-in the way I remember
-how you take your coffee.
-
-But I probably l*ve you
-in the way I text you
-the street art I see
-because you'd appreciate it.
-
-I probably l*ve you
-in the way I'm scared
-of how much I probably l*ve you.
-
-One day I'll say it without the asterisk,
-without the probably,
-without the fear.
-
-But for now,
-know this:
-I probably l*ve you
-more than I know how to say.`,
+    excerpt: 'but we\'re sitting in your car under the broken streetlight...',
+    content: `but we're sitting in your car under the broken streetlight / and you're telling me we're through / it's barely july / and the air bites negative / i can see my breath stall between us / you probably l*ve me / but you lean in at the bar / all cocksure smiles / as you say i'm just an obligation / and i can feel my heartbeat thrumming in my ears / static in my veins / and maybe you l*ve me / but you've texted me three times in two weeks / to tell me how much you h*te me / so it's possible / maybe / you mean it / whispering l*ve into the midnight hush on your couch / but honesty has a habit of curdling in your throat / so the words sound more like / I think we should f*ck / and I end up kissing sour lips / because you definitely don't l*ve me / i'm more of a vice / the bacardi you're parched for / a thought loop you can't close / an aged tattoo on your clavicle that won't wash off / the problem is / that my feelings don't dissipate / at golden hour / so i c*re about you / but when i say it / it has to sound like / did you get home safe? / i l*ve you / but i have to bite my tongue and say / yes, touch me there / there, again / i l*ve you / and i'm down for whatever / even forever / but i know you're not planning past thursday / so don't insult me with / i probably love you.`,
     publishedDate: '2026-02-05',
     wallNumber: '05'
   }
@@ -359,7 +244,7 @@ export function CollectionGalleryPage() {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
             transition={{ type: "spring", damping: 25 }}
-            className="bg-[#FAF8F5] max-w-3xl w-full max-h-[90vh] overflow-y-auto relative"
+            className="bg-[#FAF8F5] max-w-2xl w-full max-h-[90vh] overflow-y-auto relative"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}
@@ -371,41 +256,47 @@ export function CollectionGalleryPage() {
             </button>
 
             {/* Modal Content */}
-            <div className="p-12 md:p-16">
+            <div className="p-8 md:p-12">
               {/* Wall Number */}
               <div className="font-['Courier_New'] text-xs tracking-wider text-[#8B7355] mb-6 uppercase">
                 Wall {selectedPiece.wallNumber}
               </div>
 
-              {/* Title */}
-              <h2 className="font-['Cardo'] text-5xl md:text-6xl text-[#2C1810] mb-4 leading-tight">
-                {selectedPiece.title}
-              </h2>
+              {/* Header */}
+              <div className="mb-8">
+                {/* Title */}
+                <h2 className="font-['Cardo'] text-2xl md:text-3xl tracking-wide text-[#2C1810] mb-4 leading-tight">
+                  {selectedPiece.title}
+                </h2>
 
-              {/* Author & Date */}
-              <div className="flex items-center gap-4 mb-12 pb-8 border-b border-[#C4A265]/30">
-                <p className="font-['Courier_New'] text-sm text-[#8B7355]">
-                  by {selectedPiece.author}
-                </p>
-                <span className="text-[#C4A265]">•</span>
-                <p className="font-['Courier_New'] text-sm text-[#8B7355]">
-                  {new Date(selectedPiece.publishedDate).toLocaleDateString('en-US', {
-                    month: 'long',
-                    day: 'numeric',
-                    year: 'numeric'
-                  })}
-                </p>
+                {/* Author & Date */}
+                <div className="flex items-center gap-4 pb-8 border-b border-[#C4A265]/30">
+                  <p className="font-['Courier_New'] text-sm text-[#8B7355]">
+                    by {selectedPiece.author}
+                  </p>
+                  <span className="text-[#C4A265]">•</span>
+                  <p className="font-['Courier_New'] text-sm text-[#8B7355]">
+                    {new Date(selectedPiece.publishedDate).toLocaleDateString('en-US', {
+                      month: 'long',
+                      day: 'numeric',
+                      year: 'numeric'
+                    })}
+                  </p>
+                </div>
               </div>
 
-              {/* Poem Content */}
-              <div className="prose prose-lg max-w-none">
-                <div className="font-['Libre_Baskerville'] text-xl text-[#2C1810] leading-loose whitespace-pre-line">
-                  {selectedPiece.content}
+              {/* Decorative Divider with Content */}
+              <div className="border-t border-[#E8E0D8] py-8">
+                {/* Poem Content */}
+                <div className="prose prose-lg max-w-none">
+                  <div className="font-['Libre_Baskerville'] text-base text-[#2C1810] leading-loose whitespace-pre-line">
+                    {selectedPiece.content}
+                  </div>
                 </div>
               </div>
 
               {/* Category Tag */}
-              <div className="mt-12 pt-8 border-t border-[#C4A265]/30">
+              <div className="pt-8 border-t border-[#C4A265]/30">
                 <span className="inline-block px-4 py-2 bg-[#C4A265]/10 border border-[#C4A265]/30 text-[#2C1810] text-sm font-['Inter'] font-medium uppercase tracking-wider">
                   {selectedPiece.category}
                 </span>

@@ -75,87 +75,26 @@ export function AboutPage() {
             Editorial Team
           </h2>
           
-          <div className="grid md:grid-cols-3 gap-12">
+          <div className="flex justify-center gap-8 max-w-3xl mx-auto">
             {/* Editor-in-Chief */}
-            <div className="bg-white border-2 border-[#E0D8D0] rounded-lg overflow-hidden hover:border-[#C4A265] transition-all">
-              <div className="aspect-[3/4] bg-gradient-to-br from-[#C4A265]/20 to-[#E11D48]/20 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="w-32 h-32 mx-auto bg-white/80 rounded-full flex items-center justify-center mb-4">
-                    <Feather className="w-12 h-12 text-[#E11D48]" />
-                  </div>
-                  <div className="font-['Courier_New'] text-xs text-[#8B7355] uppercase tracking-wider">
-                    Photo
-                  </div>
-                </div>
-              </div>
-              <div className="p-8">
-                <h3 className="font-['Cardo'] text-3xl text-[#2C1810] mb-2">
-                  Elena Moretti
-                </h3>
-                <p className="font-['Courier_New'] text-xs text-[#E11D48] uppercase tracking-wider mb-4">
-                  Editor-in-Chief
-                </p>
-                <p className="font-[family-name:var(--font-ui)] text-sm text-[#8B7355] leading-relaxed">
-                  Elena brings fifteen years of editorial experience from <em>The Paris Review</em> and <em>Granta</em>. She holds an MFA from Iowa and believes that every manuscript deserves a careful, generous read. Her work has appeared in <em>Best American Essays</em> and <em>The New Yorker</em>.
-                </p>
-              </div>
+            <div className="flex-1 bg-white border-2 border-[#E0D8D0] rounded-lg p-8 text-center hover:border-[#C4A265] transition-all">
+              <h3 className="font-['Cardo'] text-3xl text-[#2C1810] mb-2">
+                Bea Sophia
+              </h3>
+              <p className="font-['Courier_New'] text-xs text-[#E11D48] uppercase tracking-wider">
+                Editor-in-Chief
+              </p>
             </div>
 
-            {/* Poetry Editor */}
-            <div className="bg-white border-2 border-[#E0D8D0] rounded-lg overflow-hidden hover:border-[#C4A265] transition-all">
-              <div className="aspect-[3/4] bg-gradient-to-br from-[#8B7355]/20 to-[#C4A265]/20 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="w-32 h-32 mx-auto bg-white/80 rounded-full flex items-center justify-center mb-4">
-                    <BookOpen className="w-12 h-12 text-[#8B7355]" />
-                  </div>
-                  <div className="font-['Courier_New'] text-xs text-[#8B7355] uppercase tracking-wider">
-                    Photo
-                  </div>
-                </div>
-              </div>
-              <div className="p-8">
-                <h3 className="font-['Cardo'] text-3xl text-[#2C1810] mb-2">
-                  Marcus Chen
-                </h3>
-                <p className="font-['Courier_New'] text-xs text-[#8B7355] uppercase tracking-wider mb-4">
-                  Poetry Editor
-                </p>
-                <p className="font-[family-name:var(--font-ui)] text-sm text-[#8B7355] leading-relaxed">
-                  Marcus is the author of two poetry collections and a Pushcart Prize winner. He champions innovative voices and believes poetry should be accessible without being simplistic. Previously poetry editor at <em>Tin House</em>, he teaches at Columbia University.
-                </p>
-              </div>
+            {/* Head of Print */}
+            <div className="flex-1 bg-white border-2 border-[#E0D8D0] rounded-lg p-8 text-center hover:border-[#C4A265] transition-all">
+              <h3 className="font-['Cardo'] text-3xl text-[#2C1810] mb-2">
+                Giove Pierra
+              </h3>
+              <p className="font-['Courier_New'] text-xs text-[#8B7355] uppercase tracking-wider">
+                Head of Print
+              </p>
             </div>
-
-            {/* Fiction Editor */}
-            <div className="bg-white border-2 border-[#E0D8D0] rounded-lg overflow-hidden hover:border-[#C4A265] transition-all">
-              <div className="aspect-[3/4] bg-gradient-to-br from-[#E11D48]/20 to-[#8B7355]/20 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="w-32 h-32 mx-auto bg-white/80 rounded-full flex items-center justify-center mb-4">
-                    <Heart className="w-12 h-12 text-[#E11D48]" />
-                  </div>
-                  <div className="font-['Courier_New'] text-xs text-[#8B7355] uppercase tracking-wider">
-                    Photo
-                  </div>
-                </div>
-              </div>
-              <div className="p-8">
-                <h3 className="font-['Cardo'] text-3xl text-[#2C1810] mb-2">
-                  Amara Johnson
-                </h3>
-                <p className="font-['Courier_New'] text-xs text-[#C4A265] uppercase tracking-wider mb-4">
-                  Fiction Editor
-                </p>
-                <p className="font-[family-name:var(--font-ui)] text-sm text-[#8B7355] leading-relaxed">
-                  Amara's debut novel was longlisted for the National Book Award. She's passionate about narrative voices that challenge conventions and stories that linger long after the last page. She was fiction editor at <em>One Story</em> and holds an MFA from Michigan.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-12 text-center">
-            <p className="font-['Libre_Baskerville'] text-lg text-[#8B7355] italic">
-              Plus a dedicated team of contributing editors, readers, and community moderators
-            </p>
           </div>
         </div>
       </section>

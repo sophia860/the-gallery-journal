@@ -51,7 +51,7 @@ export function ReadingModal({
 
   return (
     <div className="fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 md:p-8 animate-in fade-in duration-300">
-      <div className="bg-[#FEFCF8] max-w-4xl w-full max-h-[95vh] overflow-y-auto relative shadow-2xl animate-in slide-in-from-bottom-4 duration-300">
+      <div className="bg-[#FEFCF8] max-w-2xl w-full max-h-[95vh] overflow-y-auto relative shadow-2xl animate-in slide-in-from-bottom-4 duration-300">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -61,16 +61,16 @@ export function ReadingModal({
         </button>
 
         {/* Content */}
-        <div className="p-8 md:p-16">
+        <div className="p-8 md:p-12">
           {/* Header */}
-          <div className="mb-12">
+          <div className="mb-8">
             {/* Category Badge */}
             <span className="inline-block px-3 py-1 bg-[#E11D48]/10 text-[#E11D48] text-xs font-['Inter'] uppercase tracking-wider mb-6">
               {category}
             </span>
 
             {/* Title */}
-            <h1 className="font-['Cardo'] text-5xl md:text-6xl text-[#2C2C2C] mb-6 leading-tight">
+            <h1 className="font-['Cardo'] text-lg md:text-xl tracking-wide text-[#2C2C2C] mb-6 leading-tight">
               {title}
             </h1>
 
@@ -93,10 +93,13 @@ export function ReadingModal({
             </div>
           </div>
 
-          {/* Poem Content */}
-          <div className="prose prose-lg max-w-none mb-12">
-            <div className="font-['Libre_Baskerville'] text-xl leading-loose whitespace-pre-wrap text-[#2C2C2C]">
-              {content}
+          {/* Decorative Divider */}
+          <div className="border-t border-[#E8E0D8] py-8">
+            {/* Poem Content */}
+            <div className="prose prose-lg max-w-none">
+              <div className="font-['Libre_Baskerville'] text-base leading-loose whitespace-pre-wrap text-[#2C2C2C]">
+                {content}
+              </div>
             </div>
           </div>
 

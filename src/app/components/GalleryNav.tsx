@@ -1,44 +1,58 @@
+import { motion } from 'motion/react';
+
 export function GalleryNav() {
   return (
-    <nav className="w-full bg-[#EDE6D6] border-b border-[#1A1A1A]/10">
-      <div className="max-w-7xl mx-auto px-8 py-6">
-        <div className="flex items-center justify-center gap-6 flex-wrap">
-          <a
-            href="/"
-            className="font-['Courier_New'] text-[18px] uppercase tracking-[0.15em] text-[#1A1A1A] hover:text-[#8B2500] transition-colors"
-          >
-            EXHIBITS
-          </a>
-          <span className="text-[#4A4A4A]">·</span>
+    <motion.nav
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8 }}
+      className="fixed top-0 left-0 right-0 z-50 bg-[#FAF8F5]/95 backdrop-blur-sm border-b border-[#8B7355]/10 relative"
+    >
+      <div className="max-w-7xl mx-auto px-8 py-6 flex items-center justify-between">
+        {/* Logo - Playfair Display italic, larger */}
+        <a href="/" className="font-['Playfair_Display'] text-3xl italic font-light text-[#2C1810] hover:text-[#8B7355] transition-colors">
+          The Gallery
+        </a>
+
+        {/* Nav links - Inter, small, uppercase, spaced */}
+        <div className="flex items-center gap-8">
           <a
             href="/collection-gallery"
-            className="font-['Courier_New'] text-[18px] uppercase tracking-[0.15em] text-[#1A1A1A] hover:text-[#8B2500] transition-colors"
+            className="font-['Inter'] text-[13px] uppercase tracking-[0.15em] text-[#2C1810] hover:text-[#8B7355] transition-colors"
           >
-            COLLECTION
+            Collection
           </a>
-          <span className="text-[#4A4A4A]">·</span>
-          <a
-            href="/archive"
-            className="font-['Courier_New'] text-[18px] uppercase tracking-[0.15em] text-[#1A1A1A] hover:text-[#8B2500] transition-colors"
-          >
-            ARCHIVE
-          </a>
-          <span className="text-[#4A4A4A]">·</span>
-          <a
-            href="/submit"
-            className="font-['Courier_New'] text-[18px] uppercase tracking-[0.15em] text-[#1A1A1A] hover:text-[#8B2500] transition-colors"
-          >
-            SUBMIT
-          </a>
-          <span className="text-[#4A4A4A]">·</span>
           <a
             href="/about"
-            className="font-['Courier_New'] text-[18px] uppercase tracking-[0.15em] text-[#1A1A1A] hover:text-[#8B2500] transition-colors"
+            className="font-['Inter'] text-[13px] uppercase tracking-[0.15em] text-[#2C1810] hover:text-[#8B7355] transition-colors"
           >
-            ABOUT
+            About
+          </a>
+          
+          {/* Divider */}
+          <div className="w-px h-4 bg-[#8B7355]/20"></div>
+          
+          {/* Auth links - plain text, understated */}
+          <a
+            href="/signin"
+            className="font-['Inter'] text-[13px] uppercase tracking-[0.15em] text-[#8B7355] hover:text-[#2C1810] transition-colors"
+          >
+            Sign In
+          </a>
+          <a
+            href="/signup"
+            className="font-['Inter'] text-[13px] uppercase tracking-[0.15em] text-[#8B7355] hover:text-[#2C1810] transition-colors"
+          >
+            Join
           </a>
         </div>
       </div>
-    </nav>
+
+      {/* Hand-drawn line under nav */}
+      <div 
+        className="absolute bottom-0 left-0 right-0 h-px bg-[#8B7355]/20"
+        style={{ transform: 'rotate(-0.3deg)' }}
+      ></div>
+    </motion.nav>
   );
 }

@@ -7,9 +7,6 @@ import { GalleryLandingPage } from './pages/GalleryLandingPage';
 import { AboutPage } from './pages/AboutPage';
 import { ExhibitPage } from './pages/ExhibitPage';
 import { CollectionGalleryPage } from './pages/CollectionGalleryPage';
-import { ArchivePage } from './pages/ArchivePage';
-import { PiecePage } from './pages/PiecePage';
-import { SubmitPage } from './pages/SubmitPage';
 
 // Editor Pages
 import { EditorLoginPage } from './pages/EditorLoginPage';
@@ -116,13 +113,6 @@ function AppContent() {
     pageContent = <ExhibitPage exhibitId={exhibitId} />;
   } else if (route === '/collection-gallery' || route === '/collection') {
     pageContent = <CollectionGalleryPage />;
-  } else if (route === '/archive') {
-    pageContent = <ArchivePage />;
-  } else if (route.startsWith('/piece/')) {
-    const pieceId = route.split('/piece/')[1];
-    pageContent = <PiecePage pieceId={pieceId} />;
-  } else if (route === '/submit') {
-    pageContent = <SubmitPage />;
   }
   
   // Editor Pages

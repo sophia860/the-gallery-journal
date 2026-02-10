@@ -37,8 +37,6 @@ function getSupabaseClient() {
           persistSession: true,
           autoRefreshToken: true,
           detectSessionInUrl: true,
-          storageKey: 'sb-page-gallery-auth',
-          storage: typeof window !== 'undefined' ? window.localStorage : undefined,
         },
       }
     );

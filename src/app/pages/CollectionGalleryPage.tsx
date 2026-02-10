@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { motion } from 'motion/react';
 import { GalleryNav } from '../components/GalleryNav';
 import { GalleryFooter } from '../components/GalleryFooter';
 import { RandomPoemButton } from '../components/RandomPoemButton';
@@ -7,44 +8,49 @@ import { RandomPoemButton } from '../components/RandomPoemButton';
 const winterPoems = [
   {
     id: '1',
-    title: 'I Thought You\'d Been Queer Longer Than That',
+    title: 'I THOUGHT YOU\'D BEEN QUEER LONGER THAN THAT',
     author: 'Nix Carlson',
     category: 'Self & Introspection',
+    wallNumber: '01',
+    layout: 'left',
     background: '#FAF8F5',
-    alignment: 'left',
   },
   {
     id: '2',
-    title: 'Polyamory',
+    title: 'POLYAMORY',
     author: 'Nix Carlson',
     category: 'Love & Relationships',
+    wallNumber: '02',
+    layout: 'right',
     background: '#F0E8DC',
-    alignment: 'right',
   },
   {
     id: '3',
-    title: 'Yes',
+    title: 'YES',
     author: 'Nix Carlson',
     category: 'Love & Relationships',
+    wallNumber: '03',
+    layout: 'center',
     background: '#FAF8F5',
-    alignment: 'center',
   },
   {
     id: '4',
-    title: 'Reasons You Refuse to Date Me',
+    title: 'REASONS YOU REFUSE TO DATE ME',
     author: 'Nix Carlson',
     category: 'Love & Relationships',
+    wallNumber: '04',
+    layout: 'left',
     background: '#2C1810',
-    textColor: '#FAF8F5',
-    alignment: 'left',
+    textColor: '#F5F0EB',
   },
   {
     id: '5',
-    title: 'I Probably L*ve You',
+    title: 'I PROBABLY L*VE YOU',
     author: 'Nix Carlson',
     category: 'Love & Relationships',
+    wallNumber: '05',
+    layout: 'right',
     background: '#F0E8DC',
-    alignment: 'right',
   },
 ];
 
@@ -74,123 +80,184 @@ function PoemSection({ poem, index }: { poem: typeof winterPoems[0]; index: numb
     };
   }, []);
 
-  const alignmentClasses = {
-    left: 'text-left pl-[10%] pr-[30%]',
-    right: 'text-right pl-[30%] pr-[10%]',
-    center: 'text-center px-[15%]',
+  const layoutClasses = {
+    left: 'items-start text-left pr-[30%]',
+    right: 'items-end text-left pl-[30%]',
+    center: 'items-center text-center px-[15%]',
   };
 
   return (
-    <section
-      ref={sectionRef}
-      className="poem-section px-8 py-24 relative opacity-0 transition-all duration-1000"
-      style={{
-        backgroundColor: poem.background,
-        color: poem.textColor || '#1A1A1A',
-        boxShadow: 'inset 0 0 40px rgba(44,24,16,0.06)',
-        transform: 'translateY(32px)',
-        marginTop: index === 0 ? 0 : '120px'
-      }}
-    >
-      {/* Margin annotation - left side */}
-      <div className="absolute left-8 top-8">
-        <p className="font-['Courier_New'] text-[12px]" style={{ color: poem.textColor ? `${poem.textColor}80` : '#4A4A4A' }}>
-          [{index === 0 ? 'first published here' : index === 1 ? 'february exhibit' : index === 2 ? 'read slowly' : index === 3 ? 'new voices' : 'winter collection'}]
-        </p>
-      </div>
+    <>
+      <section
+        ref={sectionRef}
+        className="poem-section min-h-screen flex flex-col justify-center px-8 md:px-16 py-24 relative transition-all duration-1000 opacity-0 translate-y-8"
+        style={{
+          backgroundColor: poem.background,
+          color: poem.textColor || '#2C1810',
+        }}
+      >
+        {/* Paper grain texture */}
+        <div className="absolute inset-0 opacity-[0.015] pointer-events-none" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' /%3E%3C/svg%3E")`,
+          backgroundRepeat: 'repeat',
+        }}></div>
 
-      <div className={`max-w-[650px] ${poem.alignment === 'center' ? 'mx-auto' : poem.alignment === 'right' ? 'ml-auto' : ''} ${alignmentClasses[poem.alignment as keyof typeof alignmentClasses]}`}>
-        {/* Author name ABOVE piece - manuscript attribution style */}
-        <p className="font-['Courier_New'] text-[14px] mb-4 uppercase tracking-[0.1em]" style={{ color: poem.textColor ? `${poem.textColor}CC` : '#4A4A4A' }}>
-          {poem.author}
-        </p>
-
-        {/* Poem Title */}
-        <h2 className="font-['Special_Elite'] mb-12" style={{ 
-          fontSize: 'clamp(28px, 5vw, 36px)', 
-          lineHeight: '1.3',
-          color: poem.textColor || '#1A1A1A'
-        }}>
-          {poem.title}
-        </h2>
-
-        {/* Placeholder for poem text */}
-        <div className="font-['Source_Serif_Pro'] text-[18px] mb-12" style={{ 
-          lineHeight: '1.9',
-          color: poem.textColor ? `${poem.textColor}99` : '#4A4A4A'
-        }}>
-          <p className="italic">
-            Visit the full exhibit to read this piece
-          </p>
-        </div>
-
-        {/* Link to full piece */}
-        <a
-          href="https://pagegalleryjournal.com/nixcarlson"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-['Courier_New'] text-[14px] uppercase tracking-[0.1em] hover:text-[#8B2500]"
-          style={{ color: poem.textColor || '#1A1A1A' }}
-        >
-          READ FULL PIECE →
-        </a>
-      </div>
-
-      {/* Pull Quote (appears on 2nd and 4th poems) */}
-      {(index === 1 || index === 3) && (
-        <div className="max-w-[650px] mx-auto mt-24 text-center">
-          <blockquote className="font-['Special_Elite']" style={{ 
-            fontSize: 'clamp(24px, 4vw, 32px)', 
-            lineHeight: '1.4',
-            letterSpacing: '0.1em',
-            color: poem.textColor || '#1A1A1A'
+        <div className={`max-w-7xl mx-auto w-full flex flex-col ${layoutClasses[poem.layout as keyof typeof layoutClasses]}`}>
+          {/* Wall number */}
+          <div className="font-['Courier_New'] text-xs tracking-[0.4em] uppercase mb-6" style={{
+            color: poem.textColor ? `${poem.textColor}80` : '#8B7355'
           }}>
-            "WRITING THAT BREATHES"
-          </blockquote>
+            Wall {poem.wallNumber}
+          </div>
+
+          {/* Title - massive, dramatic */}
+          <h2 
+            className="font-['Playfair_Display'] italic font-light mb-12"
+            style={{
+              fontSize: 'clamp(2rem, 6vw, 5rem)',
+              lineHeight: '1.1',
+              letterSpacing: '-0.02em',
+              color: poem.textColor || '#2C1810',
+            }}
+          >
+            {poem.title}
+          </h2>
+
+          {/* Note to visit exhibit - NO fabricated content */}
+          <p 
+            className="font-['Libre_Baskerville'] italic text-lg mb-8"
+            style={{
+              color: poem.textColor ? `${poem.textColor}99` : '#8B735599',
+            }}
+          >
+            Visit the exhibit to read this piece
+          </p>
+
+          {/* Author - small, understated */}
+          <div className="mt-8">
+            <p className="font-['Libre_Baskerville'] text-base" style={{
+              color: poem.textColor ? `${poem.textColor}99` : '#8B7355'
+            }}>
+              {poem.author}
+            </p>
+            <p className="font-['Courier_New'] text-xs tracking-wider mt-1" style={{
+              color: poem.textColor ? `${poem.textColor}66` : '#8B735566'
+            }}>
+              {poem.category}
+            </p>
+          </div>
+
+          {/* Read full piece link */}
+          <a
+            href="https://pagegalleryjournal.com/nixcarlson"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 mt-8 font-['Inter'] text-sm font-medium group"
+            style={{
+              color: poem.textColor || '#2C1810',
+            }}
+          >
+            <span className="border-b border-current">Read full piece</span>
+            <span className="transform group-hover:translate-x-1 transition-transform">→</span>
+          </a>
+        </div>
+      </section>
+
+      {/* Visual divider - hand-drawn feel */}
+      {index < winterPoems.length - 1 && (
+        <div className="relative h-24 flex items-center justify-center" style={{
+          backgroundColor: index % 2 === 0 ? '#F0E8DC' : '#FAF8F5'
+        }}>
+          {index % 3 === 0 ? (
+            // Wavy line
+            <div 
+              className="w-48 h-px bg-current opacity-30"
+              style={{
+                transform: 'rotate(-1deg)',
+                color: '#8B7355',
+              }}
+            ></div>
+          ) : index % 3 === 1 ? (
+            // Decorative symbol
+            <div className="font-['Playfair_Display'] text-2xl opacity-20" style={{ color: '#8B7355' }}>
+              ✦
+            </div>
+          ) : (
+            // Dotted line
+            <div className="flex gap-2">
+              {[...Array(5)].map((_, i) => (
+                <div 
+                  key={i} 
+                  className="w-1 h-1 rounded-full bg-current opacity-30"
+                  style={{ 
+                    color: '#8B7355',
+                    transform: `translateY(${Math.sin(i) * 2}px)`
+                  }}
+                ></div>
+              ))}
+            </div>
+          )}
         </div>
       )}
-    </section>
+    </>
   );
 }
 
 export function CollectionGalleryPage() {
   return (
-    <div className="min-h-screen bg-[#F5F0E8]">
+    <div className="min-h-screen bg-[#FAF8F5]">
+      {/* Paper grain texture */}
+      <div className="fixed inset-0 opacity-[0.015] pointer-events-none" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' /%3E%3C/svg%3E")`,
+        backgroundRepeat: 'repeat',
+      }}></div>
+
+      {/* Navigation */}
       <GalleryNav />
+
+      {/* Random Poem Button */}
       <RandomPoemButton />
 
-      {/* Header - Large Monospaced Title */}
-      <section className="px-8 py-24 text-center bg-[#FAF8F5]" style={{ boxShadow: 'inset 0 0 40px rgba(44,24,16,0.06)' }}>
-        <h1 className="font-['Special_Elite'] text-[#1A1A1A] mb-8" style={{ fontSize: 'clamp(36px, 6vw, 48px)', lineHeight: '1.2' }}>
-          CURRENT EXHIBIT: FEBRUARY 2026
-        </h1>
-        
-        {/* Curator's Note */}
-        <div className="max-w-[650px] mx-auto">
-          <p className="font-['Source_Serif_Pro'] italic text-[18px] text-[#1A1A1A] leading-relaxed">
-            Five poems by Nix Carlson exploring belonging, identity, and the spaces we create for love. Each piece sits in its own room—read slowly, let the words breathe.
+      {/* Issue Header - Just the name, massive */}
+      <motion.section
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1.5 }}
+        className="px-8 md:px-16 pt-32 pb-16"
+      >
+        <div className="max-w-7xl mx-auto">
+          {/* Season marker */}
+          <p className="font-['Courier_New'] text-xs tracking-[0.4em] text-[#8B7355] uppercase mb-6">
+            Winter 2026
+          </p>
+
+          {/* Issue name - oversized */}
+          <h1 
+            className="font-['Playfair_Display'] italic font-light text-[#2C1810]"
+            style={{
+              fontSize: 'clamp(3rem, 10vw, 9rem)',
+              lineHeight: '1.05',
+              letterSpacing: '-0.03em',
+            }}
+          >
+            The<br />Collection
+          </h1>
+
+          {/* Subtitle - breathing */}
+          <p className="font-['Libre_Baskerville'] text-xl md:text-2xl text-[#8B7355] mt-8 max-w-2xl" style={{
+            lineHeight: '1.7'
+          }}>
+            Five pieces on belonging, identity, and the spaces we create for love
           </p>
         </div>
-      </section>
+      </motion.section>
 
-      {/* Poem Sections - Alternating Alignment */}
+      {/* Poem Sections */}
       {winterPoems.map((poem, index) => (
         <PoemSection key={poem.id} poem={poem} index={index} />
       ))}
 
-      {/* Bottom Spacer */}
-      <div style={{ height: '120px' }}></div>
-
-      {/* Back to Gallery Link */}
-      <section className="px-8 pb-24 text-center">
-        <a
-          href="/"
-          className="font-['Courier_New'] text-[14px] uppercase tracking-[0.1em] text-[#1A1A1A] hover:text-[#8B2500]"
-        >
-          ← BACK TO GALLERY
-        </a>
-      </section>
-
+      {/* Footer */}
       <GalleryFooter />
 
       {/* Scroll fade-in CSS */}

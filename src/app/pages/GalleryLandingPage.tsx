@@ -1,212 +1,279 @@
+import { motion } from 'motion/react';
+import { ArrowRight } from 'lucide-react';
 import { GalleryNav } from '../components/GalleryNav';
 import { GalleryFooter } from '../components/GalleryFooter';
 import { RandomPoemButton } from '../components/RandomPoemButton';
 
 export function GalleryLandingPage() {
   return (
-    <div className="min-h-screen bg-[#F5F0E8]">
+    <div className="min-h-screen bg-[#FAF8F5] relative">
+      {/* Paper grain texture */}
+      <div className="fixed inset-0 opacity-[0.015] pointer-events-none" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' /%3E%3C/svg%3E")`,
+        backgroundRepeat: 'repeat',
+      }}></div>
+
+      {/* Navigation */}
       <GalleryNav />
+      
+      {/* Random Poem Button */}
       <RandomPoemButton />
 
-      {/* Hero - LEFT-ALIGNED, generous whitespace */}
-      <section className="px-8 py-32" style={{ paddingLeft: '8%' }}>
-        <div className="max-w-4xl">
-          <h1 className="font-['Special_Elite'] text-[#1A1A1A] mb-8 text-left" style={{ fontSize: 'clamp(56px, 7vw, 64px)', lineHeight: '1.2' }}>
-            THE PAGE GALLERY
-          </h1>
-          <p className="font-['Source_Serif_Pro'] italic text-[18px] text-[#4A4A4A] mb-12 leading-relaxed text-left">
-            a gallery, but online. a journal, but not academic.
-          </p>
-          <div className="w-[40%] h-px bg-[#4A4A4A]"></div>
-        </div>
-      </section>
+      {/* FOYER - Featured Exhibit (NO fabricated poetry) */}
+      <motion.section 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 2 }}
+        className="min-h-screen flex items-center justify-center px-8 md:px-16 relative"
+        style={{ paddingTop: 'clamp(4rem, 12vh, 8rem)', paddingBottom: 'clamp(4rem, 12vh, 8rem)' }}
+      >
+        {/* Asymmetric background accent */}
+        <div className="absolute top-0 right-0 w-[40%] h-[60%] bg-gradient-to-bl from-[#F0E8DC]/30 to-transparent"></div>
+        
+        <div className="max-w-5xl mx-auto relative">
+          {/* Wall number - small, understated */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1, delay: 0.5 }}
+            className="font-['Courier_New'] text-xs tracking-[0.4em] text-[#8B7355] mb-8 uppercase"
+          >
+            Featured Exhibit
+          </motion.div>
 
-      {/* FOYER - Featured Poem */}
-      <section className="px-8 py-24 bg-[#F0E8DC]" style={{ boxShadow: 'inset 0 0 40px rgba(44,24,16,0.06)' }}>
-        <div className="max-w-4xl mx-auto">
-          {/* Wall number */}
-          <p className="font-['Courier_New'] text-[12px] uppercase tracking-[0.4em] text-[#4A4A4A] mb-6">
-            Wall 01
-          </p>
+          {/* Exhibit title - HUGE, dramatic */}
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.5, delay: 0.8 }}
+            className="font-['Playfair_Display'] italic font-light text-[#2C1810] mb-12"
+            style={{ 
+              fontSize: 'clamp(3rem, 10vw, 8rem)',
+              lineHeight: '1.05',
+              letterSpacing: '-0.02em'
+            }}
+          >
+            Along the<br />
+            Oxbow
+          </motion.h1>
 
-          {/* Poem Title */}
-          <h2 className="font-['Special_Elite'] text-[#1A1A1A] mb-8" style={{ fontSize: 'clamp(32px, 6vw, 48px)', lineHeight: '1.2' }}>
-            IT WILL TAKE SEVEN YEARS TO DIGEST THIS POEM
-          </h2>
-
-          {/* Poem Excerpt - ONLY the one real line provided */}
-          <p className="font-['Source_Serif_Pro'] italic text-[18px] text-[#1A1A1A] mb-8 leading-relaxed">
-            which, coincidentally, is how long they say it takes to replace every cell in your body.
-          </p>
-
-          {/* Attribution */}
-          <div className="border-l-2 border-[#8B2500] pl-6">
-            <p className="font-['Source_Serif_Pro'] text-[16px] text-[#1A1A1A]">
-              Nix Carlson
-            </p>
-            <p className="font-['Courier_New'] text-[12px] uppercase tracking-[0.15em] text-[#4A4A4A] mt-1">
-              Winter 2026 Collection
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Current Exhibit Section - 2-column grid */}
-      <section className="px-8 py-16 bg-[#FAF8F5]" style={{ boxShadow: 'inset 0 0 40px rgba(44,24,16,0.06)' }}>
-        <div className="max-w-6xl mx-auto">
-          <h2 className="font-['Courier_New'] text-[28px] uppercase tracking-[0.15em] text-[#1A1A1A] mb-12">
-            CURRENT EXHIBIT
-          </h2>
-
-          {/* 2-column grid: 2fr 1fr */}
-          <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-12 mb-12 pb-12 border-b border-[#1A1A1A]/10">
-            <div>
-              <h3 className="font-['Courier_New'] text-[20px] uppercase tracking-[0.1em] text-[#1A1A1A] mb-4">
-                ALONG THE OXBOW
-              </h3>
-              <p className="font-['Source_Serif_Pro'] text-[16px] text-[#4A4A4A] mb-2">
-                Bri Gearhart Staton · Illustrated by Sophia Sharkey
-              </p>
-              <p className="font-['Source_Serif_Pro'] italic text-[16px] text-[#4A4A4A] mb-6">
-                An immersive poetry experience where each verse responds to the bend in the river.
-              </p>
-              <a
-                href="https://pagegalleryjournal.com/brigearhartstaton"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-['Courier_New'] text-[14px] uppercase tracking-[0.1em] text-[#1A1A1A] hover:text-[#8B2500]"
-              >
-                VIEW EXHIBIT →
-              </a>
-            </div>
-            <div className="flex items-center justify-center">
-              <div className="w-full h-48 bg-[#E8E3D8] flex items-center justify-center">
-                <p className="font-['Courier_New'] text-[12px] text-[#4A4A4A]">[illustration]</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Winter Collection */}
-          <div>
-            <h3 className="font-['Courier_New'] text-[20px] uppercase tracking-[0.1em] text-[#1A1A1A] mb-6">
-              WINTER 2026 COLLECTION
-            </h3>
-            <p className="font-['Source_Serif_Pro'] text-[16px] text-[#4A4A4A] mb-8">
+          {/* Subtitle - breathing, generous */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1.5, delay: 1.3 }}
+            className="font-['Libre_Baskerville'] text-[#2C1810]/80 leading-[1.8] space-y-6"
+            style={{ fontSize: 'clamp(1.2rem, 2.5vw, 1.5rem)' }}
+          >
+            <p>
               Five poems by Nix Carlson
             </p>
+          </motion.div>
 
-            {/* Typed list - NO excerpts */}
-            <div className="space-y-4">
-              <div className="border-b border-[#1A1A1A]/10 pb-3">
-                <a
-                  href="https://pagegalleryjournal.com/nixcarlson"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block hover:text-[#8B2500] transition-colors"
-                >
-                  <p className="font-['Courier_New'] text-[16px] text-[#1A1A1A]">
-                    I Thought You'd Been Queer Longer Than That
-                  </p>
-                  <p className="font-['Source_Serif_Pro'] text-[14px] text-[#4A4A4A] mt-1">
-                    Nix Carlson · Self & Introspection
-                  </p>
-                </a>
-              </div>
+          {/* Attribution - offset, asymmetric */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 1.8 }}
+            className="mt-12 pl-8 border-l-2 border-[#C4A265]"
+          >
+            <p className="font-['Libre_Baskerville'] text-lg text-[#8B7355] mb-4">
+              An immersive poetry experience exploring identity, love, and belonging
+            </p>
+            <p className="font-['Courier_New'] text-xs text-[#8B7355]/60 mt-1 tracking-wider uppercase">
+              Winter 2026 Collection
+            </p>
+          </motion.div>
 
-              <div className="border-b border-[#1A1A1A]/10 pb-3">
-                <a
-                  href="https://pagegalleryjournal.com/nixcarlson"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block hover:text-[#8B2500] transition-colors"
-                >
-                  <p className="font-['Courier_New'] text-[16px] text-[#1A1A1A]">
-                    Polyamory
-                  </p>
-                  <p className="font-['Source_Serif_Pro'] text-[14px] text-[#4A4A4A] mt-1">
-                    Nix Carlson · Love & Relationships
-                  </p>
-                </a>
-              </div>
-
-              <div className="border-b border-[#1A1A1A]/10 pb-3">
-                <a
-                  href="https://pagegalleryjournal.com/nixcarlson"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block hover:text-[#8B2500] transition-colors"
-                >
-                  <p className="font-['Courier_New'] text-[16px] text-[#1A1A1A]">
-                    Yes
-                  </p>
-                  <p className="font-['Source_Serif_Pro'] text-[14px] text-[#4A4A4A] mt-1">
-                    Nix Carlson · Love & Relationships
-                  </p>
-                </a>
-              </div>
-
-              <div className="border-b border-[#1A1A1A]/10 pb-3">
-                <a
-                  href="https://pagegalleryjournal.com/nixcarlson"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block hover:text-[#8B2500] transition-colors"
-                >
-                  <p className="font-['Courier_New'] text-[16px] text-[#1A1A1A]">
-                    Reasons You Refuse to Date Me
-                  </p>
-                  <p className="font-['Source_Serif_Pro'] text-[14px] text-[#4A4A4A] mt-1">
-                    Nix Carlson · Love & Relationships
-                  </p>
-                </a>
-              </div>
-
-              <div className="border-b border-[#1A1A1A]/10 pb-3">
-                <a
-                  href="https://pagegalleryjournal.com/nixcarlson"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block hover:text-[#8B2500] transition-colors"
-                >
-                  <p className="font-['Courier_New'] text-[16px] text-[#1A1A1A]">
-                    I Probably L*ve You
-                  </p>
-                  <p className="font-['Source_Serif_Pro'] text-[14px] text-[#4A4A4A] mt-1">
-                    Nix Carlson · Love & Relationships
-                  </p>
-                </a>
-              </div>
-            </div>
-
-            <div className="mt-8">
-              <a
-                href="/collection-gallery"
-                className="font-['Courier_New'] text-[14px] uppercase tracking-[0.1em] text-[#1A1A1A] hover:text-[#8B2500]"
-              >
-                VIEW FULL COLLECTION →
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* About / Mission - Pull Quote - Dramatic dark section */}
-      <section className="px-8 py-24 bg-[#2C1810]" style={{ boxShadow: 'inset 0 0 40px rgba(0,0,0,0.3)' }}>
-        <div className="max-w-3xl mx-auto text-center">
-          <blockquote className="font-['Special_Elite'] text-[24px] text-[#FAF8F5] leading-relaxed">
-            "There is no algorithm. Just a nervous system, a lot of tabs open, and a deep love for what people make when they are paying attention."
-          </blockquote>
-          <div className="mt-8">
+          {/* Enter exhibit link */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 2.2 }}
+            className="mt-12"
+          >
             <a
-              href="/about"
-              className="font-['Courier_New'] text-[14px] uppercase tracking-[0.1em] text-[#FAF8F5] hover:text-[#8B2500]"
+              href="/collection-gallery"
+              className="inline-flex items-center gap-3 px-6 py-3 bg-[#2C1810] text-white hover:bg-[#1A1A1A] transition-all font-['Inter'] text-sm font-semibold tracking-wide group"
+              style={{ borderRadius: '2px 8px 2px 8px' }}
             >
-              READ MORE →
+              Enter the Exhibit
+              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </a>
+          </motion.div>
+        </div>
+
+        {/* Scroll hint - subtle */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 2 }}
+          className="absolute bottom-12 left-1/2 -translate-x-1/2"
+        >
+          <div className="w-px h-16 bg-gradient-to-b from-[#8B7355]/40 to-transparent"></div>
+        </motion.div>
+      </motion.section>
+
+      {/* ABOUT COPY - Large, breathing, imperfect */}
+      <section className="px-8 md:px-16 py-24 md:py-32 bg-[#F0E8DC] relative overflow-hidden">
+        {/* Ink bleed effect */}
+        <div className="absolute inset-0 opacity-40" style={{
+          boxShadow: 'inset 0 0 120px rgba(44, 24, 16, 0.03), inset 0 0 60px rgba(44, 24, 16, 0.02)'
+        }}></div>
+
+        <div className="max-w-6xl mx-auto relative">
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_1.5fr] gap-16 items-start">
+            {/* Left column - smaller */}
+            <div>
+              <p className="font-['Courier_New'] text-xs tracking-[0.3em] text-[#8B7355] uppercase mb-4">
+                About Page
+              </p>
+              <h2 className="font-['Playfair_Display'] text-5xl md:text-6xl italic font-light text-[#2C1810] leading-tight">
+                A room of<br />one's own
+              </h2>
+            </div>
+
+            {/* Right column - larger, offset down */}
+            <div className="md:mt-12">
+              <p className="font-['Libre_Baskerville'] text-xl md:text-2xl text-[#2C1810] leading-relaxed mb-8" style={{ lineHeight: '1.8' }}>
+                PAGE is a literary journal that exists in the margins of traditional publishing. We believe in slow reading, in giving writers time to develop their voice, in creating space for work that doesn't fit neatly into categories.
+              </p>
+              <p className="font-['Libre_Baskerville'] text-xl md:text-2xl text-[#2C1810]/70 leading-relaxed" style={{ lineHeight: '1.8' }}>
+                Each issue is a curated exhibition—poems, prose, and hybrid forms that speak to the moment we're living through.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
+      {/* FEATURED EXHIBIT - Full bleed, dramatic */}
+      <motion.section
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ duration: 1.5 }}
+        viewport={{ once: true }}
+        className="relative overflow-hidden"
+        style={{ minHeight: 'clamp(600px, 80vh, 900px)' }}
+      >
+        {/* Textured gradient background placeholder */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#1A1F2E] via-[#2C1810] to-[#1A1F2E]">
+          {/* Atmospheric elements */}
+          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#4F46E5]/10 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-[800px] h-[800px] bg-[#C4A265]/5 rounded-full blur-3xl"></div>
+          
+          {/* Noise overlay */}
+          <div className="absolute inset-0 opacity-20 mix-blend-overlay" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' /%3E%3C/svg%3E")`
+          }}></div>
+        </div>
+
+        {/* Content - asymmetric overlay */}
+        <div className="relative h-full flex items-end px-8 md:px-16 py-16 md:py-24">
+          <div className="max-w-7xl w-full grid grid-cols-1 md:grid-cols-[1.5fr_1fr] gap-16 items-end">
+            {/* Left - oversized title */}
+            <div>
+              <motion.div
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 0.3 }}
+                viewport={{ once: true }}
+              >
+                <p className="font-['Courier_New'] text-xs tracking-[0.3em] text-[#C4A265] mb-6 uppercase">
+                  Immersive Experience
+                </p>
+                <h2 className="font-['Playfair_Display'] italic font-light text-white mb-8" style={{
+                  fontSize: 'clamp(3rem, 10vw, 8rem)',
+                  lineHeight: '0.95',
+                  letterSpacing: '-0.02em'
+                }}>
+                  Along the<br />Oxbow
+                </h2>
+              </motion.div>
+            </div>
+
+            {/* Right - credits and description, offset */}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 0.6 }}
+              viewport={{ once: true }}
+              className="md:-mb-8"
+            >
+              <div className="bg-[#2C1810]/60 backdrop-blur-sm p-8 border-l-4 border-[#C4A265]" style={{
+                borderRadius: '2px 12px 4px 8px',
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)'
+              }}>
+                <p className="font-['Libre_Baskerville'] text-lg text-[#E8E4DC] mb-4">
+                  Written by <span className="text-[#C4A265] font-semibold">Bri Gearhart Staton</span>
+                </p>
+                <p className="font-['Libre_Baskerville'] text-lg text-[#E8E4DC] mb-6">
+                  Illustrated by <span className="text-[#4F46E5] font-semibold">Sophia Sharkey</span>
+                </p>
+                <p className="font-['Libre_Baskerville'] text-base text-[#E8E4DC]/80 leading-relaxed italic mb-6">
+                  An immersive poetry experience where each verse responds to the bend in the river.
+                </p>
+                <a
+                  href="https://pagegalleryjournal.com/brigearhartstaton"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-3 px-6 py-3 bg-[#E11D48] text-white hover:bg-[#C01040] transition-all font-['Inter'] text-sm font-semibold tracking-wide group"
+                  style={{ borderRadius: '2px 8px 2px 8px' }}
+                >
+                  Enter Exhibit
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                </a>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Decorative element */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-px h-[40%] bg-gradient-to-b from-transparent via-[#C4A265]/20 to-transparent"></div>
+      </motion.section>
+
+      {/* WINTER COLLECTION - Asymmetric grid */}
+      <section className="px-8 md:px-16 py-24 md:py-32 bg-[#FAF8F5]">
+        <div className="max-w-7xl mx-auto">
+          {/* Header - offset */}
+          <div className="mb-16 grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-8">
+            <div>
+              <p className="font-['Courier_New'] text-xs tracking-[0.3em] text-[#8B7355] uppercase mb-4">
+                Winter 2026
+              </p>
+              <h2 className="font-['Playfair_Display'] text-6xl md:text-7xl italic font-light text-[#2C1810]" style={{
+                lineHeight: '1.1'
+              }}>
+                Five pieces on<br />belonging
+              </h2>
+            </div>
+            <div className="flex items-end">
+              <p className="font-['Libre_Baskerville'] text-lg text-[#8B7355] leading-relaxed">
+                Identity, desire, love, and the spaces between words
+              </p>
+            </div>
+          </div>
+
+          {/* CTA - hand-cut feel */}
+          <a 
+            href="/collection-gallery"
+            className="inline-block bg-[#2C1810] text-white px-8 py-4 hover:bg-[#1A1A1A] transition-all group relative overflow-hidden"
+            style={{
+              borderRadius: '3px 10px 2px 12px',
+              boxShadow: '4px 4px 0 rgba(44, 24, 16, 0.1), 8px 8px 24px rgba(44, 24, 16, 0.08)'
+            }}
+          >
+            <span className="font-['Playfair_Display'] text-2xl italic relative z-10">
+              View the Collection
+            </span>
+            <ArrowRight className="inline-block ml-3 w-5 h-5 transition-transform group-hover:translate-x-2 relative z-10" />
+            
+            {/* Ink bleed effect */}
+            <div className="absolute inset-0 bg-gradient-to-br from-[#C4A265]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          </a>
+        </div>
+      </section>
+
+      {/* Footer */}
       <GalleryFooter />
     </div>
   );

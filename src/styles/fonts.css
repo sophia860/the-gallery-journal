@@ -1,12 +1,26 @@
-/* Font imports for THE PAGE GALLERY - Typewriter Literary Magazine */
+/* Font imports for PAGE - The Page Gallery Writing Platform */
 
-/* Display & Headers - Special Elite (typewriter) */
-@import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
+/* PRIMARY VOICES - Design System */
 
-/* Body Text - Source Serif Pro (literary serif) */
-@import url('https://fonts.googleapis.com/css2?family=Source+Serif+Pro:ital,wght@0,400;0,600;1,400;1,600&display=swap');
+/* Display Voice - Cardo (italic-forward, poetic, editorial) */
+@import url('https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&display=swap');
 
-/* Alternative Body - Crimson Text */
-@import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400;1,600&display=swap');
+/* Literary Voice - Libre Baskerville (reading, body text, contemplative) */
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
 
-/* Monospace - Courier New is system font, no import needed */
+/* LEGACY FONTS - For compatibility */
+
+/* Alternative Headline Option - Playfair Display */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap');
+
+/* Body Text - Open Sans for clean readability */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&display=swap');
+
+/* Poetry / Quoted Text - EB Garamond for warmth */
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap');
+
+/* UI Elements - Inter for geometric clarity */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+/* Additional body option - Source Sans Pro */
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&display=swap');

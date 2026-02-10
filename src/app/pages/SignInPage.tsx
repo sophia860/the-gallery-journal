@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { Moon } from 'lucide-react';
+import { Moon, Github } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { GalleryNav } from '../components/GalleryNav';
 
 export function SignInPage() {
-  const { signIn, user, supabase } = useAuth();
+  const { signIn, user, supabase, signInWithGitHub } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -16,6 +16,9 @@ export function SignInPage() {
     const redirect = params.get('redirect');
     return redirect || '/studio';
   };
+
+  // Check if this is an editor login attempt
+  const isEditorLogin = getRedirectUrl() === '/editor-dashboard';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,11 +38,11 @@ export function SignInPage() {
           .select('role')
           .eq('id', session.user.id)
           .single();
-
+          
         if (profileError) {
           console.error('Error fetching profile:', profileError);
         }
-
+        
         // Redirect based on role
         if (profile?.role === 'editor' || profile?.role === 'eic' || profile?.role === 'admin') {
           window.location.href = '/editor-dashboard';
@@ -54,11 +57,22 @@ export function SignInPage() {
     }
   };
 
+  const handleGitHubSignIn = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      await signInWithGitHub();
+    } catch (err: any) {
+      setError(err.message || 'Failed to sign in with GitHub.');
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#F5F0EB]">
       {/* The Gallery Navigation */}
       <GalleryNav />
-
+      
       {/* Sign In Form */}
       <div className="pt-40 pb-24 flex items-center justify-center px-8">
         <div className="w-full max-w-md">
@@ -67,11 +81,34 @@ export function SignInPage() {
               Welcome Back
             </h1>
             <p className="font-[family-name:var(--font-body)] text-[#717171] text-lg">
-              Enter your room in The Gallery
+              {isEditorLogin ? 'Editor-in-Chief Sign In' : 'Enter your room in The Gallery'}
             </p>
           </div>
 
           <div className="bg-white border-2 border-[#E0D8D0] p-8">
+            {/* GitHub Sign In for EIC */}
+            {isEditorLogin && (
+              <div className="mb-6">
+                <button
+                  type="button"
+                  onClick={handleGitHubSignIn}
+                  disabled={loading}
+                  className="w-full px-6 py-4 bg-[#24292e] text-white hover:bg-[#1a1e22] transition-colors font-['Courier_New'] text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+                >
+                  <Github size={20} />
+                  {loading ? 'CONNECTING...' : 'SIGN IN WITH GITHUB'}
+                </button>
+                <div className="relative my-6">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-[#E0D8D0]"></div>
+                  </div>
+                  <div className="relative flex justify-center text-xs">
+                    <span className="bg-white px-4 text-[#717171] font-['Courier_New']">OR</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-6">
               {error && (
                 <div className="p-4 bg-[#E11D48]/10 border border-[#E11D48] text-[#E11D48] font-['Courier_New'] text-sm">
@@ -123,29 +160,6 @@ export function SignInPage() {
                 {loading ? 'SIGNING IN...' : 'SIGN IN'}
               </button>
             </form>
-
-            <div className="mt-6">
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-[#E0D8D0]"></div>
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-white px-2 text-[#717171] font-['Courier_New']">Or</span>
-                </div>
-              </div>
-              
-              <a
-                href={getRedirectUrl()}
-                onClick={() => {
-                  if (typeof window !== 'undefined') {
-                    localStorage.setItem('demoMode', 'true');
-                  }
-                }}
-                className="mt-4 w-full px-6 py-4 bg-white border-2 border-[#E0D8D0] text-[#717171] hover:border-[#C4918A] hover:text-[#2C2C2C] transition-colors font-['Courier_New'] text-sm flex items-center justify-center gap-2"
-              >
-                Continue as Guest (Demo Mode)
-              </a>
-            </div>
 
             <p className="mt-8 text-center font-['Courier_New'] text-sm text-[#717171]">
               Don't have a room yet?{' '}

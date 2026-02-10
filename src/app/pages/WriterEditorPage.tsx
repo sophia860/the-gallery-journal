@@ -5,7 +5,8 @@ import {
   ChevronUp, Tag, FileImage, X, Lock
 } from 'lucide-react';
 import { GalleryNav } from '../components/GalleryNav';
-import { saveDraft, submitToGallery, type Draft } from '../../services/backend';
+import { saveDraft, submitToGallery, getDrafts, type Draft } from '../../services/backend';
+import { useAuth } from '../contexts/AuthContext';
 
 const categories = [
   { name: 'Poetry', description: 'Verse, free form, or structured poetry' },
@@ -28,7 +29,7 @@ export function WriterEditorPage() {
   const [tagInput, setTagInput] = useState('');
   const [showPreview, setShowPreview] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [showPublishing, setShowPublishing] = useState(false);
+  const [showPublishing, setShowPublishing] = useState(true);
   const [wordCount, setWordCount] = useState(0);
   const [readingTime, setReadingTime] = useState(0);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
@@ -44,6 +45,7 @@ export function WriterEditorPage() {
   const [websiteUrl, setWebsiteUrl] = useState('');
   
   const contentRef = useRef<HTMLTextAreaElement>(null);
+  const { user } = useAuth();
 
   // Calculate word count and reading time
   useEffect(() => {
@@ -51,6 +53,30 @@ export function WriterEditorPage() {
     setWordCount(words);
     setReadingTime(Math.ceil(words / 200)); // Average reading speed
   }, [content]);
+
+  // Load most recent draft
+  useEffect(() => {
+    const loadDraft = async () => {
+      try {
+        const drafts = await getDrafts();
+        if (drafts.length === 0) return;
+        const [latest] = [...drafts].sort((a, b) => {
+          const aTime = a.updatedAt || a.createdAt || '';
+          const bTime = b.updatedAt || b.createdAt || '';
+          return bTime.localeCompare(aTime);
+        });
+        setTitle(latest.title || '');
+        setContent(latest.content || '');
+        setSelectedCategory(latest.category || '');
+        setTags(latest.tags || []);
+        setShareToCommunity(latest.shareToCommunity !== false);
+        if (latest.id) setCurrentDraftId(latest.id);
+      } catch (err) {
+        console.warn('[WriterEditor] Failed to load drafts', err);
+      }
+    };
+    loadDraft();
+  }, []);
 
   // Auto-save simulation
   useEffect(() => {
@@ -76,7 +102,11 @@ export function WriterEditorPage() {
   };
 
   const handleSaveDraft = async () => {
+    const draftId = currentDraftId || crypto.randomUUID();
     const draft: Draft = {
+      id: draftId,
+      userId: user?.id,
+      authorName: user?.user_metadata?.name,
       title,
       content,
       category: selectedCategory,
@@ -87,13 +117,23 @@ export function WriterEditorPage() {
       authorTwitterUrl: twitterUrl,
       authorWebsiteUrl: websiteUrl,
     };
-    await saveDraft(draft);
-    setShowSuccessMessage('Draft saved successfully!');
+    const result = await saveDraft(draft);
+    if (result.success) {
+      setCurrentDraftId(draftId);
+      setLastSaved(new Date());
+      setShowSuccessMessage('Draft saved successfully!');
+    } else {
+      setShowSuccessMessage('Could not save draft. Please try again.');
+    }
     setTimeout(() => setShowSuccessMessage(null), 3000);
   };
 
   const handleSubmitToGallery = async () => {
+    const draftId = currentDraftId || crypto.randomUUID();
     const draft: Draft = {
+      id: draftId,
+      userId: user?.id,
+      authorName: user?.user_metadata?.name,
       title,
       content,
       category: selectedCategory,
@@ -104,8 +144,13 @@ export function WriterEditorPage() {
       authorTwitterUrl: twitterUrl,
       authorWebsiteUrl: websiteUrl,
     };
-    await submitToGallery(draft);
-    setShowSuccessMessage('Submitted to The Gallery successfully!');
+    const result = await submitToGallery(draft);
+    if (result.success) {
+      setCurrentDraftId(draftId);
+      setShowSuccessMessage('Submitted to The Gallery successfully!');
+    } else {
+      setShowSuccessMessage('Submission failed. Please try again.');
+    }
     setTimeout(() => setShowSuccessMessage(null), 3000);
   };
 

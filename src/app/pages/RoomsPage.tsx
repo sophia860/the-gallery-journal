@@ -4,55 +4,71 @@ import { useAuth } from '../contexts/AuthContext';
 import { GalleryNav } from '../components/GalleryNav';
 import { GalleryFooter } from '../components/GalleryFooter';
 
-// Sample writer rooms
+// Sample writer rooms reimagined as personal anthologies
 const sampleRooms = [
   {
     id: 'sample1',
     writerName: 'Pam Martin-Lawrence',
-    bio: 'Poet exploring love, memory, and the cosmos.',
+    bio: 'Curating poems that trace the constellations of love and distance.',
     atmosphere: 'warm',
+    collections: ['Orbiting Love', 'Letters to August'],
+    highlight: 'Your Eyes',
   },
   {
     id: 'sample2',
     writerName: 'Ella B Winters',
-    bio: 'Writing at the intersection of desire and weather.',
+    bio: 'Writing at the intersection of desire, weather, and heatwave nights.',
     atmosphere: 'warm',
+    collections: ['Heatwave Psalms', 'Summer Fever'],
+    highlight: 'Thoughts on love during a heatwave',
   },
   {
     id: 'sample3',
     writerName: 'Indee Sehrish Watson',
-    bio: 'Collector of shoreline fragments and sea glass.',
+    bio: 'Collector of shoreline fragments and sea glass turned lyric.',
     atmosphere: 'warm',
+    collections: ['Tidal Notebooks', 'Sea Glass Psalms'],
+    highlight: 'Ocean Pockets',
   },
   {
     id: 'sample4',
     writerName: 'Bhavna Jain',
-    bio: 'Finding clarity in the aftermath of storms.',
+    bio: 'Finding clarity and beginnings in the aftermath of storms.',
     atmosphere: 'warm',
+    collections: ['After the Storm', 'Clear Sky Studies'],
+    highlight: 'The Clear Sky',
   },
   {
     id: 'sample5',
     writerName: 'Leonie Rowland',
-    bio: 'Celebrating the holy in the ordinary.',
+    bio: 'Celebrating the holy in the ordinary and quiet Tuesdays.',
     atmosphere: 'warm',
+    collections: ['Blessings', 'Kitchen Light'],
+    highlight: 'Blessings',
   },
   {
     id: 'sample6',
     writerName: 'Seth Trochtenberg',
-    bio: 'Urban poet. Observer of crowds and solitude.',
+    bio: 'Urban poet mapping crowds, solitude, and neon insomnia.',
     atmosphere: 'warm',
+    collections: ['City Static', 'Neon Solitudes'],
+    highlight: 'Dialogue in Times Square',
   },
   {
     id: 'sample7',
     writerName: 'Sadiya Ali',
-    bio: 'Writing grief, memory, and small sounds.',
+    bio: 'Writing grief, memory, and the small sounds that linger.',
     atmosphere: 'warm',
+    collections: ['Glass Bells', 'Elegy Studies'],
+    highlight: 'Tinkles',
   },
   {
     id: 'sample8',
     writerName: 'Luna Bailey',
-    bio: 'Mother, writer, witness to becoming.',
+    bio: 'Mother, writer, witness to the becoming of self and daughter.',
     atmosphere: 'warm',
+    collections: ['Becoming', 'Open Fields'],
+    highlight: 'Her Graduation',
   },
 ];
 
@@ -81,7 +97,7 @@ export function RoomsPage() {
             Writer Rooms
           </h1>
           <p className="font-[family-name:var(--font-body)] text-xl text-[#717171] max-w-2xl mx-auto leading-relaxed">
-            Each writer has their own room. A space to display work, curate exhibits, and invite readers in.
+            Personal anthology spaces for writers to curate themed collections—small chapbooks, seasonal suites, and in-progress sequences.
           </p>
         </div>
       </motion.section>
@@ -108,6 +124,24 @@ export function RoomsPage() {
                 <p className="font-[family-name:var(--font-body)] text-base leading-relaxed text-[#717171]">
                   {room.bio}
                 </p>
+                <div className="mt-4">
+                  <div className="text-xs font-['Courier_New'] uppercase tracking-wider text-[#8B7355] mb-2">
+                    Featured Collection
+                  </div>
+                  <p className="font-[family-name:var(--font-body)] text-sm text-[#2C2C2C] mb-3">
+                    {room.highlight}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {room.collections.map((collection) => (
+                      <span
+                        key={collection}
+                        className="px-3 py-1 bg-[#F5F0EB] text-[#717171] text-xs font-['Inter'] border border-[#E0D8D0]"
+                      >
+                        {collection}
+                      </span>
+                    ))}
+                  </div>
+                </div>
                 <div className="mt-6 pt-6 border-t border-[#E0D8D0] font-['Courier_New'] text-xs text-[#C4918A] group-hover:text-[#E11D48] transition-colors">
                   ENTER ROOM →
                 </div>
@@ -124,7 +158,7 @@ export function RoomsPage() {
             Start Your Own Room
           </h2>
           <p className="font-[family-name:var(--font-body)] text-xl leading-relaxed mb-8 text-[#717171]">
-            Writers, create your own space in The Gallery. Share your work, build exhibits, and connect with readers.
+            Build a personal anthology: gather your poems, essays, and fragments into themed mini-collections to share with readers.
           </p>
           <a
             href="/signup"

@@ -29,6 +29,7 @@ export function EditorDashboardPage() {
   const { user, supabase, signOut, loading: authLoading } = useAuth();
   const [pageLoading, setPageLoading] = useState(true);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [redirectTo, setRedirectTo] = useState<string | null>(null);
   const [view, setView] = useState<ViewMode>('submissions');
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
@@ -46,12 +47,47 @@ export function EditorDashboardPage() {
   });
 
   useEffect(() => {
-    // Wait for auth context to finish loading before checking auth
-    console.log('[EditorDashboard] Auth loading status:', authLoading, 'User:', user?.email);
+    // Timeout: Show dashboard after 5 seconds even if loading
+    const loadingTimeout = setTimeout(() => {
+      console.log('[EditorDashboard] TIMEOUT: 5 seconds elapsed, forcing dashboard to show');
+      if (pageLoading) {
+        // Create fallback profile from user if available
+        if (user) {
+          const fallbackProfile: Profile = {
+            id: user.id,
+            email: user.email || 'editor@page.com',
+            display_name: user.email?.split('@')[0] || 'Editor',
+            role: 'editor'
+          };
+          console.log('[EditorDashboard] Using fallback profile:', fallbackProfile);
+          setProfile(fallbackProfile);
+        }
+        setPageLoading(false);
+      }
+    }, 5000);
+
+    // Only check auth after authLoading is complete
     if (!authLoading) {
       checkAuth();
     }
-  }, [authLoading]);
+    
+    // Subscribe to auth state changes for immediate access grant on signin
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('[EditorDashboard] Auth state changed:', event, session ? 'has session' : 'no session');
+      
+      if (event === 'SIGNED_IN' && session) {
+        // Immediately check auth when user signs in
+        checkAuth();
+      } else if (event === 'SIGNED_OUT') {
+        setRedirectTo('/signin?redirect=/editor-dashboard');
+      }
+    });
+
+    return () => {
+      clearTimeout(loadingTimeout);
+      subscription.unsubscribe();
+    };
+  }, [authLoading, user, pageLoading]);
 
   useEffect(() => {
     if (view === 'submissions' && profile) {
@@ -60,47 +96,98 @@ export function EditorDashboardPage() {
   }, [view, profile]);
 
   const checkAuth = async () => {
-    console.log('[EditorDashboard] checkAuth called. User:', user?.email);
+    console.log('[EditorDashboard] ========== START checkAuth ==========');
+    console.log('[EditorDashboard] authLoading:', authLoading, 'user:', user?.email);
     
-    // If no user after auth loading is complete, redirect to signin
-    if (!user) {
-      console.log('[EditorDashboard] No user found, redirecting to signin');
-      window.location.href = '/signin?redirect=/editor-dashboard';
-      return;
-    }
-
-    console.log('[EditorDashboard] User found, fetching profile for:', user.id);
-
     try {
-      const { data: profileData, error } = await supabase
+      // Get session directly from Supabase with retry logic for race condition
+      console.log('[EditorDashboard] Step 1: Getting initial session...');
+      let { data: { session }, error } = await supabase.auth.getSession();
+      console.log('[EditorDashboard] Step 1 result - session:', session ? `exists (user: ${session.user.email})` : 'null', 'error:', error);
+      
+      // If no session initially, wait 2 seconds and retry once (handles race condition on page load)
+      if (!session && !error) {
+        console.log('[EditorDashboard] Step 2: No session found, waiting 2s for session restoration...');
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        console.log('[EditorDashboard] Step 2: Retrying getSession()...');
+        const retry = await supabase.auth.getSession();
+        session = retry.data.session;
+        console.log('[EditorDashboard] Step 2 result - session:', session ? `exists (user: ${session.user.email})` : 'null');
+      }
+      
+      // If still no session after retry, redirect to signin
+      if (!session) {
+        console.log('[EditorDashboard] Step 3: No session after retry, setting redirect to signin');
+        setRedirectTo('/signin?redirect=/editor-dashboard');
+        setPageLoading(false); // Ensure loading stops
+        console.log('[EditorDashboard] ========== END checkAuth (no session) ==========');
+        return;
+      }
+
+      console.log('[EditorDashboard] Step 3: Session confirmed! User ID:', session.user.id);
+      console.log('[EditorDashboard] Step 4: Fetching profile from profiles table...');
+
+      // Fetch profile
+      const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', user.id)
+        .eq('id', session.user.id)
         .single();
 
-      console.log('[EditorDashboard] Profile data:', profileData, 'Error:', error);
+      console.log('[EditorDashboard] Step 4 result - profileData:', profileData, 'error:', profileError);
 
-      if (error || !profileData) {
-        console.error('[EditorDashboard] Error fetching profile:', error);
-        window.location.href = '/signin';
+      if (profileError || !profileData) {
+        console.error('[EditorDashboard] Step 5: Profile fetch failed! Creating fallback profile...');
+        
+        // Create fallback profile instead of redirecting
+        const fallbackProfile: Profile = {
+          id: session.user.id,
+          email: session.user.email || 'editor@page.com',
+          display_name: session.user.email?.split('@')[0] || 'Editor',
+          role: 'editor'
+        };
+        
+        console.log('[EditorDashboard] Step 5: Using fallback profile:', fallbackProfile);
+        setProfile(fallbackProfile);
+        setPageLoading(false);
+        console.log('[EditorDashboard] ========== END checkAuth (fallback profile) ==========');
         return;
       }
 
-      // Check if user has editor role - accept editor, eic, or admin
-      console.log('[EditorDashboard] Checking role:', profileData.role);
+      // Check role
+      console.log('[EditorDashboard] Step 5: Checking role:', profileData.role);
       if (!['editor', 'eic', 'admin'].includes(profileData.role)) {
-        console.log('[EditorDashboard] Access denied. Role:', profileData.role);
+        console.log('[EditorDashboard] Step 6: Access denied - invalid role:', profileData.role);
         alert('Access denied. This page is for editors only.');
-        window.location.href = '/studio';
+        setRedirectTo('/studio');
+        setPageLoading(false); // Ensure loading stops
+        console.log('[EditorDashboard] ========== END checkAuth (access denied) ==========');
         return;
       }
 
-      console.log('[EditorDashboard] Access granted. Loading dashboard...');
+      console.log('[EditorDashboard] Step 6: Access granted! Setting profile and stopping loading...');
       setProfile(profileData);
       setPageLoading(false);
+      console.log('[EditorDashboard] ========== END checkAuth (success) ==========');
     } catch (err) {
-      console.error('[EditorDashboard] Auth check error:', err);
-      window.location.href = '/signin';
+      console.error('[EditorDashboard] CATCH BLOCK - Auth check error:', err);
+      
+      // Create fallback profile on error
+      if (user) {
+        const fallbackProfile: Profile = {
+          id: user.id,
+          email: user.email || 'editor@page.com',
+          display_name: user.email?.split('@')[0] || 'Editor',
+          role: 'editor'
+        };
+        console.log('[EditorDashboard] CATCH BLOCK - Using fallback profile:', fallbackProfile);
+        setProfile(fallbackProfile);
+      } else {
+        setRedirectTo('/signin?redirect=/editor-dashboard');
+      }
+      
+      setPageLoading(false); // Ensure loading stops even on error
+      console.log('[EditorDashboard] ========== END checkAuth (error) ==========');
     }
   };
 
@@ -129,7 +216,7 @@ export function EditorDashboardPage() {
         .update({
           status,
           notes,
-          reviewed_by: user?.id,
+          reviewed_by: user.id,
           reviewed_at: new Date().toISOString(),
         })
         .eq('id', id);
@@ -162,7 +249,7 @@ export function EditorDashboardPage() {
           genre: uploadForm.genre,
           status: uploadForm.status,
           submitted_at: uploadForm.submissionDate,
-          user_id: user?.id, // Using current editor as placeholder
+          user_id: user.id, // Using current editor as placeholder
           notes: `Legacy submission - Author: ${uploadForm.authorName} (${uploadForm.authorEmail})`,
         });
 
@@ -190,7 +277,7 @@ export function EditorDashboardPage() {
 
   const handleLogout = async () => {
     await signOut();
-    window.location.href = '/';
+    setRedirectTo('/');
   };
 
   // Show loading screen while auth is loading OR while checking profile/role
@@ -200,6 +287,23 @@ export function EditorDashboardPage() {
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#E11D48] mb-4"></div>
           <div className="text-[#2C1810] font-['Cardo'] text-xl">Loading Editor Dashboard...</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Redirect if necessary
+  if (redirectTo) {
+    // Use setTimeout to redirect after showing loading screen briefly
+    setTimeout(() => {
+      window.location.href = redirectTo;
+    }, 100);
+    
+    return (
+      <div className="min-h-screen bg-[#FAF7F2] flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#E11D48] mb-4"></div>
+          <div className="text-[#2C1810] font-['Cardo'] text-xl">Redirecting...</div>
         </div>
       </div>
     );

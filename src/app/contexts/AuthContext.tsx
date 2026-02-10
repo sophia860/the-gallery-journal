@@ -16,7 +16,7 @@ interface AuthContextType {
   user: User | null;
   accessToken: string | null;
   loading: boolean;
-  supabase: typeof supabase;
+  supabase: ReturnType<typeof createClient>;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, name: string, writerName: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -24,10 +24,27 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const supabase = createClient(
-  `https://${projectId}.supabase.co`,
-  publicAnonKey
-);
+// Create a singleton Supabase client
+let supabaseInstance: ReturnType<typeof createClient> | null = null;
+
+function getSupabaseClient() {
+  if (!supabaseInstance) {
+    supabaseInstance = createClient(
+      `https://${projectId}.supabase.co`,
+      publicAnonKey,
+      {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true,
+        },
+      }
+    );
+  }
+  return supabaseInstance;
+}
+
+const supabase = getSupabaseClient();
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);

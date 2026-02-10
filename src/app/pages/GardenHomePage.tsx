@@ -33,8 +33,8 @@ const MOCK_WRITINGS = [
   },
   {
     id: '4',
-    title: 'What I\'ve Learned About Love',
-    preview: 'Love is not what the movies promised. It\'s doing dishes together at midnight. It\'s learning to say sorry. It\'s choosing each other, again and again...',
+    title: 'What I have Learned About Love',
+    preview: 'Love is not what the movies promised. It is doing dishes together at midnight. It is learning to say sorry. It is choosing each other, again and again...',
     tags: ['Memoir', 'Relationships'],
     status: 'bloom' as const,
     lastEdited: '3 days ago',
@@ -43,7 +43,7 @@ const MOCK_WRITINGS = [
   {
     id: '5',
     title: 'The Architecture of Memory',
-    preview: 'Memory is not a photograph. It\'s a building we construct, room by room, each visit changing the walls slightly...',
+    preview: 'Memory is not a photograph. It is a building we construct, room by room, each visit changing the walls slightly...',
     tags: ['Essay', 'Philosophy'],
     status: 'sprout' as const,
     lastEdited: '1 day ago',

@@ -16,11 +16,12 @@
   --font-literary: 'Libre Baskerville', serif;  /* Reading, body text */
   --font-display: 'Cardo', serif;                /* Headlines, poetry */
   --font-journal: 'Courier New', monospace;      /* Metadata, notes */
+  --font-dramatic: 'Playfair Display', serif;    /* Oversized, unapologetic headers */
   
   /* For compatibility - all map to our two families */
   --font-headline: 'Cardo', serif;
   --font-body: 'Libre Baskerville', serif;
-  --font-ui: 'Libre Baskerville', serif;
+  --font-ui: 'Inter', sans-serif;  /* Smaller, understated UI */
   
   /* COLOR PALETTE - Emotional Roles */
   /* Earth & Growth (Primary) */

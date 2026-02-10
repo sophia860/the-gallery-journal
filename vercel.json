@@ -4,5 +4,15 @@
       "source": "/((?!assets/).*)",
       "destination": "/index.html"
     }
+  ],
+  "routes": [
+    {
+      "src": "/editor-dashboard",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/auth/callback",
+      "dest": "/index.html"
+    }
   ]
 }

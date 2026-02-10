@@ -86,7 +86,6 @@ const additionalServices = [
     features: [
       'Line-by-line commentary',
       'Structural analysis',
-      '30-minute video call',
       'Revision suggestions',
       '7-day turnaround',
     ],
@@ -361,7 +360,7 @@ export function PricingPage() {
               What's included in editorial feedback?
             </h3>
             <p className="font-[family-name:var(--font-ui)] text-sm text-[#8B7355] leading-relaxed">
-              Our editors provide comprehensive line edits, structural suggestions, and a 30-minute video call to discuss your piece. Turnaround is 7 days.
+              Our editors provide comprehensive line edits, structural suggestions, and revision guidance for your piece. Turnaround is 7 days.
             </p>
           </div>
         </div>

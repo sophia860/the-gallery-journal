@@ -206,7 +206,7 @@ const categories = [
 const joinFeatures = [
   {
     icon: User,
-    title: 'Your Own Page',
+    title: 'Your Page',
     description: 'A personal page where your pieces, drafts, and bio live.',
   },
   {
@@ -499,12 +499,12 @@ export function GalleryLandingPage() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="text-center space-y-8"
+            className="text-center space-y-8 rounded-3xl bg-[#0B1221] text-white p-12 shadow-xl overflow-hidden"
           >
-            <h2 className="font-[family-name:var(--font-display)] text-6xl md:text-7xl text-[#1A1F2E]">
-              Join <span className="italic text-[#8B7355]">page</span>
+            <h2 className="font-[family-name:var(--font-display)] text-6xl md:text-7xl">
+              Join <span className="italic text-[#E6D5B8]">page</span>
             </h2>
-            <p className="font-[family-name:var(--font-body)] text-xl md:text-2xl text-[#1A1F2E]/80 max-w-3xl mx-auto leading-relaxed">
+            <p className="font-[family-name:var(--font-body)] text-xl md:text-2xl text-white/80 max-w-3xl mx-auto leading-relaxed">
               The social home of The Gallery — follow writers, share drafts, and see what the editors are reading.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -516,12 +516,12 @@ export function GalleryLandingPage() {
               </a>
               <a
                 href="/meet-the-page"
-                className="inline-flex items-center justify-center px-8 py-4 border border-[#8B7355] text-[#8B7355] rounded-md hover:bg-[#8B7355] hover:text-white transition-all font-[family-name:var(--font-ui)] text-sm tracking-wide"
+                className="inline-flex items-center justify-center px-8 py-4 border border-white/30 text-white rounded-md hover:bg-white/10 transition-all font-[family-name:var(--font-ui)] text-sm tracking-wide"
               >
                 Learn More
               </a>
             </div>
-            <p className="font-[family-name:var(--font-body)] text-sm text-[#1A1F2E]/70">
+            <p className="font-[family-name:var(--font-body)] text-sm text-white/60">
               Free to join, for writers and readers.
             </p>
           </motion.div>
@@ -543,28 +543,32 @@ export function GalleryLandingPage() {
               </p>
             </div>
             <div className="grid gap-6 md:grid-cols-3 xl:grid-cols-5">
-              {joinFeatures.map((feature, index) => (
-                <motion.div
-                  key={feature.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  viewport={{ once: true }}
-                  className="p-6 bg-white/90 border border-[#E0D8D0] rounded-lg shadow-sm hover:shadow-md transition-shadow"
-                >
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 rounded-full bg-[#F5F0EB] border border-[#E0D8D0] flex items-center justify-center">
-                      <feature.icon className="w-6 h-6 text-[#8B7355]" />
+              {joinFeatures.map((feature, index) => {
+                const Icon = feature.icon;
+
+                return (
+                  <motion.div
+                    key={feature.title}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    viewport={{ once: true }}
+                    className="p-6 bg-white/90 border border-[#E0D8D0] rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-12 h-12 rounded-full bg-[#F5F0EB] border border-[#E0D8D0] flex items-center justify-center">
+                        <Icon className="w-6 h-6 text-[#8B7355]" />
+                      </div>
+                      <h4 className="font-[family-name:var(--font-display)] text-xl text-[#1A1F2E]">
+                        {feature.title}
+                      </h4>
                     </div>
-                    <h4 className="font-[family-name:var(--font-display)] text-xl text-[#1A1F2E]">
-                      {feature.title}
-                    </h4>
-                  </div>
-                  <p className="font-[family-name:var(--font-body)] text-base text-[#1A1F2E]/75 leading-relaxed">
-                    {feature.description}
-                  </p>
-                </motion.div>
-              ))}
+                    <p className="font-[family-name:var(--font-body)] text-base text-[#1A1F2E]/75 leading-relaxed">
+                      {feature.description}
+                    </p>
+                  </motion.div>
+                );
+              })}
             </div>
           </motion.div>
 

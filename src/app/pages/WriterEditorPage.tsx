@@ -36,7 +36,14 @@ export function WriterEditorPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [shareToCommunity, setShareToCommunity] = useState(true); // Default ON
   const [showSuccessMessage, setShowSuccessMessage] = useState<string | null>(null);
-  const [currentDraftId, setCurrentDraftId] = useState<string>(crypto.randomUUID());
+  const [currentDraftId] = useState(crypto.randomUUID());
+  
+  // Author bio and social fields
+  const [authorBio, setAuthorBio] = useState('');
+  const [instagramUrl, setInstagramUrl] = useState('');
+  const [twitterUrl, setTwitterUrl] = useState('');
+  const [websiteUrl, setWebsiteUrl] = useState('');
+  
   const contentRef = useRef<HTMLTextAreaElement>(null);
   const { user } = useAuth();
 
@@ -105,6 +112,10 @@ export function WriterEditorPage() {
       category: selectedCategory,
       tags,
       shareToCommunity,
+      authorBio,
+      authorInstagramUrl: instagramUrl,
+      authorTwitterUrl: twitterUrl,
+      authorWebsiteUrl: websiteUrl,
     };
     const result = await saveDraft(draft);
     if (result.success) {
@@ -128,6 +139,10 @@ export function WriterEditorPage() {
       category: selectedCategory,
       tags,
       shareToCommunity,
+      authorBio,
+      authorInstagramUrl: instagramUrl,
+      authorTwitterUrl: twitterUrl,
+      authorWebsiteUrl: websiteUrl,
     };
     const result = await submitToGallery(draft);
     if (result.success) {
@@ -370,6 +385,76 @@ export function WriterEditorPage() {
                           + {tag}
                         </button>
                       ))}
+                    </div>
+                  </div>
+
+                  {/* Author Bio & Social Links */}
+                  <div className="pt-6 pb-2 border-t border-[#E8E0D8]">
+                    <label className="block text-xs uppercase tracking-wider text-[#717171] mb-3 font-['Inter']">
+                      Author Bio & Social Links
+                    </label>
+                    <p className="text-xs text-[#717171] font-['Inter'] mb-4 leading-relaxed">
+                      Share a bit about yourself. This will appear alongside your published work in The Collection.
+                    </p>
+                    
+                    {/* Bio */}
+                    <div className="mb-4">
+                      <label className="block text-xs text-[#717171] mb-2 font-['Inter']">
+                        Bio (optional)
+                      </label>
+                      <textarea
+                        value={authorBio}
+                        onChange={(e) => setAuthorBio(e.target.value)}
+                        placeholder="Write a brief bio about yourself..."
+                        className="w-full px-3 py-2 border border-[#E8E0D8] bg-white text-[#2C2C2C] font-['Inter'] text-sm resize-none"
+                        rows={3}
+                        maxLength={250}
+                      />
+                      <div className="text-xs text-[#717171] mt-1 text-right">
+                        {authorBio.length}/250
+                      </div>
+                    </div>
+
+                    {/* Instagram URL */}
+                    <div className="mb-3">
+                      <label className="block text-xs text-[#717171] mb-2 font-['Inter']">
+                        Instagram URL (optional)
+                      </label>
+                      <input
+                        type="url"
+                        value={instagramUrl}
+                        onChange={(e) => setInstagramUrl(e.target.value)}
+                        placeholder="https://instagram.com/yourhandle"
+                        className="w-full px-3 py-2 border border-[#E8E0D8] bg-white text-[#2C2C2C] font-['Inter'] text-sm"
+                      />
+                    </div>
+
+                    {/* Twitter URL */}
+                    <div className="mb-3">
+                      <label className="block text-xs text-[#717171] mb-2 font-['Inter']">
+                        Twitter URL (optional)
+                      </label>
+                      <input
+                        type="url"
+                        value={twitterUrl}
+                        onChange={(e) => setTwitterUrl(e.target.value)}
+                        placeholder="https://twitter.com/yourhandle"
+                        className="w-full px-3 py-2 border border-[#E8E0D8] bg-white text-[#2C2C2C] font-['Inter'] text-sm"
+                      />
+                    </div>
+
+                    {/* Website URL */}
+                    <div className="mb-3">
+                      <label className="block text-xs text-[#717171] mb-2 font-['Inter']">
+                        Website URL (optional)
+                      </label>
+                      <input
+                        type="url"
+                        value={websiteUrl}
+                        onChange={(e) => setWebsiteUrl(e.target.value)}
+                        placeholder="https://yourwebsite.com"
+                        className="w-full px-3 py-2 border border-[#E8E0D8] bg-white text-[#2C2C2C] font-['Inter'] text-sm"
+                      />
                     </div>
                   </div>
 

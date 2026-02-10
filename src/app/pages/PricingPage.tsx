@@ -28,6 +28,7 @@ const tiers: PricingTier[] = [
       'Read all published works',
       'Follow favorite writers',
       'Bookmark pieces',
+      '3 free submissions/month',
       'Monthly newsletter',
     ],
     cta: 'Start Reading',
@@ -42,12 +43,12 @@ const tiers: PricingTier[] = [
     features: [
       'Everything in Reader',
       'Your own Writer\'s Studio',
-      'Submit unlimited work',
+      'Unlimited submissions',
+      'Priority editorial response',
       'Personal Room & portfolio',
       'Community Wall access',
       'Gallery Wall publication',
       'Analytics dashboard',
-      'No submission fees',
     ],
     cta: 'Start Writing',
     popular: true,
@@ -61,7 +62,8 @@ const tiers: PricingTier[] = [
     description: 'Support the literary arts & get exclusive access',
     features: [
       'Everything in Writer',
-      'Priority submission review',
+      'Unlimited submissions',
+      'Priority editorial response',
       'Quarterly editorial feedback',
       'Early access to new features',
       'Exclusive patron-only events',
@@ -339,7 +341,7 @@ export function PricingPage() {
               Do you charge submission fees?
             </h3>
             <p className="font-[family-name:var(--font-ui)] text-sm text-[#8B7355] leading-relaxed">
-              Writer and Patron members can submit unlimited work with no fees. Non-members pay $5 per submission to help us maintain quality review processes.
+              Everyone gets 3 free submissions per month! Writer and Patron members enjoy unlimited submissions with priority editorial response. Additional submissions for free users are $5 each.
             </p>
           </div>
 

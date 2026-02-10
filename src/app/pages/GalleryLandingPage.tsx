@@ -250,6 +250,218 @@ export function GalleryLandingPage() {
         </div>
       </motion.section>
 
+      {/* THE GARDEN PROMOTIONAL HERO - NEW SOCIAL WRITING PLATFORM */}
+      <motion.section
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ duration: 1 }}
+        viewport={{ once: true }}
+        className="relative py-32 px-8 overflow-hidden"
+        style={{ 
+          background: 'linear-gradient(135deg, #FAF8F5 0%, #F0F7F0 50%, #FAF8F5 100%)'
+        }}
+      >
+        {/* Botanical Background Decorations */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {/* Subtle leaf patterns */}
+          <div className="absolute top-20 left-10 w-64 h-64 bg-[#A3C4A0]/5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 right-10 w-80 h-80 bg-[#D4B896]/5 rounded-full blur-3xl"></div>
+          <div className="absolute top-1/2 left-1/4 w-48 h-48 bg-[#C48B8B]/5 rounded-full blur-2xl"></div>
+          
+          {/* Decorative botanical elements */}
+          <svg className="absolute top-10 right-20 w-32 h-32 text-[#A3C4A0]/10" viewBox="0 0 100 100" fill="currentColor">
+            <path d="M50 10 Q60 30 50 50 Q40 30 50 10" />
+            <path d="M50 50 Q70 60 50 80 Q30 60 50 50" />
+            <circle cx="50" cy="50" r="3" />
+          </svg>
+          <svg className="absolute bottom-20 left-20 w-40 h-40 text-[#D4B896]/10" viewBox="0 0 100 100" fill="currentColor">
+            <path d="M50 20 L55 40 L50 60 L45 40 Z" />
+            <circle cx="50" cy="60" r="8" />
+          </svg>
+        </div>
+
+        <div className="max-w-6xl mx-auto relative z-10">
+          {/* Headline */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            viewport={{ once: true }}
+            className="text-center mb-8"
+          >
+            <div className="inline-flex items-center gap-3 mb-6 px-6 py-3 bg-white/60 backdrop-blur-sm border-2 border-[#7A9E7E]/30 rounded-full">
+              <Feather className="w-5 h-5 text-[#7A9E7E]" />
+              <span className="font-['Inter'] text-sm font-semibold text-[#7A9E7E] uppercase tracking-wider">
+                New Platform
+              </span>
+            </div>
+            
+            <h2 className="font-['Lora'] text-6xl md:text-7xl lg:text-8xl font-semibold text-[#2C2C2C] mb-6 leading-tight">
+              Your Words Deserve<br />
+              <span className="text-[#7A9E7E] italic">a Garden</span>
+            </h2>
+          </motion.div>
+
+          {/* Subheadline */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            viewport={{ once: true }}
+            className="font-['Inter'] text-xl md:text-2xl text-[#6B6B6B] text-center max-w-3xl mx-auto mb-12 leading-relaxed"
+          >
+            A space for writers to plant ideas, nurture drafts, and share blooms with intimate circles. 
+            <span className="block mt-2 font-semibold text-[#2C2C2C]">No algorithms. No metrics. Just writing.</span>
+          </motion.p>
+
+          {/* Visual Element - Garden Illustration */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, delay: 0.6 }}
+            viewport={{ once: true }}
+            className="max-w-4xl mx-auto mb-16"
+          >
+            <div className="relative bg-white/80 backdrop-blur-sm border-2 border-[#E5E0DA] rounded-3xl p-12 shadow-2xl">
+              {/* Garden Visual */}
+              <div className="flex items-end justify-center gap-8 mb-8">
+                {/* Seed */}
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-[#FBF7F0] border-3 border-[#D4B896] rounded-full flex items-center justify-center mb-3 mx-auto">
+                    <div className="w-6 h-6 bg-[#D4B896] rounded-full"></div>
+                  </div>
+                  <p className="font-['Inter'] text-sm font-semibold text-[#9B7E4F]">Seed</p>
+                  <p className="font-['Inter'] text-xs text-[#9B9B9B] mt-1">Early ideas</p>
+                </div>
+
+                {/* Sprout */}
+                <div className="text-center">
+                  <div className="w-20 h-20 bg-[#F0F7F0] border-3 border-[#A3C4A0] rounded-full flex items-center justify-center mb-3 mx-auto">
+                    <svg className="w-10 h-10 text-[#A3C4A0]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M12 22v-8m0-4V2m0 8c-2.5-2-5-2-7 0m7 0c2.5-2 5-2 7 0" strokeLinecap="round"/>
+                    </svg>
+                  </div>
+                  <p className="font-['Inter'] text-sm font-semibold text-[#5A7E58]">Sprout</p>
+                  <p className="font-['Inter'] text-xs text-[#9B9B9B] mt-1">Drafts growing</p>
+                </div>
+
+                {/* Bloom */}
+                <div className="text-center">
+                  <div className="w-24 h-24 bg-[#FAF2F2] border-3 border-[#C48B8B] rounded-full flex items-center justify-center mb-3 mx-auto">
+                    <svg className="w-12 h-12 text-[#C48B8B]" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2c-1.5 4-1.5 6 0 8 1.5-2 1.5-4 0-8zm0 8c-4 1.5-6 1.5-8 0 2 1.5 4 1.5 8 0zm0 0c4 1.5 6 1.5 8 0-2 1.5-4 1.5-8 0zm0 0c-1.5 4-1.5 6 0 8 1.5-2 1.5-4 0-8z" opacity="0.5"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  </div>
+                  <p className="font-['Inter'] text-sm font-semibold text-[#9E5A5A]">Bloom</p>
+                  <p className="font-['Inter'] text-xs text-[#9B9B9B] mt-1">Finished pieces</p>
+                </div>
+              </div>
+
+              {/* Decorative soil line */}
+              <div className="h-1 bg-gradient-to-r from-transparent via-[#E5E0DA] to-transparent mb-4"></div>
+              
+              <p className="font-['Inter'] text-sm text-[#9B9B9B] text-center italic">
+                Watch your writing grow from seeds to blooms
+              </p>
+            </div>
+          </motion.div>
+
+          {/* CTA Buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.8 }}
+            viewport={{ once: true }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20"
+          >
+            <a
+              href="/garden/signup"
+              className="w-full sm:w-auto px-10 py-5 bg-[#7A9E7E] text-white hover:bg-[#6A8E6E] transition-all font-['Inter'] font-bold text-lg rounded-xl shadow-lg hover:shadow-2xl hover:scale-105 transform duration-300 flex items-center justify-center gap-3 group"
+            >
+              Start Your Garden
+              <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+            </a>
+            <a
+              href="/garden"
+              className="w-full sm:w-auto px-10 py-5 bg-white border-2 border-[#E5E0DA] text-[#2C2C2C] hover:border-[#7A9E7E] hover:text-[#7A9E7E] transition-all font-['Inter'] font-bold text-lg rounded-xl shadow-sm hover:shadow-lg"
+            >
+              Learn More
+            </a>
+          </motion.div>
+
+          {/* Feature Grid */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 1 }}
+            viewport={{ once: true }}
+            className="grid md:grid-cols-2 lg:grid-cols-4 gap-6"
+          >
+            {/* Feature 1: Plant Ideas */}
+            <div className="bg-white/60 backdrop-blur-sm border-2 border-[#E5E0DA] rounded-2xl p-6 hover:border-[#D4B896] transition-all hover:shadow-lg group">
+              <div className="w-12 h-12 bg-[#FBF7F0] rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <div className="w-4 h-4 bg-[#D4B896] rounded-full"></div>
+              </div>
+              <h3 className="font-['Lora'] text-xl font-semibold text-[#2C2C2C] mb-2">
+                Plant Ideas
+              </h3>
+              <p className="font-['Inter'] text-sm text-[#6B6B6B] leading-relaxed">
+                Capture fragments, thoughts, and early ideas as seeds in your garden
+              </p>
+            </div>
+
+            {/* Feature 2: Nurture Drafts */}
+            <div className="bg-white/60 backdrop-blur-sm border-2 border-[#E5E0DA] rounded-2xl p-6 hover:border-[#A3C4A0] transition-all hover:shadow-lg group">
+              <div className="w-12 h-12 bg-[#F0F7F0] rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <svg className="w-6 h-6 text-[#A3C4A0]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M12 22v-8m0-4V2m0 8c-2.5-2-5-2-7 0m7 0c2.5-2 5-2 7 0" strokeLinecap="round"/>
+                </svg>
+              </div>
+              <h3 className="font-['Lora'] text-xl font-semibold text-[#2C2C2C] mb-2">
+                Nurture Drafts
+              </h3>
+              <p className="font-['Inter'] text-sm text-[#6B6B6B] leading-relaxed">
+                Grow your writing through revisions, watching sprouts develop
+              </p>
+            </div>
+
+            {/* Feature 3: Share Blooms */}
+            <div className="bg-white/60 backdrop-blur-sm border-2 border-[#E5E0DA] rounded-2xl p-6 hover:border-[#C48B8B] transition-all hover:shadow-lg group">
+              <div className="w-12 h-12 bg-[#FAF2F2] rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <svg className="w-6 h-6 text-[#C48B8B]" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2c-1.5 4-1.5 6 0 8 1.5-2 1.5-4 0-8zm0 8c-4 1.5-6 1.5-8 0 2 1.5 4 1.5 8 0zm0 0c4 1.5 6 1.5 8 0-2 1.5-4 1.5-8 0zm0 0c-1.5 4-1.5 6 0 8 1.5-2 1.5-4 0-8z" opacity="0.5"/>
+                  <circle cx="12" cy="12" r="2.5"/>
+                </svg>
+              </div>
+              <h3 className="font-['Lora'] text-xl font-semibold text-[#2C2C2C] mb-2">
+                Share Blooms
+              </h3>
+              <p className="font-['Inter'] text-sm text-[#6B6B6B] leading-relaxed">
+                Publish finished pieces to your garden or intimate writing circles
+              </p>
+            </div>
+
+            {/* Feature 4: Join Circles */}
+            <div className="bg-white/60 backdrop-blur-sm border-2 border-[#E5E0DA] rounded-2xl p-6 hover:border-[#7A9E7E] transition-all hover:shadow-lg group">
+              <div className="w-12 h-12 bg-[#F0F7F0] rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <svg className="w-6 h-6 text-[#7A9E7E]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="9" cy="7" r="4"/>
+                  <circle cx="15" cy="17" r="4"/>
+                  <path d="M12 11v2"/>
+                </svg>
+              </div>
+              <h3 className="font-['Lora'] text-xl font-semibold text-[#2C2C2C] mb-2">
+                Join Circles
+              </h3>
+              <p className="font-['Inter'] text-sm text-[#6B6B6B] leading-relaxed">
+                Connect with small writing communities for feedback and support
+              </p>
+            </div>
+          </motion.div>
+        </div>
+      </motion.section>
+
       {/* Featured Exhibit Section */}
       <motion.section
         initial={{ opacity: 0 }}

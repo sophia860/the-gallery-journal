@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { subscribeNewsletter } from '../../services/backend';
 
 const literaryQuotes = [
-  "Words are, in my not-so-humble opinion, our most inexhaustible source of magic. - J.K. Rowling",
+  "Poetry is the way we help give name to the nameless so it can be thought. - Audre Lorde",
   "There is no greater agony than bearing an untold story inside you. - Maya Angelou",
-  "A writer is someone for whom writing is more difficult than it is for other people. - Thomas Mann",
-  "You can make anything by writing. - C.S. Lewis",
+  "We write to taste life twice, in the moment and in retrospect. - Anaïs Nin",
+  "Words are a pretext. It is the inner bond that draws one person to another, not words. - Rumi",
+  "The role of a writer is not to say what we can all say, but what we are unable to say. - Anaïs Nin",
+  "You must write as if you are writing for the dead—for those who will never read you. - Ocean Vuong",
 ];
 
 export function Footer() {

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { SubscriptionProvider } from './contexts/SubscriptionContext';
 import { Header } from './components/Header';
 import { LandingPage } from './pages/LandingPage';
 import { SignUpPage } from './pages/SignUpPage';
@@ -16,6 +17,7 @@ import { GalleryLandingPage } from './pages/GalleryLandingPage';
 import { GalleryWallPage } from './pages/GalleryWallPage';
 import { AfterhoursPage } from './pages/AfterhoursPage';
 import { RoomsPage } from './pages/RoomsPage';
+import { PricingPage } from './pages/PricingPage';
 import { MeetThePagePage } from './pages/MeetThePagePage';
 
 // Studio pages
@@ -122,6 +124,8 @@ function AppContent() {
     pageContent = <SignUpPage />;
   } else if (route === '/signin') {
     pageContent = <SignInPage />;
+  } else if (route === '/pricing') {
+    pageContent = <PricingPage />;
   } else if (route === '/dashboard') {
     pageContent = <DashboardPage />;
   } else if (route === '/dashboard/new-exhibit' || route === '/studio/new-exhibit') {
@@ -180,11 +184,13 @@ function AppContent() {
   );
 }
 
-// Main App component - wraps everything in AuthProvider
+// Main App component - wraps everything in AuthProvider and SubscriptionProvider
 export default function App() {
   return (
     <AuthProvider>
-      <AppContent />
+      <SubscriptionProvider>
+        <AppContent />
+      </SubscriptionProvider>
     </AuthProvider>
   );
 }

@@ -56,7 +56,7 @@ function Router() {
 
     const handleHashChange = () => {
       const hash = window.location.hash.slice(1);
-      if (hash) {
+      if (hash.startsWith('/')) {
         setRoute(hash);
       }
     };
@@ -66,7 +66,9 @@ function Router() {
     
     if (window.location.hash) {
       const hash = window.location.hash.slice(1);
-      setRoute(hash);
+      if (hash.startsWith('/')) {
+        setRoute(hash);
+      }
     }
     
     return () => {

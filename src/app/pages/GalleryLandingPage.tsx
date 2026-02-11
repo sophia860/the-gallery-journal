@@ -591,7 +591,7 @@ export function GalleryLandingPage() {
                 {/* Features list with golden bullets */}
                 <div className="space-y-3 mb-8">
                   {[
-                    'Quarterly exhibitions',
+                    'Work goes live the moment an editor selects it',
                     'No submissions. No slush pile.',
                     'Writers are paid when their work is selected',
                     'Editorially curated by attention, not application'
@@ -781,7 +781,7 @@ export function GalleryLandingPage() {
                   lineHeight: '1.8',
                 }}
               >
-                Our editors are reading. Our inaugural exhibition will be assembled from work already growing in the Gardens.
+                Editors are reading the Gardens. When a piece stops them, they publish it. The first works will appear here soon.
               </p>
             </div>
           </div>

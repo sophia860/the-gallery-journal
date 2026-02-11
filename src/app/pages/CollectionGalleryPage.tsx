@@ -25,7 +25,7 @@ export function CollectionGalleryPage() {
             Coming Soon
           </h1>
           <p className="font-['Cormorant_Garamond'] text-[20px] text-[#8b9dc3]" style={{ lineHeight: '1.8' }}>
-            Our inaugural collection is currently being curated
+            Editors are reading. Work appears here the moment it's selected.
           </p>
         </div>
       </div>

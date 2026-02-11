@@ -27,7 +27,7 @@ export function NotificationsPage() {
           id: '1',
           type: 'replant_request',
           title: 'Publication Offer from The Gallery',
-          message: 'Editor Bea Sophia wants to publish "Memory is a kind of architecture" in the Spring 2026 issue. This is a Replant Request—your piece would move from your Garden to the public Gallery. View the request to accept or decline.',
+          message: 'Editor Bea Sophia wants to publish "Memory is a kind of architecture" in The Gallery. This is a Replant Request—your piece would move from your Garden to the public Gallery. View the request to accept or decline.',
           timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
           read: false,
           actionRequired: true,

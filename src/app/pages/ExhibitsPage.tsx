@@ -183,7 +183,7 @@ export function ExhibitsPage() {
               Coming Soon
             </p>
             <p className="font-['Libre_Baskerville'] text-lg text-[#c8cad8] max-w-2xl" style={{ lineHeight: '1.8' }}>
-              Our inaugural exhibition is currently being curated
+              Editors are reading. Work appears here the moment it's selected.
             </p>
           </div>
         </div>

@@ -2,37 +2,37 @@ import { useEffect, useState } from 'react';
 
 function SimpleStarfield() {
   // Generate stars with random positions and animation delays
-  const stars = Array.from({ length: 100 }, (_, i) => ({
+  const stars = Array.from({ length: 150 }, (_, i) => ({
     id: i,
     left: `${Math.random() * 100}%`,
     top: `${Math.random() * 100}%`,
-    size: Math.random() > 0.7 ? (Math.random() * 2 + 1) : (Math.random() * 1.5 + 0.5),
-    opacity: Math.random() * 0.6 + 0.2,
+    size: Math.random() > 0.7 ? (Math.random() * 2.5 + 1.5) : (Math.random() * 2 + 0.8),
+    opacity: Math.random() * 0.8 + 0.3,
     duration: Math.random() * 4 + 2,
     delay: Math.random() * 6
   }));
 
   // Generate bright stars with glow
-  const brightStars = Array.from({ length: 5 }, (_, i) => ({
+  const brightStars = Array.from({ length: 8 }, (_, i) => ({
     id: i,
     left: `${Math.random() * 100}%`,
     top: `${Math.random() * 100}%`,
-    size: Math.random() * 2 + 2,
+    size: Math.random() * 3 + 2.5,
     duration: Math.random() * 3 + 2,
     delay: Math.random() * 4
   }));
 
   // Generate shooting stars
-  const shootingStars = Array.from({ length: 3 }, (_, i) => ({
+  const shootingStars = Array.from({ length: 4 }, (_, i) => ({
     id: i,
     left: `${Math.random() * 50 + 10}%`,
     top: `${Math.random() * 50 + 10}%`,
-    delay: i * 10 + 5
+    delay: i * 8 + 4
   }));
 
   return (
     <>
-      <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 0 }}>
+      <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 5 }}>
         {/* Regular twinkling stars */}
         {stars.map(star => (
           <div
@@ -46,7 +46,7 @@ function SimpleStarfield() {
               opacity: star.opacity,
               animationDuration: `${star.duration}s`,
               animationDelay: `${star.delay}s`,
-              boxShadow: star.size > 1.5 ? '0 0 2px rgba(255, 255, 255, 0.8)' : 'none'
+              boxShadow: star.size > 2 ? '0 0 4px rgba(255, 255, 255, 0.9)' : '0 0 2px rgba(255, 255, 255, 0.6)'
             }}
           />
         ))}
@@ -62,7 +62,7 @@ function SimpleStarfield() {
               width: `${star.size}px`,
               height: `${star.size}px`,
               backgroundColor: '#fff',
-              boxShadow: '0 0 8px rgba(255, 255, 255, 0.9), 0 0 16px rgba(255, 255, 255, 0.6), 0 0 24px rgba(255, 255, 255, 0.3)',
+              boxShadow: '0 0 12px rgba(255, 255, 255, 1), 0 0 20px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.5)',
               animationDuration: `${star.duration}s`,
               animationDelay: `${star.delay}s`
             }}
@@ -77,11 +77,12 @@ function SimpleStarfield() {
             style={{
               left: star.left,
               top: star.top,
-              width: '100px',
-              height: '1px',
-              background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent)',
+              width: '120px',
+              height: '2px',
+              background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), transparent)',
               transform: 'rotate(-45deg)',
-              animationDelay: `${star.delay}s`
+              animationDelay: `${star.delay}s`,
+              boxShadow: '0 0 6px rgba(255, 255, 255, 0.8)'
             }}
           />
         ))}
@@ -89,20 +90,20 @@ function SimpleStarfield() {
 
       <style>{`
         @keyframes twinkle-star {
-          0%, 100% { opacity: 0.2; }
+          0%, 100% { opacity: 0.3; }
           50% { opacity: 1; }
         }
         
         @keyframes pulse-glow-star {
-          0%, 100% { opacity: 0.7; transform: scale(1); }
-          50% { opacity: 1; transform: scale(1.2); }
+          0%, 100% { opacity: 0.8; transform: scale(1); }
+          50% { opacity: 1; transform: scale(1.3); }
         }
         
         @keyframes shooting-star-trail {
           0% { transform: translateX(-100px) translateY(-100px) rotate(-45deg); opacity: 0; }
           10% { opacity: 1; }
           90% { opacity: 1; }
-          100% { transform: translateX(300px) translateY(300px) rotate(-45deg); opacity: 0; }
+          100% { transform: translateX(400px) translateY(400px) rotate(-45deg); opacity: 0; }
         }
         
         .animate-twinkle-star {
@@ -114,7 +115,7 @@ function SimpleStarfield() {
         }
         
         .animate-shooting-star-trail {
-          animation: shooting-star-trail 3s ease-out infinite;
+          animation: shooting-star-trail 4s ease-out infinite;
         }
       `}</style>
     </>
@@ -327,7 +328,7 @@ export function GalleryLandingPage() {
     <div 
       className="min-h-screen text-white relative overflow-hidden"
       style={{
-        background: 'linear-gradient(to bottom, #08090d 0%, #0f1118 100%)',
+        background: 'linear-gradient(to bottom, #0a1628 0%, #132a45 50%, #1a3a5a 100%)',
       }}
     >
       <style>{`

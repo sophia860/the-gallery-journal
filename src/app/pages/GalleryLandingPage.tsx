@@ -2,108 +2,107 @@ import { useEffect, useState } from 'react';
 
 function SimpleStarfield() {
   // Generate stars with random positions and animation delays
-  const stars = Array.from({ length: 150 }, (_, i) => ({
+  const stars = Array.from({ length: 200 }, (_, i) => ({
     id: i,
     left: `${Math.random() * 100}%`,
     top: `${Math.random() * 100}%`,
-    size: Math.random() > 0.7 ? (Math.random() * 2.5 + 1.5) : (Math.random() * 2 + 0.8),
-    opacity: Math.random() * 0.8 + 0.3,
+    size: Math.random() > 0.7 ? (Math.random() * 3 + 2) : (Math.random() * 2.5 + 1),
+    opacity: Math.random() * 0.7 + 0.5,
     duration: Math.random() * 4 + 2,
     delay: Math.random() * 6
   }));
 
   // Generate bright stars with glow
-  const brightStars = Array.from({ length: 8 }, (_, i) => ({
+  const brightStars = Array.from({ length: 15 }, (_, i) => ({
     id: i,
     left: `${Math.random() * 100}%`,
     top: `${Math.random() * 100}%`,
-    size: Math.random() * 3 + 2.5,
+    size: Math.random() * 4 + 3,
     duration: Math.random() * 3 + 2,
     delay: Math.random() * 4
   }));
 
   // Generate shooting stars
-  const shootingStars = Array.from({ length: 4 }, (_, i) => ({
+  const shootingStars = Array.from({ length: 5 }, (_, i) => ({
     id: i,
     left: `${Math.random() * 50 + 10}%`,
     top: `${Math.random() * 50 + 10}%`,
-    delay: i * 8 + 4
+    delay: i * 7 + 3
   }));
 
   return (
-    <>
-      <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 5 }}>
-        {/* Regular twinkling stars */}
-        {stars.map(star => (
-          <div
-            key={`star-${star.id}`}
-            className="absolute rounded-full bg-white animate-twinkle-star"
-            style={{
-              left: star.left,
-              top: star.top,
-              width: `${star.size}px`,
-              height: `${star.size}px`,
-              opacity: star.opacity,
-              animationDuration: `${star.duration}s`,
-              animationDelay: `${star.delay}s`,
-              boxShadow: star.size > 2 ? '0 0 4px rgba(255, 255, 255, 0.9)' : '0 0 2px rgba(255, 255, 255, 0.6)'
-            }}
-          />
-        ))}
+    <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 2 }}>
+      {/* Regular twinkling stars */}
+      {stars.map(star => (
+        <div
+          key={`star-${star.id}`}
+          className="absolute rounded-full animate-twinkle-star"
+          style={{
+            left: star.left,
+            top: star.top,
+            width: `${star.size}px`,
+            height: `${star.size}px`,
+            backgroundColor: '#ffffff',
+            opacity: star.opacity,
+            animationDuration: `${star.duration}s`,
+            animationDelay: `${star.delay}s`,
+            boxShadow: star.size > 2 ? '0 0 6px rgba(255, 255, 255, 1), 0 0 10px rgba(255, 255, 255, 0.5)' : '0 0 3px rgba(255, 255, 255, 0.8)'
+          }}
+        />
+      ))}
 
-        {/* Bright stars with radial glow */}
-        {brightStars.map(star => (
-          <div
-            key={`bright-${star.id}`}
-            className="absolute rounded-full animate-pulse-glow-star"
-            style={{
-              left: star.left,
-              top: star.top,
-              width: `${star.size}px`,
-              height: `${star.size}px`,
-              backgroundColor: '#fff',
-              boxShadow: '0 0 12px rgba(255, 255, 255, 1), 0 0 20px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.5)',
-              animationDuration: `${star.duration}s`,
-              animationDelay: `${star.delay}s`
-            }}
-          />
-        ))}
+      {/* Bright stars with radial glow */}
+      {brightStars.map(star => (
+        <div
+          key={`bright-${star.id}`}
+          className="absolute rounded-full animate-pulse-glow-star"
+          style={{
+            left: star.left,
+            top: star.top,
+            width: `${star.size}px`,
+            height: `${star.size}px`,
+            backgroundColor: '#ffffff',
+            boxShadow: '0 0 15px rgba(255, 255, 255, 1), 0 0 25px rgba(255, 255, 255, 0.8), 0 0 35px rgba(255, 255, 255, 0.6)',
+            animationDuration: `${star.duration}s`,
+            animationDelay: `${star.delay}s`
+          }}
+        />
+      ))}
 
-        {/* Shooting stars */}
-        {shootingStars.map(star => (
-          <div
-            key={`shooting-${star.id}`}
-            className="absolute animate-shooting-star-trail"
-            style={{
-              left: star.left,
-              top: star.top,
-              width: '120px',
-              height: '2px',
-              background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), transparent)',
-              transform: 'rotate(-45deg)',
-              animationDelay: `${star.delay}s`,
-              boxShadow: '0 0 6px rgba(255, 255, 255, 0.8)'
-            }}
-          />
-        ))}
-      </div>
+      {/* Shooting stars */}
+      {shootingStars.map(star => (
+        <div
+          key={`shooting-${star.id}`}
+          className="absolute animate-shooting-star-trail"
+          style={{
+            left: star.left,
+            top: star.top,
+            width: '150px',
+            height: '3px',
+            background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 1), transparent)',
+            transform: 'rotate(-45deg)',
+            animationDelay: `${star.delay}s`,
+            boxShadow: '0 0 8px rgba(255, 255, 255, 1)'
+          }}
+        />
+      ))}
 
       <style>{`
         @keyframes twinkle-star {
-          0%, 100% { opacity: 0.3; }
+          0%, 100% { opacity: 0.4; }
           50% { opacity: 1; }
         }
         
         @keyframes pulse-glow-star {
-          0%, 100% { opacity: 0.8; transform: scale(1); }
-          50% { opacity: 1; transform: scale(1.3); }
+          0%, 100% { opacity: 0.9; transform: scale(1); }
+          50% { opacity: 1; transform: scale(1.4); }
         }
         
         @keyframes shooting-star-trail {
-          0% { transform: translateX(-100px) translateY(-100px) rotate(-45deg); opacity: 0; }
+          0% { transform: translateX(-150px) translateY(-150px) rotate(-45deg); opacity: 0; }
           10% { opacity: 1; }
           90% { opacity: 1; }
-          100% { transform: translateX(400px) translateY(400px) rotate(-45deg); opacity: 0; }
+          100% { transform: translateX(500px) translateY(500px) rotate(-45deg); opacity: 0; }
         }
         
         .animate-twinkle-star {
@@ -115,10 +114,10 @@ function SimpleStarfield() {
         }
         
         .animate-shooting-star-trail {
-          animation: shooting-star-trail 4s ease-out infinite;
+          animation: shooting-star-trail 5s ease-out infinite;
         }
       `}</style>
-    </>
+    </div>
   );
 }
 

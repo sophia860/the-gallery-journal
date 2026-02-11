@@ -37,6 +37,9 @@ export function SignupPage() {
         formData.writerName || formData.displayName
       );
       console.log('[SignupPage] Signup successful, redirecting...');
+      // FIX: Session is now verified in AuthContext.signUp, safe to redirect
+      // Small delay to ensure DOM is ready for redirect
+      await new Promise(resolve => setTimeout(resolve, 100));
       window.location.href = '/garden/dashboard';
     } catch (err: any) {
       console.error('[SignupPage] Signup error:', err);

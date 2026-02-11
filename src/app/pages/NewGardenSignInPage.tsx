@@ -40,7 +40,7 @@ export function NewGardenSignInPage() {
         if (session && session.user) {
           console.log('[NewGardenSignInPage] Session confirmed, redirecting to garden');
           // Session is confirmed, safe to redirect
-          window.location.href = '/garden';
+          // Session is confirmed, use client-side navigation to preserve auth state in memory           window.history.pushState({}, '', '/garden');           window.dispatchEvent(new PopStateEvent('popstate'));
           return;
         }
         
@@ -51,7 +51,7 @@ export function NewGardenSignInPage() {
       
       // If we get here, session wasn't confirmed but sign-in succeeded
       console.warn('[NewGardenSignInPage] Session not confirmed in time, redirecting anyway');
-      window.location.href = '/garden';
+      // Session is confirmed, use client-side navigation to preserve auth state in memory           window.history.pushState({}, '', '/garden');           window.dispatchEvent(new PopStateEvent('popstate'));
     } catch (err: any) {
       console.error('[NewGardenSignInPage] Sign in error:', err);
       setError(err.message || 'Invalid email or password');

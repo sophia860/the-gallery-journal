@@ -1,17 +1,7 @@
-import { createClient } from '@supabase/supabase-js';
-import { projectId, publicAnonKey } from '/utils/supabase/info';
+import { getSupabaseClient } from '/src/utils/supabase/client';
 import { Profile, GardenStats } from '/src/types/garden';
 
-const supabase = createClient(
-  `https://${projectId}.supabase.co`,
-  publicAnonKey,
-  {
-    auth: {
-      storageKey: 'sb-page-gallery-profile',
-      storage: typeof window !== 'undefined' ? window.localStorage : undefined,
-    },
-  }
-);
+const supabase = getSupabaseClient();
 
 // Get profile by user ID
 export async function getProfile(userId: string): Promise<Profile | null> {

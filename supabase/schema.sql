@@ -40,9 +40,11 @@ CREATE TABLE IF NOT EXISTS writings (
   user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   title TEXT NOT NULL,
   content TEXT NOT NULL,
-  type TEXT NOT NULL CHECK (type IN ('essay', 'poem', 'fragment', 'marginalia')),
+  work_type TEXT CHECK (work_type IN ('poetry', 'prose', 'fiction', 'essay', 'fragment', 'personal', 'experimental', 'memoir')),
   growth_stage TEXT NOT NULL DEFAULT 'seed' CHECK (growth_stage IN ('seed', 'sprout', 'bloom')),
-  visibility TEXT NOT NULL DEFAULT 'private' CHECK (visibility IN ('private', 'circles', 'public')),
+  visibility TEXT NOT NULL DEFAULT 'private' CHECK (visibility IN ('private', 'circles', 'garden', 'public')),
+  word_count INTEGER DEFAULT 0,
+  character_count INTEGER DEFAULT 0,
   tags TEXT[], -- Array of tags
   position_x FLOAT, -- For visual garden layout
   position_y FLOAT,
@@ -51,30 +53,35 @@ CREATE TABLE IF NOT EXISTS writings (
   published_at TIMESTAMPTZ -- When it became a "bloom"
 );
 
-CREATE INDEX writings_user_id_idx ON writings(user_id);
-CREATE INDEX writings_visibility_idx ON writings(visibility);
-CREATE INDEX writings_growth_stage_idx ON writings(growth_stage);
-CREATE INDEX writings_tags_idx ON writings USING GIN(tags);
+CREATE INDEX IF NOT EXISTS writings_user_id_idx ON writings(user_id);
+CREATE INDEX IF NOT EXISTS writings_visibility_idx ON writings(visibility);
+CREATE INDEX IF NOT EXISTS writings_growth_stage_idx ON writings(growth_stage);
+CREATE INDEX IF NOT EXISTS writings_tags_idx ON writings USING GIN(tags);
 
 ALTER TABLE writings ENABLE ROW LEVEL SECURITY;
 
 -- Policies for writings
+DROP POLICY IF EXISTS "Users can view own writings" ON writings;
 CREATE POLICY "Users can view own writings"
   ON writings FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Public blooms are viewable by everyone" ON writings;
 CREATE POLICY "Public blooms are viewable by everyone"
   ON writings FOR SELECT
-  USING (visibility = 'public' AND growth_stage = 'bloom');
+  USING ((visibility = 'public' OR visibility = 'garden') AND growth_stage = 'bloom');
 
+DROP POLICY IF EXISTS "Users can insert own writings" ON writings;
 CREATE POLICY "Users can insert own writings"
   ON writings FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update own writings" ON writings;
 CREATE POLICY "Users can update own writings"
   ON writings FOR UPDATE
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can delete own writings" ON writings;
 CREATE POLICY "Users can delete own writings"
   ON writings FOR DELETE
   USING (auth.uid() = user_id);

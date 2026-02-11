@@ -1,34 +1,24 @@
 import { createClient } from '@supabase/supabase-js';
+import { projectId, publicAnonKey } from './info';
 
-// Singleton Supabase client
-let supabaseClient: ReturnType<typeof createClient> | null = null;
+// Singleton Supabase client - shared across all services
+let supabaseInstance: ReturnType<typeof createClient> | null = null;
 
 export function getSupabaseClient() {
-  // Return existing instance if it exists
-  if (supabaseClient) {
-    return supabaseClient;
+  if (!supabaseInstance) {
+    supabaseInstance = createClient(
+      `https://${projectId}.supabase.co`,
+      publicAnonKey,
+      {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true,
+          storageKey: 'sb-page-gallery-auth', // Use the same storage key as AuthContext
+          storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+        },
+      }
+    );
   }
-
-  // Create new instance only if it doesn't exist
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
-
-  if (!supabaseUrl || !supabaseAnonKey) {
-    console.warn('Supabase URL or Anon Key is missing. Client not initialized.');
-    // Return a dummy client or handle gracefully
-    return null;
-  }
-
-  supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true,
-    },
-  });
-
-  return supabaseClient;
+  return supabaseInstance;
 }
-
-// Export the client getter as default
-export default getSupabaseClient;

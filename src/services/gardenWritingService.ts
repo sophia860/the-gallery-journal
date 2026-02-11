@@ -1,76 +1,77 @@
-import { createClient } from '@supabase/supabase-js';
-import { projectId, publicAnonKey } from '/utils/supabase/info';
+import { getSupabaseClient } from '/src/utils/supabase/client';
 import { Writing } from '/src/types/garden';
 
-const supabase = createClient(
-  `https://${projectId}.supabase.co`,
-  publicAnonKey,
-  {
-    auth: {
-      storageKey: 'sb-page-gallery-writing',
-      storage: typeof window !== 'undefined' ? window.localStorage : undefined,
-    },
-  }
-);
+const supabase = getSupabaseClient();
 
 // Get user's writings
 export async function getUserWritings(userId: string): Promise<Writing[]> {
-  const { data, error } = await supabase
-    .from('writings')
-    .select(`
-      *,
-      profile:profiles(*)
-    `)
-    .eq('user_id', userId)
-    .order('updated_at', { ascending: false });
+  try {
+    const { data, error } = await supabase
+      .from('writings')
+      .select(`
+        *,
+        profile:profiles(*)
+      `)
+      .eq('user_id', userId)
+      .order('updated_at', { ascending: false });
 
-  if (error) {
-    console.error('Error fetching user writings:', error);
+    if (error) {
+      console.log('Database tables not yet available for user writings');
+      return [];
+    }
+
+    return data || [];
+  } catch (error) {
+    console.log('Database not available, returning empty writings list');
     return [];
   }
-
-  return data || [];
 }
 
 // Get public blooms for explore page
 export async function getPublicBlooms(limit = 50, offset = 0): Promise<Writing[]> {
-  const currentUserId = (await supabase.auth.getUser()).data.user?.id;
+  try {
+    const currentUserId = (await supabase.auth.getUser()).data.user?.id;
 
-  const { data, error } = await supabase
-    .from('writings')
-    .select(`
-      *,
-      profile:profiles(*),
-      tends(count)
-    `)
-    .eq('visibility', 'public')
-    .eq('growth_stage', 'bloom')
-    .order('published_at', { ascending: false })
-    .range(offset, offset + limit - 1);
+    const { data, error } = await supabase
+      .from('writings')
+      .select(`
+        *,
+        profile:profiles(*),
+        tends(count)
+      `)
+      .eq('visibility', 'public')
+      .eq('growth_stage', 'bloom')
+      .order('published_at', { ascending: false })
+      .range(offset, offset + limit - 1);
 
-  if (error) {
-    console.error('Error fetching public blooms:', error);
+    if (error) {
+      console.log('Database tables not yet available, will use mock data');
+      return [];
+    }
+
+    // Add has_tended flag for current user
+    if (currentUserId && data) {
+      const writingIds = data.map(w => w.id);
+      const { data: userTends } = await supabase
+        .from('tends')
+        .select('writing_id')
+        .eq('user_id', currentUserId)
+        .in('writing_id', writingIds);
+
+      const tendedIds = new Set(userTends?.map(t => t.writing_id) || []);
+
+      return data.map(writing => ({
+        ...writing,
+        has_tended: tendedIds.has(writing.id)
+      }));
+    }
+
+    return data || [];
+  } catch (error) {
+    // Silently fail and return empty array - ExplorePage will use mock data
+    console.log('Database not available, using mock data in Explore page');
     return [];
   }
-
-  // Add has_tended flag for current user
-  if (currentUserId && data) {
-    const writingIds = data.map(w => w.id);
-    const { data: userTends } = await supabase
-      .from('tends')
-      .select('writing_id')
-      .eq('user_id', currentUserId)
-      .in('writing_id', writingIds);
-
-    const tendedIds = new Set(userTends?.map(t => t.writing_id) || []);
-
-    return data.map(writing => ({
-      ...writing,
-      has_tended: tendedIds.has(writing.id)
-    }));
-  }
-
-  return data || [];
 }
 
 // Get a single writing

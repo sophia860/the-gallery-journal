@@ -1,222 +1,216 @@
 import { useState, useEffect } from 'react';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { ErrorBoundary } from './components/ErrorBoundary';
+import { AuthProvider } from './contexts/AuthContext';
 
-// Gallery Pages - ONLY
+// Gallery pages
 import { GalleryLandingPage } from './pages/GalleryLandingPage';
-import { AboutPage } from './pages/AboutPage';
-import { ExhibitPage } from './pages/ExhibitPage';
-import { CollectionGalleryPage } from './pages/CollectionGalleryPage';
-import { ArchivePage } from './pages/ArchivePage';
-import { SubmitPage } from './pages/SubmitPage';
 import { ExhibitsPage } from './pages/ExhibitsPage';
+import { CollectionGalleryPage } from './pages/CollectionGalleryPage';
 
-// Editor Pages
-import { EditorLoginPage } from './pages/EditorLoginPage';
-import { EditorDashboard } from './editor/EditorDashboard';
-
-// Writer Platform Pages
-import { SignInPage } from './pages/SignInPage';
-import { SignUpPage } from './pages/SignUpPage';
-import { MyGarden } from './studio/MyGarden';
-import { WriterProfilePage } from './pages/WriterProfilePage';
-
-// Garden Platform Pages
-import { GardenSignUpPage } from './pages/GardenSignUpPage';
-import { GardenSignInPage } from './pages/GardenSignInPage';
+// Garden pages - New
 import { MyGardenPage } from './pages/MyGardenPage';
 import { WritingEditorPage } from './pages/WritingEditorPage';
+import { NewGardenSignInPage } from './pages/NewGardenSignInPage';
+import { NewGardenSignUpPage } from './pages/NewGardenSignUpPage';
 import { ExplorePage } from './pages/ExplorePage';
 import { CirclesPage } from './pages/CirclesPage';
 import { CircleDetailPage } from './pages/CircleDetailPage';
-
-// New Garden Platform Pages
-import { NewGardenSignUpPage } from './pages/NewGardenSignUpPage';
-import { NewGardenSignInPage } from './pages/NewGardenSignInPage';
-import { SetupPage } from './pages/SetupPage';
-import { GardenHomePage } from './pages/GardenHomePage';
-import { EditorPage } from './pages/EditorPage';
-import { TablesOverviewPage } from './pages/TablesOverviewPage';
-import { TableDetailPage } from './pages/TableDetailPage';
-import { DiscoverPage } from './pages/DiscoverPage';
-import { ProfilePage } from './pages/ProfilePage';
 import { SettingsPage } from './pages/SettingsPage';
+import { SetupPage } from './pages/SetupPage';
+import { ReadingModePage } from './pages/ReadingModePage';
 
-// Admin Pages (for demo setup)
-import { AdminPage } from './pages/AdminPage';
-import { DemoModePage } from './pages/DemoModePage';
-import { DesignSystemDemo } from './pages/DesignSystemDemo';
-import { DebugPage } from './pages/DebugPage';
+// Garden pages - Old (keeping for compatibility)
+import { DashboardPage } from './garden/pages/DashboardPage';
+import { LoginPage } from './garden/pages/LoginPage';
+import { SignupPage } from './garden/pages/SignupPage';
+import { WritePage } from './garden/pages/WritePage';
+import { ExplorePage as OldExplorePage } from './garden/pages/ExplorePage';
+import { CirclesPage as OldCirclesPage } from './garden/pages/CirclesPage';
+import { HarvestPage } from './garden/pages/HarvestPage';
+import { QuietHoursPage } from './garden/pages/QuietHoursPage';
+import { ProfilePage } from './garden/pages/ProfilePage';
+import { NotificationsPage } from './garden/pages/NotificationsPage';
+import { ReaderPage } from './garden/pages/ReaderPage';
+import { BookmarksPage } from './garden/pages/BookmarksPage';
+import { PromptsPage } from './garden/pages/PromptsPage';
 
-// 404 Page
-import { NotFoundPage } from './pages/NotFoundPage';
+// Editor pages
+import { EditorDashboard } from './editor/EditorDashboard';
+import { EditorLoginPage } from './editor/EditorLoginPage';
 
-// AppContent component that uses auth - MUST be inside AuthProvider
-function AppContent() {
+// Simple client-side router
+function Router() {
   const [route, setRoute] = useState(window.location.pathname);
-  const { loading } = useAuth();
+  const [params, setParams] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const handlePopState = () => {
       setRoute(window.location.pathname);
     };
 
-    window.addEventListener('popstate', handlePopState);
-    
-    // Intercept link clicks for client-side navigation
-    const handleClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      const link = target.closest('a');
-      
-      if (link && link.href && link.origin === window.location.origin) {
-        e.preventDefault();
-        const path = new URL(link.href).pathname;
-        window.history.pushState({}, '', path);
-        setRoute(path);
+    const handleHashChange = () => {
+      const hash = window.location.hash.slice(1);
+      if (hash) {
+        setRoute(hash);
       }
     };
 
-    document.addEventListener('click', handleClick);
-
+    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('hashchange', handleHashChange);
+    
+    if (window.location.hash) {
+      const hash = window.location.hash.slice(1);
+      setRoute(hash);
+    }
+    
     return () => {
       window.removeEventListener('popstate', handlePopState);
-      document.removeEventListener('click', handleClick);
+      window.removeEventListener('hashchange', handleHashChange);
     };
   }, []);
 
-  // Pages that use their own navigation (don't show the default Header)
-  const pagesWithOwnNav = [
-    '/',
-    '/about',
-    '/collection-gallery',
-    '/collection'
-  ];
-  const showDefaultHeader = !pagesWithOwnNav.includes(route);
+  useEffect(() => {
+    const match = route.match(/\/garden\/reader\/([^/]+)/);
+    if (match) {
+      setParams({ id: match[1] });
+    }
+    const circleMatch = route.match(/\/circles\/([^/]+)/);
+    if (circleMatch) {
+      setParams({ circleId: circleMatch[1] });
+    }
+    const readingMatch = route.match(/\/garden\/reading\/([^/]+)/);
+    if (readingMatch) {
+      setParams({ writingId: readingMatch[1] });
+    }
+  }, [route]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F5F0EB]">
-        <div className="font-[family-name:var(--font-ui)] text-[#717171]">
-          Loading...
-        </div>
-      </div>
-    );
-  }
-
-  // Route matching - Gallery focused ONLY
-  let pageContent;
-  
-  // Gallery Pages
-  if (route === '/') {
-    pageContent = <GalleryLandingPage />;
-  } else if (route === '/about') {
-    pageContent = <AboutPage />;
-  } else if (route.startsWith('/exhibit/')) {
-    const exhibitId = route.split('/exhibit/')[1];
-    pageContent = <ExhibitPage exhibitId={exhibitId} />;
-  } else if (route === '/collection-gallery' || route === '/collection') {
-    pageContent = <CollectionGalleryPage />;
-  } else if (route === '/archive') {
-    pageContent = <ArchivePage />;
-  } else if (route === '/submit') {
-    pageContent = <SubmitPage />;
-  } else if (route === '/exhibits') {
-    pageContent = <ExhibitsPage />;
+  // Gallery routes
+  if (route === '/' || route === '') {
+    return <GalleryLandingPage />;
   }
   
-  // Editor Pages
-  else if (route === '/editors') {
-    pageContent = <EditorLoginPage />;
-  } else if (route === '/editors/dashboard') {
-    pageContent = <EditorDashboard />;
-  }
-  
-  // Writer Platform Pages
-  else if (route === '/signin') {
-    pageContent = <SignInPage />;
-  } else if (route === '/signup') {
-    pageContent = <SignUpPage />;
-  } else if (route === '/garden') {
-    pageContent = <MyGarden />;
-  } else if (route.startsWith('/profile/')) {
-    pageContent = <WriterProfilePage />;
-  }
-  
-  // Garden Platform Pages
-  else if (route === '/garden/signup') {
-    pageContent = <GardenSignUpPage />;
-  } else if (route === '/garden/signin') {
-    pageContent = <GardenSignInPage />;
-  } else if (route === '/my-garden') {
-    pageContent = <MyGardenPage />;
-  } else if (route === '/garden/write') {
-    pageContent = <WritingEditorPage />;
-  } else if (route.startsWith('/garden/write/')) {
-    const writingId = route.split('/garden/write/')[1];
-    pageContent = <WritingEditorPage writingId={writingId} />;
-  } else if (route === '/explore') {
-    pageContent = <ExplorePage />;
-  } else if (route === '/circles') {
-    pageContent = <CirclesPage />;
-  } else if (route.startsWith('/circles/')) {
-    const circleId = route.split('/circles/')[1];
-    pageContent = <CircleDetailPage circleId={circleId} />;
-  }
-  
-  // New Garden Platform Pages
-  else if (route === '/garden/new-signup') {
-    pageContent = <NewGardenSignUpPage />;
-  } else if (route === '/garden/new-signin') {
-    pageContent = <NewGardenSignInPage />;
-  } else if (route === '/garden/setup') {
-    pageContent = <SetupPage />;
-  } else if (route === '/garden/home') {
-    pageContent = <GardenHomePage />;
-  } else if (route === '/garden/editor') {
-    pageContent = <EditorPage />;
-  } else if (route === '/garden/tables') {
-    pageContent = <TablesOverviewPage />;
-  } else if (route.startsWith('/garden/tables/')) {
-    const tableId = route.split('/garden/tables/')[1];
-    pageContent = <TableDetailPage tableId={tableId} />;
-  } else if (route === '/garden/discover') {
-    pageContent = <DiscoverPage />;
-  } else if (route === '/garden/profile') {
-    pageContent = <ProfilePage />;
-  } else if (route === '/garden/settings') {
-    pageContent = <SettingsPage />;
-  }
-  
-  // Admin Pages (for demo setup)
-  else if (route === '/admin') {
-    pageContent = <AdminPage />;
-  } else if (route === '/admin/demo-mode') {
-    pageContent = <DemoModePage />;
-  } else if (route === '/admin/design-system-demo') {
-    pageContent = <DesignSystemDemo />;
-  } else if (route === '/admin/debug') {
-    pageContent = <DebugPage />;
-  }
-  
-  // 404 Page
-  else {
-    pageContent = <NotFoundPage />;
+  if (route === '/exhibits') {
+    return <ExhibitsPage />;
   }
 
-  return (
-    <div className="min-h-screen bg-background text-foreground">
-      {pageContent}
-    </div>
-  );
+  if (route === '/collection-gallery') {
+    return <CollectionGalleryPage />;
+  }
+
+  // NEW Garden routes (Main Navigation)
+  if (route === '/my-garden') {
+    return <MyGardenPage />;
+  }
+
+  if (route === '/garden/signin') {
+    return <NewGardenSignInPage />;
+  }
+
+  if (route === '/garden/signup') {
+    return <NewGardenSignUpPage />;
+  }
+
+  if (route === '/garden/write' || route === '/write') {
+    return <WritingEditorPage />;
+  }
+
+  if (route === '/explore') {
+    return <ExplorePage />;
+  }
+
+  if (route === '/circles') {
+    return <CirclesPage />;
+  }
+
+  if (route.startsWith('/circles/')) {
+    return <CircleDetailPage circleId={params.circleId || ''} />;
+  }
+
+  if (route === '/settings') {
+    return <SettingsPage />;
+  }
+
+  if (route === '/setup') {
+    return <SetupPage />;
+  }
+
+  if (route === '/reading-mode') {
+    return <ReadingModePage writingId="" />; // Default empty
+  }
+
+  if (route.startsWith('/garden/reading/')) {
+    return <ReadingModePage writingId={params.writingId || ''} />;
+  }
+
+  // OLD Garden routes (keeping for compatibility)
+  if (route === '/garden' || route === '/garden/dashboard') {
+    return <DashboardPage />;
+  }
+  
+  if (route === '/garden/login') {
+    return <LoginPage />;
+  }
+  
+  if (route === '/garden/signup') {
+    return <SignupPage />;
+  }
+  
+  if (route === '/garden/write') {
+    return <WritePage />;
+  }
+  
+  if (route === '/garden/explore') {
+    return <ExplorePage />; // Redirect to new ExplorePage with proper content
+  }
+  
+  if (route === '/garden/circles') {
+    return <CirclesPage />; // Redirect to new CirclesPage with proper content
+  }
+  
+  if (route === '/garden/harvest') {
+    return <HarvestPage />;
+  }
+  
+  if (route === '/garden/quiet-hours') {
+    return <QuietHoursPage />;
+  }
+  
+  if (route === '/garden/profile') {
+    return <ProfilePage />;
+  }
+  
+  if (route === '/garden/notifications') {
+    return <NotificationsPage />;
+  }
+  
+  if (route.startsWith('/garden/reader/')) {
+    return <ReaderPage userId={params.id || ''} />;
+  }
+  
+  if (route === '/garden/bookmarks') {
+    return <BookmarksPage />;
+  }
+  
+  if (route === '/garden/prompts') {
+    return <PromptsPage />;
+  }
+
+  // Editor routes
+  if (route === '/editor-login') {
+    return <EditorLoginPage />;
+  }
+  
+  if (route === '/editor' || route === '/editor/dashboard') {
+    return <EditorDashboard />;
+  }
+
+  // Default fallback to gallery landing
+  return <GalleryLandingPage />;
 }
 
-// Main App component - wraps everything in AuthProvider
 export default function App() {
   return (
     <AuthProvider>
-      <ErrorBoundary>
-        <AppContent />
-      </ErrorBoundary>
+      <Router />
     </AuthProvider>
   );
 }

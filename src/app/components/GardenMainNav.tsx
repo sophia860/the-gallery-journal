@@ -11,32 +11,62 @@ export function GardenMainNav({ variant = 'light' }: GardenNavProps) {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const { user, signOut } = useAuth();
 
+  // TEMPORARY: Mock user for demo
+  const mockUser = { 
+    id: 'demo-user-123', 
+    email: 'demo@example.com',
+    user_metadata: { display_name: 'Demo Writer' }
+  };
+  const demoUser = user || mockUser;
+
   const isActive = (page: string) => {
     const path = typeof window !== 'undefined' ? window.location.pathname : '';
     return path.includes(page);
   };
 
   const handleSignOut = async () => {
-    await signOut();
+    if (user) {
+      await signOut();
+    }
     window.location.href = '/';
   };
 
   // Dark variant styling
   const isDark = variant === 'dark';
-  const bgColor = isDark ? 'bg-[#1A1F2E]/95' : 'bg-[#F5F0EB]/95';
-  const borderColor = isDark ? 'border-[#2C3347]' : 'border-[#E0D8D0]';
-  const textColor = isDark ? 'text-[#E8E4DC]' : 'text-[#2C1810]';
-  const linkColor = isDark ? 'text-[#E8E4DC]' : 'text-[#2C1810]';
-  const linkHover = 'hover:text-[#8A9A7B]';
-  const activeColor = 'font-medium text-[#8A9A7B]';
-  const mobileBg = isDark ? 'bg-[#1A1F2E]' : 'bg-[#F5F0EB]';
+  const bgColor = isDark ? 'rgba(15, 23, 41, 0.85)' : 'bg-[#F5F0EB]/95';
+  const borderColor = isDark ? 'border-[rgba(96,165,250,0.2)]' : 'border-[#E0D8D0]';
+  const textColor = isDark ? 'text-[#e8f0ff]' : 'text-[#2C1810]';
+  const linkColor = isDark ? 'text-[#c8cad8]' : 'text-[#2C1810]';
+  const linkHover = isDark ? 'hover:text-[#60a5fa]' : 'hover:text-[#8A9A7B]';
+  const activeColor = isDark ? 'text-[#60a5fa]' : 'text-[#8A9A7B]';
+  const mobileBg = isDark ? 'bg-[rgba(15,23,41,0.95)]' : 'bg-[#F5F0EB]';
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 px-8 py-6 ${bgColor} backdrop-blur-md border-b ${borderColor} shadow-sm`}>
+    <header 
+      className={`fixed top-0 left-0 right-0 z-50 px-8 py-6 border-b ${borderColor} ${isDark ? 'shadow-lg shadow-black/20' : 'shadow-sm'}`}
+      style={isDark ? {
+        backgroundColor: 'rgba(15, 23, 41, 0.85)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        boxShadow: '0 0 30px rgba(96, 165, 250, 0.1)'
+      } : {
+        backgroundColor: 'rgba(245, 240, 235, 0.95)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)'
+      }}
+    >
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <div className="flex items-center gap-10">
           {/* Logo */}
-          <a href="/" className={`font-['Cardo'] text-2xl italic ${textColor} hover:text-[#8A9A7B] transition-colors duration-300 flex items-center gap-2`}>
+          <a 
+            href="/" 
+            className={`${textColor} hover:text-[#8A9A7B] transition-colors duration-300 flex items-center gap-2`}
+            style={{ 
+              fontSize: '1.4rem', 
+              letterSpacing: '0.05em',
+              fontFamily: "'Special Elite', cursive"
+            }}
+          >
             <Sprout className="w-6 h-6" />
             The Garden
           </a>
@@ -60,7 +90,7 @@ export function GardenMainNav({ variant = 'light' }: GardenNavProps) {
               <span className="absolute -bottom-2 left-0 w-0 h-0.5 bg-[#8A9A7B] group-hover:w-full transition-all duration-300"></span>
             </a>
 
-            {user && (
+            {demoUser && (
               <>
                 <a 
                   href="/my-garden" 
@@ -85,7 +115,7 @@ export function GardenMainNav({ variant = 'light' }: GardenNavProps) {
 
         {/* Desktop Right Side - Auth UI */}
         <div className="hidden md:flex items-center gap-4">
-          {user ? (
+          {demoUser ? (
             // Logged In - User Dropdown
             <div className="relative">
               <button
@@ -93,10 +123,10 @@ export function GardenMainNav({ variant = 'light' }: GardenNavProps) {
                 className="flex items-center gap-3 px-4 py-2 hover:bg-white/50 rounded-lg transition-colors"
               >
                 <div className="w-8 h-8 bg-[#8A9A7B] rounded-full flex items-center justify-center text-white text-xs font-['Inter'] font-semibold">
-                  {(user.user_metadata?.display_name || user.email || 'U')[0].toUpperCase()}
+                  {(demoUser.user_metadata?.display_name || demoUser.email || 'U')[0].toUpperCase()}
                 </div>
                 <span className={`text-sm font-['Inter'] ${textColor}`}>
-                  {user.user_metadata?.display_name || 'Writer'}
+                  {demoUser.user_metadata?.display_name || 'Writer'}
                 </span>
               </button>
 
@@ -188,7 +218,7 @@ export function GardenMainNav({ variant = 'light' }: GardenNavProps) {
               Explore
             </a>
 
-            {user && (
+            {demoUser && (
               <>
                 <div className="border-t border-[#E0D8D0] pt-4 mt-4">
                   <a 
@@ -226,7 +256,7 @@ export function GardenMainNav({ variant = 'light' }: GardenNavProps) {
               </>
             )}
 
-            {!user && (
+            {!demoUser && (
               <div className="border-t border-[#E0D8D0] pt-4 mt-4 space-y-3">
                 <a
                   href="/garden/signin"

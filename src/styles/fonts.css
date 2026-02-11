@@ -1,5 +1,11 @@
 /* Font imports for The Page Gallery & The Garden - Dual System */
 
+/* Playfair Display - Elegant serif for all display headings */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&display=swap');
+
+/* Special Elite - Typewriter font for logo */
+@import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
+
 /* Cardo - Serif for ALL headings and body text */
 @import url('https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&display=swap');
 

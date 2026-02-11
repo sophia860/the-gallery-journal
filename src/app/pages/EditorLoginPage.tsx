@@ -1,312 +1,157 @@
-import { useState, useEffect } from 'react';
-import { Key, ArrowRight, Mail, Lock, UserPlus, Copy, CheckCircle } from 'lucide-react';
-import { enableDemoMode } from '../../services/editorService';
-
-interface EditorInvite {
-  token: string;
-  email: string;
-  role: 'editor' | 'managing_editor';
-  used: boolean;
-  createdAt: string;
-}
+import { useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 
 export function EditorLoginPage() {
-  const [mode, setMode] = useState<'login' | 'invite'>('login');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const { signIn, supabase } = useAuth();
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
   const [error, setError] = useState('');
-  const [inviteToken, setInviteToken] = useState<string | null>(null);
-  const [inviteData, setInviteData] = useState<EditorInvite | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    // Check for invite token in URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('invite');
-    
-    if (token) {
-      // Validate invite token
-      const invites = JSON.parse(localStorage.getItem('editor_invites') || '[]');
-      const invite = invites.find((inv: EditorInvite) => inv.token === token && !inv.used);
-      
-      if (invite) {
-        setMode('invite');
-        setInviteToken(token);
-        setInviteData(invite);
-        setEmail(invite.email);
-      } else {
-        setError('This invite link is invalid or has already been used.');
-      }
-    }
-  }, []);
-
-  const handleDemoLogin = () => {
-    // Enable demo mode
-    enableDemoMode();
-    localStorage.setItem('editor_logged_in', 'true');
-    localStorage.setItem('editor_name', 'Demo Editor');
-    localStorage.setItem('editor_role', 'editor');
-    
-    // Redirect to dashboard
-    window.location.href = '/editors/dashboard';
-  };
-
-  const handleInviteSetup = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    if (!formData.email || !formData.password) {
+      setError('Please fill in all fields');
+      return;
+    }
+
     setLoading(true);
-
-    // Validate passwords match
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      setLoading(false);
-      return;
-    }
-
-    if (password.length < 8) {
-      setError('Password must be at least 8 characters');
-      setLoading(false);
-      return;
-    }
-
     try {
-      // Mark invite as used
-      const invites = JSON.parse(localStorage.getItem('editor_invites') || '[]');
-      const updatedInvites = invites.map((inv: EditorInvite) => 
-        inv.token === inviteToken ? { ...inv, used: true } : inv
-      );
-      localStorage.setItem('editor_invites', JSON.stringify(updatedInvites));
+      // For demo: editor@thegallery.com / demo
+      if (formData.email === 'editor@thegallery.com' && formData.password === 'demo') {
+        localStorage.setItem('editor_logged_in', 'true');
+        localStorage.setItem('editor_name', 'Demo Editor');
+        localStorage.setItem('editor_role', 'editor');
+        window.location.href = '/editor/dashboard';
+        return;
+      }
 
-      // Create editor account (in demo mode, just store in localStorage)
-      enableDemoMode();
-      localStorage.setItem('editor_logged_in', 'true');
-      localStorage.setItem('editor_name', email.split('@')[0]);
-      localStorage.setItem('editor_role', inviteData?.role || 'editor');
-      localStorage.setItem('editor_email', email);
-
-      // TODO: In production, create Supabase user with auth.admin.createUser
-
-      // Redirect to dashboard
-      window.location.href = '/editors/dashboard';
-    } catch (err) {
-      setError('Failed to complete setup. Please try again.');
+      await signIn(formData.email, formData.password);
+      // Check if user is editor
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .single();
+      
+      if (profile?.role === 'editor') {
+        window.location.href = '/editor/dashboard';
+      } else {
+        setError('Editor access only');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Login failed');
+    } finally {
       setLoading(false);
     }
-  };
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-
-    // For demo purposes, check for demo credentials
-    if (email === 'editor@thegallery.com' && password === 'demo') {
-      handleDemoLogin();
-      return;
-    }
-
-    // TODO: Implement real Supabase authentication
-    setError('Invalid credentials. Use editor@thegallery.com / demo for demo mode.');
-    setLoading(false);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#FAF8F5] via-[#F5F0EB] to-[#FAF8F5] flex items-center justify-center px-6 py-12">
-      <div className="max-w-md w-full">
-        {/* Header */}
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-[#2C1810] to-[#1A1A1A] rounded-2xl mb-6 shadow-xl">
-            <Key className="w-10 h-10 text-[#C4A265]" />
-          </div>
-          <h1 className="font-['Cardo'] text-6xl text-[#2C1810] italic mb-3">
-            {mode === 'invite' ? 'Welcome' : 'Editor Studio'}
+    <div className="min-h-screen bg-[#0d1117] flex items-center justify-center px-8 relative overflow-hidden">
+      {/* Starfield background */}
+      <div className="fixed inset-0 pointer-events-none opacity-30">
+        <div className="stars-layer-1"></div>
+        <div className="stars-layer-2"></div>
+      </div>
+
+      <style>{`
+        .stars-layer-1, .stars-layer-2 {
+          position: absolute;
+          inset: 0;
+          background-repeat: repeat;
+        }
+
+        .stars-layer-1 {
+          background-image: 
+            radial-gradient(1px 1px at 20% 30%, rgba(196, 164, 108, 0.4), transparent),
+            radial-gradient(1px 1px at 60% 70%, rgba(196, 164, 108, 0.3), transparent);
+          background-size: 200% 200%
+;
+        }
+
+        .stars-layer-2 {
+          background-image:
+            radial-gradient(1px 1px at 40% 40%, rgba(139, 157, 195, 0.3), transparent);
+          background-size: 200% 200%;
+        }
+      `}</style>
+
+      <div className="max-w-md w-full relative z-10">
+        <div className="text-center mb-12">
+          <h1 className="font-['Playfair_Display'] italic text-[64px] text-[#c4a46c] mb-4" style={{ lineHeight: '1.1', textShadow: '0 0 40px rgba(196, 164, 108, 0.25)' }}>
+            The Studio
           </h1>
-          <p className="font-['Libre_Baskerville'] text-lg text-[#8B7355]">
-            {mode === 'invite' 
-              ? 'Complete your account setup'
-              : 'The private door of The Gallery'
-            }
+          <p className="font-['Cormorant_Garamond'] text-[18px] text-[#8b9dc3]" style={{ lineHeight: '1.8' }}>
+            Editor access only.
           </p>
         </div>
 
-        {/* Invite Setup Form */}
-        {mode === 'invite' && inviteData && (
-          <form onSubmit={handleInviteSetup} className="bg-white border-2 border-[#E0D8D0] rounded-2xl p-8 shadow-xl mb-6">
-            <div className="mb-6 p-4 bg-[#8A9A7B]/10 border-2 border-[#8A9A7B]/20 rounded-xl">
-              <div className="flex items-center gap-2 mb-2">
-                <UserPlus className="w-5 h-5 text-[#8A9A7B]" />
-                <p className="font-['Inter'] text-sm font-semibold text-[#2C1810]">
-                  You've been invited as {inviteData.role === 'managing_editor' ? 'Managing Editor' : 'Editor'}
-                </p>
-              </div>
-              <p className="font-['Inter'] text-xs text-[#8B7355]">
-                Set up your password to access the editorial dashboard
-              </p>
+        <form onSubmit={handleSubmit} className="bg-[rgba(15,21,37,0.6)] border border-[rgba(196,164,108,0.2)] rounded p-10 backdrop-blur-md" style={{ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)' }}>
+          <h2 className="font-['Cardo'] text-2xl text-[#e0e0e0] mb-6">Editor Login</h2>
+
+          {error && (
+            <div className="mb-4 p-3 bg-red-900/20 border border-red-900/50 rounded text-red-400 text-sm">
+              {error}
+            </div>
+          )}
+
+          <div className="space-y-4">
+            <div>
+              <label className="block font-['Courier_New'] text-[11px] uppercase tracking-[0.15em] text-[#e0e0e0]/70 mb-2">
+                Email
+              </label>
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className="w-full bg-[#121212] border border-[#333] rounded px-4 py-3 text-[#e0e0e0] focus:border-[#c4a46c] focus:outline-none transition-colors"
+                placeholder="editor@thegallery.com"
+              />
             </div>
 
-            <div className="space-y-5">
-              <div>
-                <label htmlFor="email" className="block font-['Inter'] text-sm font-medium text-[#2C1810] mb-2">
-                  Email Address
-                </label>
-                <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8B7355]" />
-                  <input
-                    id="email"
-                    type="email"
-                    value={email}
-                    disabled
-                    className="w-full pl-11 pr-4 py-3 border-2 border-[#E0D8D0] rounded-xl bg-[#F5F0EB]/30 font-['Inter'] text-sm text-[#8B7355]"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="password" className="block font-['Inter'] text-sm font-medium text-[#2C1810] mb-2">
-                  Create Password
-                </label>
-                <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8B7355]" />
-                  <input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="At least 8 characters"
-                    required
-                    className="w-full pl-11 pr-4 py-3 border-2 border-[#E0D8D0] rounded-xl focus:border-[#8A9A7B] focus:outline-none font-['Inter'] text-sm"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="confirmPassword" className="block font-['Inter'] text-sm font-medium text-[#2C1810] mb-2">
-                  Confirm Password
-                </label>
-                <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8B7355]" />
-                  <input
-                    id="confirmPassword"
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Confirm your password"
-                    required
-                    className="w-full pl-11 pr-4 py-3 border-2 border-[#E0D8D0] rounded-xl focus:border-[#8A9A7B] focus:outline-none font-['Inter'] text-sm"
-                  />
-                </div>
-              </div>
-
-              {error && (
-                <div className="p-4 bg-[#E11D48]/10 border-2 border-[#E11D48]/20 rounded-xl">
-                  <p className="font-['Inter'] text-sm text-[#E11D48]">{error}</p>
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full inline-flex items-center justify-center gap-3 px-6 py-4 bg-[#2C1810] text-white hover:bg-[#1A1A1A] transition-all font-['Cardo'] text-lg tracking-wide group disabled:opacity-50 rounded-xl shadow-lg"
-              >
-                {loading ? 'Setting up...' : 'Complete Setup'}
-                <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-              </button>
+            <div>
+              <label className="block font-['Courier_New'] text-[11px] uppercase tracking-[0.15em] text-[#e0e0e0]/70 mb-2">
+                Password
+              </label>
+              <input
+                type="password"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                className="w-full bg-[#121212] border border-[#333] rounded px-4 py-3 text-[#e0e0e0] focus:border-[#c4a46c] focus:outline-none transition-colors"
+                placeholder="your_password"
+              />
             </div>
-          </form>
-        )}
-
-        {/* Normal Login Form */}
-        {mode === 'login' && (
-          <form onSubmit={handleLogin} className="bg-white border-2 border-[#E0D8D0] rounded-2xl p-8 shadow-xl mb-6">
-            <div className="space-y-5">
-              <div>
-                <label htmlFor="email" className="block font-['Inter'] text-sm font-medium text-[#2C1810] mb-2">
-                  Email Address
-                </label>
-                <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8B7355]" />
-                  <input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="editor@thegallery.com"
-                    required
-                    className="w-full pl-11 pr-4 py-3 border-2 border-[#E0D8D0] rounded-xl focus:border-[#8A9A7B] focus:outline-none font-['Inter'] text-sm"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="password" className="block font-['Inter'] text-sm font-medium text-[#2C1810] mb-2">
-                  Password
-                </label>
-                <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8B7355]" />
-                  <input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter your password"
-                    required
-                    className="w-full pl-11 pr-4 py-3 border-2 border-[#E0D8D0] rounded-xl focus:border-[#8A9A7B] focus:outline-none font-['Inter'] text-sm"
-                  />
-                </div>
-              </div>
-
-              {error && (
-                <div className="p-4 bg-[#E11D48]/10 border-2 border-[#E11D48]/20 rounded-xl">
-                  <p className="font-['Inter'] text-sm text-[#E11D48]">{error}</p>
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full inline-flex items-center justify-center gap-3 px-6 py-4 bg-[#2C1810] text-white hover:bg-[#1A1A1A] transition-all font-['Cardo'] text-lg tracking-wide group disabled:opacity-50 rounded-xl shadow-lg"
-              >
-                {loading ? 'Logging in...' : 'Log In'}
-                <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-              </button>
-            </div>
-          </form>
-        )}
-
-        {/* Demo Mode Card */}
-        {mode === 'login' && (
-          <div className="p-6 bg-white/60 border-2 border-[#E0D8D0] rounded-2xl backdrop-blur-sm">
-            <div className="flex items-start gap-3 mb-4">
-              <div className="w-10 h-10 rounded-lg bg-[#8A9A7B]/10 flex items-center justify-center flex-shrink-0">
-                <Key className="w-5 h-5 text-[#8A9A7B]" />
-              </div>
-              <div>
-                <h3 className="font-['Cardo'] text-lg text-[#2C1810] mb-1">Demo Mode</h3>
-                <p className="font-['Inter'] text-sm text-[#8B7355] leading-relaxed">
-                  Try the editor dashboard without authentication. Perfect for exploring features.
-                </p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={handleDemoLogin}
-              className="w-full px-4 py-3 border-2 border-[#8A9A7B] text-[#8A9A7B] hover:bg-[#8A9A7B] hover:text-white transition-all font-['Inter'] text-sm font-medium rounded-xl"
-            >
-              Launch Demo Dashboard
-            </button>
           </div>
-        )}
 
-        {/* Back to Gallery */}
-        <div className="mt-8 text-center">
-          <a
-            href="/"
-            className="inline-flex items-center gap-2 text-sm text-[#8B7355] hover:text-[#2C1810] transition-colors font-['Libre_Baskerville']"
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full mt-6 bg-[#c4a46c] hover:bg-[#d4b47c] text-[#0d1117] font-['Courier_New'] text-[12px] uppercase tracking-[0.2em] py-4 rounded transition-colors cursor-pointer disabled:opacity-50"
           >
-            ← Back to The Gallery
-          </a>
-        </div>
+            {loading ? 'Logging in...' : 'Enter Studio'}
+          </button>
+
+          <div className="mt-6 p-4 bg-[rgba(196,164,108,0.1)] border border-[rgba(196,164,108,0.2)] rounded">
+            <p className="font-['Courier_New'] text-[10px] uppercase tracking-[0.15em] text-[#c4a46c]/70 mb-2">
+              Demo Access
+            </p>
+            <p className="font-['Cardo'] text-[13px] text-[#e0e0e0]/60 mb-0">
+              editor@thegallery.com / demo
+            </p>
+          </div>
+
+          <div className="mt-6 text-center">
+            <a
+              href="/"
+              className="font-['Courier_New'] text-[11px] uppercase tracking-[0.15em] text-[#8b9dc3]/60 hover:text-[#8b9dc3] transition-colors cursor-pointer"
+            >
+              ← Back to Gallery
+            </a>
+          </div>
+        </form>
       </div>
     </div>
   );

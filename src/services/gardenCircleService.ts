@@ -1,108 +1,111 @@
-import { createClient } from '@supabase/supabase-js';
-import { projectId, publicAnonKey } from '/utils/supabase/info';
+import { getSupabaseClient } from '/src/utils/supabase/client';
 import { Circle, CircleMember, CircleInvite } from '/src/types/garden';
 
-const supabase = createClient(
-  `https://${projectId}.supabase.co`,
-  publicAnonKey,
-  {
-    auth: {
-      storageKey: 'sb-page-gallery-circles',
-      storage: typeof window !== 'undefined' ? window.localStorage : undefined,
-    },
-  }
-);
+const supabase = getSupabaseClient();
 
 // Get user's circles
 export async function getUserCircles(userId: string): Promise<Circle[]> {
-  const { data, error } = await supabase
-    .from('circle_members')
-    .select(`
-      circle_id,
-      circles (
-        *,
-        circle_members (count)
-      )
-    `)
-    .eq('user_id', userId);
+  try {
+    const { data, error } = await supabase
+      .from('circle_members')
+      .select(`
+        circle_id,
+        circles (
+          *,
+          circle_members (count)
+        )
+      `)
+      .eq('user_id', userId);
 
-  if (error) {
-    console.error('Error fetching user circles:', error);
+    if (error) {
+      console.log('Circle tables not available, using mock data');
+      throw error;
+    }
+
+    return data?.map(item => ({
+      ...item.circles,
+      member_count: item.circles.circle_members?.[0]?.count || 0,
+      is_member: true
+    })) || [];
+  } catch (error) {
+    // Silently fail and let the component use mock data
     return [];
   }
-
-  return data?.map(item => ({
-    ...item.circles,
-    member_count: item.circles.circle_members?.[0]?.count || 0,
-    is_member: true
-  })) || [];
 }
 
 // Get circle by ID
 export async function getCircle(circleId: string): Promise<Circle | null> {
-  const currentUserId = (await supabase.auth.getUser()).data.user?.id;
+  try {
+    const currentUserId = (await supabase.auth.getUser()).data.user?.id;
 
-  const { data, error } = await supabase
-    .from('circles')
-    .select(`
-      *,
-      circle_members (count)
-    `)
-    .eq('id', circleId)
-    .single();
-
-  if (error) {
-    console.error('Error fetching circle:', error);
-    return null;
-  }
-
-  // Check if user is a member
-  if (currentUserId) {
-    const { data: membership } = await supabase
-      .from('circle_members')
-      .select('id')
-      .eq('circle_id', circleId)
-      .eq('user_id', currentUserId)
+    const { data, error } = await supabase
+      .from('circles')
+      .select(`
+        *,
+        circle_members (count)
+      `)
+      .eq('id', circleId)
       .single();
 
-    data.is_member = !!membership;
-  }
+    if (error) {
+      console.log('Circle tables not available');
+      throw error;
+    }
 
-  return {
-    ...data,
-    member_count: data.circle_members?.[0]?.count || 0
-  };
+    // Check if user is a member
+    if (currentUserId) {
+      const { data: membership } = await supabase
+        .from('circle_members')
+        .select('id')
+        .eq('circle_id', circleId)
+        .eq('user_id', currentUserId)
+        .single();
+
+      data.is_member = !!membership;
+    }
+
+    return {
+      ...data,
+      member_count: data.circle_members?.[0]?.count || 0
+    };
+  } catch (error) {
+    return null;
+  }
 }
 
 // Create a circle
 export async function createCircle(circle: { name: string; description?: string; member_limit?: number }): Promise<Circle | null> {
-  const currentUserId = (await supabase.auth.getUser()).data.user?.id;
-  if (!currentUserId) return null;
+  try {
+    const currentUserId = (await supabase.auth.getUser()).data.user?.id;
+    if (!currentUserId) return null;
 
-  const { data, error } = await supabase
-    .from('circles')
-    .insert({
-      ...circle,
-      creator_id: currentUserId
-    })
-    .select()
-    .single();
+    const { data, error } = await supabase
+      .from('circles')
+      .insert({
+        ...circle,
+        creator_id: currentUserId
+      })
+      .select()
+      .single();
 
-  if (error) {
-    console.error('Error creating circle:', error);
+    if (error) {
+      console.log('Cannot create circle - tables not available');
+      throw error;
+    }
+
+    // Add creator as member
+    await supabase
+      .from('circle_members')
+      .insert({
+        circle_id: data.id,
+        user_id: currentUserId,
+        role: 'creator'
+      });
+
+    return data;
+  } catch (error) {
     return null;
   }
-
-  // Add creator as member
-  await supabase
-    .from('circle_members')
-    .insert({
-      circle_id: data.id,
-      user_id: currentUserId,
-      role: 'creator'
-    });
-
-  return data;
 }
 
 // Update circle

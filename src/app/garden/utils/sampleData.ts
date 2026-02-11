@@ -1,0 +1,151 @@
+// Sample data for The Garden with varied work types
+
+import { GardenNote, WorkType } from './notes';
+
+export const sampleNotes: Partial<GardenNote>[] = [
+  {
+    id: 'sample_1',
+    title: 'Morning Light Through Kitchen Window',
+    content: 'The way sunlight catches dust particles / suspended in air like tiny galaxies / Each mote a world unto itself / spinning through the breakfast hour',
+    workType: 'poetry',
+    state: 'bloom',
+    tags: ['morning', 'observation', 'light'],
+    visibility: 'garden',
+    wordCount: 28,
+  },
+  {
+    id: 'sample_2',
+    title: 'On the Ethics of Silence',
+    content: 'There are moments when speaking feels like an intrusion—not into conversation, but into the fabric of what exists between people. I have been thinking about how silence operates as its own language, complete with grammar and syntax we barely acknowledge...',
+    workType: 'essay',
+    state: 'sprout',
+    tags: ['philosophy', 'language', 'communication'],
+    visibility: 'garden',
+    wordCount: 156,
+  },
+  {
+    id: 'sample_3',
+    title: 'The thing about trains',
+    content: 'is how they make you believe in linear time again. A to B. Departure and arrival. No scrolling back, no refresh.',
+    workType: 'fragment',
+    state: 'seed',
+    tags: ['transit', 'time', 'observation'],
+    visibility: 'private',
+    wordCount: 24,
+  },
+  {
+    id: 'sample_4',
+    title: 'The Last Coffee Shop',
+    content: 'Margaret had been coming to Rosie\'s for thirty years, always ordering the same thing: black coffee, no sugar, and whatever pie was fresh. She didn\'t know that today the shop would close forever, or that the waitress serving her had been working up the courage to ask about Margaret\'s life all this time...',
+    workType: 'fiction',
+    state: 'bloom',
+    tags: ['character study', 'endings', 'nostalgia'],
+    visibility: 'garden',
+    wordCount: 178,
+  },
+  {
+    id: 'sample_5',
+    title: 'What I Remember About Being 7',
+    content: 'The carpet in my grandmother\'s living room. How it smelled like dust and decades. The way she\'d let me eat cookies before dinner because "rules are for people who forgot how to live." I didn\'t understand what that meant then. I think I\'m starting to now.',
+    workType: 'personal',
+    state: 'sprout',
+    tags: ['memory', 'family', 'childhood'],
+    visibility: 'garden',
+    wordCount: 67,
+  },
+  {
+    id: 'sample_6',
+    title: '01001000 01100101 01101100 01101100 01101111',
+    content: 'what if every word / was actually / a number / pretending / to be / a feeling / and we all just / agreed / to play along',
+    workType: 'experimental',
+    state: 'bloom',
+    tags: ['language', 'form', 'digital'],
+    visibility: 'garden',
+    wordCount: 22,
+  },
+  {
+    id: 'sample_7',
+    title: 'Draft: The Architecture of Forgetting',
+    content: 'Memory as building. Forgetting as demolition. But what if it\'s more like renovation? You don\'t tear down the whole structure—you repurpose, rearrange, let new light in through old windows. Some rooms you wall off entirely. Others you expand until they swallow adjacent spaces...',
+    workType: 'prose',
+    state: 'sprout',
+    tags: ['memory', 'metaphor', 'architecture'],
+    visibility: 'garden',
+    wordCount: 98,
+  },
+  {
+    id: 'sample_8',
+    title: 'Instructions for Growing a Garden in Your Chest',
+    content: '1. Locate the hollow space between your ribs\n2. Plant something small\n3. Water with salt\n4. Wait\n5. Do not dig it up to check if it\'s growing\n6. Wait longer\n7. Feel the first green shoots pressing against bone\n8. Learn to breathe around them',
+    workType: 'poetry',
+    state: 'bloom',
+    tags: ['body', 'growth', 'instruction'],
+    visibility: 'garden',
+    wordCount: 56,
+  },
+  {
+    id: 'sample_9',
+    title: 'Why We Talk About Weather',
+    content: 'It\'s not because we care about meteorology. It\'s because we need a language for "I acknowledge your existence" that doesn\'t demand vulnerability. The weather is neutral territory. Safe. Shared. Nobody has to reveal anything beyond "yes, it is raining."',
+    workType: 'essay',
+    state: 'sprout',
+    tags: ['social', 'communication', 'observation'],
+    visibility: 'garden',
+    wordCount: 52,
+  },
+  {
+    id: 'sample_10',
+    title: 'Untitled (Tuesday)',
+    content: 'I keep starting sentences and deleting them.',
+    workType: 'fragment',
+    state: 'seed',
+    tags: ['draft', 'process'],
+    visibility: 'private',
+    wordCount: 7,
+  },
+  {
+    id: 'sample_11',
+    title: 'The Woman Who Collected Silence',
+    content: 'She stored it in glass jars, labeled by location and date. "Library Reading Room, March 14th." "Empty Church, 3am." "Snow falling, no one watching." Her apartment was full of them, shelves and shelves of carefully preserved quiet. When asked why, she said she was building an archive of what would be lost.',
+    workType: 'fiction',
+    state: 'bloom',
+    tags: ['character', 'collection', 'silence'],
+    visibility: 'garden',
+    wordCount: 67,
+  },
+  {
+    id: 'sample_12',
+    title: 'Things My Mother Never Said Out Loud',
+    content: 'But I heard them anyway in the way she washed dishes—the particular violence of scrubbing that meant disappointment. In how she folded laundry: sharp corners for anger, loose edges for resignation. The whole emotional vocabulary of a woman who was taught that speaking your mind was the same as losing it.',
+    workType: 'personal',
+    state: 'bloom',
+    tags: ['mother', 'silence', 'family'],
+    visibility: 'garden',
+    wordCount: 67,
+  },
+];
+
+export const getRandomWorkType = (): WorkType => {
+  const types: WorkType[] = ['poetry', 'prose', 'fragment', 'essay', 'fiction', 'personal', 'experimental'];
+  return types[Math.floor(Math.random() * types.length)];
+};
+
+export const workTypeColors: Record<WorkType, { bg: string; text: string; border: string }> = {
+  poetry: { bg: 'rgba(139, 92, 246, 0.1)', text: '#a78bfa', border: 'rgba(139, 92, 246, 0.3)' },
+  prose: { bg: 'rgba(196, 164, 108, 0.1)', text: '#c4a46c', border: 'rgba(196, 164, 108, 0.3)' },
+  fragment: { bg: 'rgba(139, 157, 195, 0.1)', text: '#8b9dc3', border: 'rgba(139, 157, 195, 0.3)' },
+  essay: { bg: 'rgba(245, 158, 11, 0.1)', text: '#f59e0b', border: 'rgba(245, 158, 11, 0.3)' },
+  fiction: { bg: 'rgba(236, 72, 153, 0.1)', text: '#ec4899', border: 'rgba(236, 72, 153, 0.3)' },
+  personal: { bg: 'rgba(122, 155, 118, 0.1)', text: '#7a9b76', border: 'rgba(122, 155, 118, 0.3)' },
+  experimental: { bg: 'rgba(14, 165, 233, 0.1)', text: '#0ea5e9', border: 'rgba(14, 165, 233, 0.3)' },
+};
+
+export const workTypeLabels: Record<WorkType, string> = {
+  poetry: 'Poetry',
+  prose: 'Prose',
+  fragment: 'Fragment',
+  essay: 'Essay',
+  fiction: 'Fiction',
+  personal: 'Personal',
+  experimental: 'Experimental',
+};

@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
-import { projectId, publicAnonKey } from '/utils/supabase/info';
+import { getSupabaseClient } from '/src/utils/supabase/client';
 
 interface User {
   id: string;
@@ -16,7 +15,7 @@ interface AuthContextType {
   user: User | null;
   accessToken: string | null;
   loading: boolean;
-  supabase: ReturnType<typeof createClient>;
+  supabase: ReturnType<typeof getSupabaseClient>;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, name: string, writerName: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -24,28 +23,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Create a singleton Supabase client
-let supabaseInstance: ReturnType<typeof createClient> | null = null;
-
-function getSupabaseClient() {
-  if (!supabaseInstance) {
-    supabaseInstance = createClient(
-      `https://${projectId}.supabase.co`,
-      publicAnonKey,
-      {
-        auth: {
-          persistSession: true,
-          autoRefreshToken: true,
-          detectSessionInUrl: true,
-          storageKey: 'sb-page-gallery-auth',
-          storage: typeof window !== 'undefined' ? window.localStorage : undefined,
-        },
-      }
-    );
-  }
-  return supabaseInstance;
-}
-
+// Use the shared Supabase client
 const supabase = getSupabaseClient();
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -80,14 +58,54 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           return;
         }
 
-        // Regular auth flow
-        const { data: { session } } = await supabase.auth.getSession();
+        // Regular auth flow with error recovery
+        let session = null;
+        
+        try {
+          const { data } = await supabase.auth.getSession();
+          session = data.session;
+        } catch (error) {
+          console.error('[AuthContext] Error getting session from Supabase:', error);
+          
+          // FIX #2 & #6: Try to recover session from localStorage if Supabase call fails
+          if (typeof window !== 'undefined') {
+            const storedAuth = localStorage.getItem('sb-page-gallery-auth');
+            if (storedAuth) {
+              try {
+                const authData = JSON.parse(storedAuth);
+                console.log('[AuthContext] Attempting session recovery from localStorage');
+                
+                // Try to restore the session
+                if (authData.access_token && authData.refresh_token) {
+                  const { data: recoveredSession, error: recoveryError } = await supabase.auth.setSession({
+                    access_token: authData.access_token,
+                    refresh_token: authData.refresh_token,
+                  });
+                  
+                  if (!recoveryError && recoveredSession.session) {
+                    console.log('[AuthContext] Session recovered successfully');
+                    session = recoveredSession.session;
+                  } else {
+                    console.error('[AuthContext] Session recovery failed:', recoveryError);
+                  }
+                }
+              } catch (parseError) {
+                console.error('[AuthContext] Failed to parse stored auth data:', parseError);
+              }
+            }
+          }
+        }
+        
         if (session) {
+          console.log('[AuthContext] Session found, setting user');
           setUser(session.user);
           setAccessToken(session.access_token);
+        } else {
+          console.log('[AuthContext] No session found');
         }
       } catch (error) {
-        console.error('Error getting session:', error);
+        console.error('[AuthContext] Fatal error in initAuth:', error);
+        // FIX #2: Don't clear state on error - keep existing state if any
       } finally {
         setLoading(false);
       }
@@ -95,20 +113,107 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     initAuth();
 
-    // Listen for auth state changes
+    // FIX #1, #3, #4: Listen for auth state changes with proper event handling
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      (event, session) => {
+        console.log('[AuthContext] Auth state change:', event, session ? 'session exists' : 'no session');
+        
         // Don't override demo mode
         const isDemoMode = typeof window !== 'undefined' && localStorage.getItem('demoMode') === 'true';
-        if (isDemoMode) return;
+        if (isDemoMode) {
+          console.log('[AuthContext] Ignoring auth state change in demo mode');
+          return;
+        }
         
-        setUser(session?.user ?? null);
-        setAccessToken(session?.access_token ?? null);
-        setLoading(false);
+        // FIX #1: Handle events explicitly - NEVER clear user unless SIGNED_OUT
+        switch (event) {
+          case 'SIGNED_IN':
+            console.log('[AuthContext] User signed in');
+            if (session) {
+              setUser(session.user);
+              setAccessToken(session.access_token);
+              
+              // FIX #4: Persist session to localStorage as backup
+              if (typeof window !== 'undefined') {
+                try {
+                  localStorage.setItem('sb-page-gallery-auth', JSON.stringify({
+                    access_token: session.access_token,
+                    refresh_token: session.refresh_token,
+                    user: session.user,
+                  }));
+                  console.log('[AuthContext] Session backed up to localStorage');
+                } catch (e) {
+                  console.error('[AuthContext] Failed to backup session:', e);
+                }
+              }
+            }
+            setLoading(false);
+            break;
+            
+          case 'SIGNED_OUT':
+            console.log('[AuthContext] User signed out');
+            setUser(null);
+            setAccessToken(null);
+            setLoading(false);
+            break;
+            
+          case 'TOKEN_REFRESHED':
+            console.log('[AuthContext] Token refreshed');
+            // FIX #1: Always restore session on token refresh
+            if (session) {
+              setUser(session.user);
+              setAccessToken(session.access_token);
+              
+              // Update localStorage backup
+              if (typeof window !== 'undefined') {
+                try {
+                  localStorage.setItem('sb-page-gallery-auth', JSON.stringify({
+                    access_token: session.access_token,
+                    refresh_token: session.refresh_token,
+                    user: session.user,
+                  }));
+                } catch (e) {
+                  console.error('[AuthContext] Failed to update session backup:', e);
+                }
+              }
+            }
+            setLoading(false);
+            break;
+            
+          case 'INITIAL_SESSION':
+            console.log('[AuthContext] Initial session loaded');
+            // FIX #1: Always restore session on initial load
+            if (session) {
+              setUser(session.user);
+              setAccessToken(session.access_token);
+            }
+            setLoading(false);
+            break;
+            
+          case 'USER_UPDATED':
+            console.log('[AuthContext] User data updated');
+            if (session) {
+              setUser(session.user);
+              // Don't update token on user update
+            }
+            break;
+            
+          default:
+            console.log('[AuthContext] Unhandled auth event:', event);
+            // FIX #1: For any other event, only update if we have a valid session
+            // NEVER clear user state unless explicitly signed out
+            if (session) {
+              setUser(session.user);
+              setAccessToken(session.access_token);
+            }
+            setLoading(false);
+        }
       }
     );
 
+    // FIX #3: Properly clean up subscription
     return () => {
+      console.log('[AuthContext] Cleaning up auth subscription');
       subscription.unsubscribe();
     };
   }, []);
@@ -126,6 +231,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (data.session) {
       setUser(data.user);
       setAccessToken(data.session.access_token);
+      
+      // Persist session to localStorage as backup
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('sb-page-gallery-auth', JSON.stringify({
+            access_token: data.session.access_token,
+            refresh_token: data.session.refresh_token,
+            user: data.user,
+          }));
+        } catch (e) {
+          console.error('[AuthContext] Failed to backup session on signIn:', e);
+        }
+      }
     }
   };
 
@@ -153,9 +271,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
-    // Clear demo mode if active
+    // FIX #7: Clear ALL auth-related localStorage keys
     if (typeof window !== 'undefined') {
+      console.log('[AuthContext] Clearing all auth-related storage');
       localStorage.removeItem('demoMode');
+      localStorage.removeItem('demoRole');
+      localStorage.removeItem('sb-page-gallery-auth');
+      
+      // Clear any other Supabase storage keys
+      const allKeys = Object.keys(localStorage);
+      allKeys.forEach(key => {
+        if (key.startsWith('sb-') || key.includes('supabase')) {
+          localStorage.removeItem(key);
+        }
+      });
     }
     
     await supabase.auth.signOut();
@@ -179,12 +308,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    console.error('useAuth must be used within an AuthProvider. Make sure your component is wrapped in <AuthProvider>');
-    // Return a default context to prevent crashes
+    // Gracefully return a default context to prevent crashes
+    // This can happen during initial render before AuthProvider mounts
     return {
       user: null,
       accessToken: null,
-      loading: false,
+      loading: true, // Keep loading true so components wait
       supabase,
       signIn: async () => { throw new Error('Auth not initialized'); },
       signUp: async () => { throw new Error('Auth not initialized'); },

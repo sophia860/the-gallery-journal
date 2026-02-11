@@ -1,199 +1,184 @@
 import { GalleryNav } from '../components/GalleryNav';
 import { GalleryFooter } from '../components/GalleryFooter';
-import { RandomPoemButton } from '../components/RandomPoemButton';
+import { ParallaxStarfield } from '../components/ParallaxStarfield';
+import { useEffect } from 'react';
 
 export function AboutPage() {
+  useEffect(() => {
+    // Fade in observer
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('fade-in-visible');
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    setTimeout(() => {
+      document.querySelectorAll('.fade-in-element').forEach((el) => {
+        observer.observe(el);
+      });
+    }, 100);
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <div className="min-h-screen bg-[#FAF8F5] relative">
-      {/* Paper grain texture */}
-      <div className="fixed inset-0 opacity-[0.015] pointer-events-none" style={{
-        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' /%3E%3C/svg%3E")`,
-        backgroundRepeat: 'repeat',
-      }}></div>
+    <div className="min-h-screen bg-[#0a0e1a] relative">
+      <ParallaxStarfield />
 
-      <GalleryNav />
-      <RandomPoemButton />
+      <style>{`
+        .fade-in-element {
+          opacity: 0;
+          transform: translateY(20px);
+          transition: opacity 1s ease, transform 1s ease;
+        }
 
-      {/* Hero - Massive, asymmetric */}
-      <section className="pt-40 pb-24 px-8 md:px-16">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-[1.5fr_1fr] gap-16 items-end">
-          {/* Left - oversized heading */}
-          <div>
-            <p className="font-['Courier_New'] text-xs tracking-[0.4em] text-[#8B7355] uppercase mb-6">
-              About
-            </p>
-            <h1 
-              className="font-['Playfair_Display'] italic font-light text-[#2C1810]"
-              style={{
-                fontSize: 'clamp(3rem, 10vw, 8rem)',
-                lineHeight: '1.05',
-                letterSpacing: '-0.03em',
-              }}
-            >
-              Meet<br />The Gallery
-            </h1>
-          </div>
+        .fade-in-element.fade-in-visible {
+          opacity: 1;
+          transform: translateY(0);
+        }
 
-          {/* Right - breathing copy */}
-          <div className="md:mb-8">
-            <p className="font-['Libre_Baskerville'] text-xl md:text-2xl text-[#8B7355] leading-relaxed" style={{ lineHeight: '1.8' }}>
-              A digital sanctuary for contemporary writing, where literary excellence meets community
-            </p>
-          </div>
-        </div>
-      </section>
+        .hospital-note {
+          background: rgba(20, 25, 35, 0.5);
+          border-left: 2px solid rgba(196, 164, 108, 0.3);
+          backdrop-filter: blur(10px);
+        }
+      `}</style>
 
-      {/* Mission - Full-width, dark background */}
-      <section className="px-8 md:px-16 py-24 md:py-32 bg-[#F0E8DC]">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="font-['Playfair_Display'] text-5xl md:text-6xl italic font-light text-[#2C1810] mb-12">
-            Our Mission
-          </h2>
-          <p className="font-['Libre_Baskerville'] text-xl md:text-2xl text-[#2C1810] leading-relaxed mb-8" style={{ lineHeight: '1.9' }}>
-            To create a space where writers can share their work with dignity and readers can engage with literature in the intimate, contemplative way it deserves.
-          </p>
-          <p className="font-['Libre_Baskerville'] text-xl md:text-2xl text-[#2C1810]/70 leading-relaxed" style={{ lineHeight: '1.9' }}>
-            We believe good writing needs more than a platform—it needs a <em>place</em>: a room with atmosphere, care, and intentional design.
-          </p>
-        </div>
-      </section>
+      <div className="relative z-10">
+        <GalleryNav />
 
-      {/* Our Story - Asymmetric layout */}
-      <section className="px-8 md:px-16 py-24 md:py-32 bg-[#FAF8F5]">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-16">
-          {/* Left - sticky title */}
-          <div className="md:sticky md:top-32 md:h-fit">
-            <h2 className="font-['Playfair_Display'] text-5xl md:text-6xl italic font-light text-[#2C1810]">
-              Our Story
-            </h2>
-          </div>
-
-          {/* Right - story text */}
-          <div className="space-y-8 font-['Libre_Baskerville'] text-lg text-[#2C1810]" style={{ lineHeight: '1.8' }}>
-            <p>
-              The Gallery was born from a simple frustration: every platform for writers seemed to prioritize metrics over meaning, engagement over experience. We watched as beautiful essays were flattened into inbox clutter, as poetry was scrolled past in algorithmic feeds.
-            </p>
-            <p>
-              We wanted something different. Not a newsletter service that takes 10% of your revenue. Not a social media feed that rewards frequency over quality. Not another platform optimized for "engagement."
-            </p>
-            <p>
-              We imagined a digital space that felt more like a gallery than a feed—where each piece of writing could exist in its own room, with its own atmosphere. Where readers could wander rather than scroll.
-            </p>
-            <p>
-              The Gallery launched in early 2026 as an experiment in what we call "calm technology for writers." No notification badges. No follower counts. No pressure to post daily.
-            </p>
-            <p className="text-[#8B7355] italic text-xl">
-              "A room of one's own" isn't just our tagline—it's our founding principle.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Editorial Team - Print masthead style */}
-      <section className="px-8 md:px-16 py-24 md:py-32 bg-[#2C1810] text-[#FAF8F5]">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="font-['Playfair_Display'] text-5xl md:text-6xl italic font-light mb-16">
-            Editorial Team
-          </h2>
+        {/* Long-scrolling, unhurried page */}
+        <div className="max-w-3xl mx-auto px-8 py-40">
           
-          {/* Masthead list - no cards, just names */}
-          <div className="space-y-12">
-            <div className="border-b border-[#FAF8F5]/20 pb-8">
-              <h3 className="font-['Libre_Baskerville'] text-3xl mb-2">
-                Bea Sophia
-              </h3>
-              <p className="font-['Courier_New'] text-xs uppercase tracking-[0.2em] text-[#FAF8F5]/60">
-                Editor-in-Chief
+          {/* WHY THIS EXISTS */}
+          <section className="mb-32 fade-in-element">
+            <div className="mb-16">
+              <div className="w-12 h-[1px] bg-[#c4a46c] mb-8"></div>
+              <h2 className="font-['Cormorant_Garamond'] text-[14px] uppercase tracking-[0.25em] text-[#c4a46c] mb-2">
+                Why This Exists
+              </h2>
+            </div>
+
+            <div className="space-y-8 font-['Georgia'] text-[22px] text-[#f5f0e8]" style={{ lineHeight: '1.9' }}>
+              <p>
+                Sophia got sick.
+              </p>
+
+              <p>
+                The world shrank to the square foot around her bed. In that slowed-down space, small things gained weight—the way people spoke when they weren't performing, the accidental sentences that slipped out between tasks. She began collecting those fragments.
+              </p>
+
+              <p>
+                She made a vow: to build a place that would treat people's words as exhibits, because that is what they are—evidence of a mind insisting on being heard. Not decoration. Not draft material. Exhibits.
+              </p>
+            </div>
+          </section>
+
+          {/* THE PROMISE */}
+          <section className="mb-32 fade-in-element">
+            <div className="space-y-8 font-['Georgia'] text-[22px] text-[#e8ddd0]" style={{ lineHeight: '1.9' }}>
+              <p>
+                The Page Gallery was built to keep that promise.
+              </p>
+
+              <p>
+                The calls are written in plain language. The edits explain instead of exclude. The invitations don't depend on the right credentials. And the fragments themselves are not apologised for—they are the form.
+              </p>
+            </div>
+          </section>
+
+          {/* WHAT THE GALLERY IS */}
+          <section className="mb-32 fade-in-element">
+            <div className="mb-16">
+              <div className="w-12 h-[1px] bg-[#c4a46c] mb-8"></div>
+              <h2 className="font-['Cormorant_Garamond'] text-[14px] uppercase tracking-[0.25em] text-[#c4a46c] mb-2">
+                What The Gallery Is
+              </h2>
+            </div>
+
+            <div className="space-y-8 font-['Georgia'] text-[22px] text-[#e8ddd0]" style={{ lineHeight: '1.9' }}>
+              <p>
+                The Gallery is not an archive of polish; it is a body in motion. It shifts like weather.
+              </p>
+
+              <p>
+                Step inside and you are briefly inside someone else's thinking: their private weather system, their running joke, their hesitation. Nothing here is manicured to impress. It is presented to be witnessed.
+              </p>
+
+              <p>
+                The smudge, the strike-through, the tangent: each is proof that a life was here, demanding to be noticed.
+              </p>
+            </div>
+          </section>
+
+          {/* THE BELIEF */}
+          <section className="mb-32 fade-in-element">
+            <div className="mb-16">
+              <div className="w-12 h-[1px] bg-[#c4a46c] mb-8"></div>
+              <h2 className="font-['Cormorant_Garamond'] text-[14px] uppercase tracking-[0.25em] text-[#c4a46c] mb-2">
+                The Belief
+              </h2>
+            </div>
+
+            <div className="space-y-8 font-['Georgia'] text-[22px] text-[#e8ddd0]" style={{ lineHeight: '1.9' }}>
+              <p>
+                Anyone who can write can change what the world pays attention to.
+              </p>
+
+              <p>
+                Change does not mean utopia. It means a door opens, a silence cracks, a perspective shifts.
+              </p>
+
+              <p>
+                The Page Gallery listens hard enough to make that possible, carrying voices into spaces they have not been allowed to reach.
               </p>
             </div>
 
-            <div className="border-b border-[#FAF8F5]/20 pb-8">
-              <h3 className="font-['Libre_Baskerville'] text-3xl mb-2">
-                Giove Pierra
-              </h3>
-              <p className="font-['Courier_New'] text-xs uppercase tracking-[0.2em] text-[#FAF8F5]/60">
-                Head of Print
+            <div className="mt-16 pt-12 border-t border-[rgba(196,164,108,0.2)]">
+              <p className="font-['Cormorant_Garamond'] text-[16px] text-[#8b9dc3]">
+                Sophia Sharkey, Founder
+              </p>
+              <p className="font-['Cormorant_Garamond'] text-[14px] text-[#8b9dc3]/60 mt-1">
+                The Page Gallery, 2025
+              </p>
+            </div>
+          </section>
+
+          {/* HOSPITAL DIARY - THE MOST IMPORTANT PART */}
+          <section className="mb-32 fade-in-element">
+            <div className="mb-8">
+              <p className="font-['Cormorant_Garamond'] text-[12px] uppercase tracking-[0.25em] text-[#c4a46c]/70 italic">
+                From the founder's notebook
               </p>
             </div>
 
-            <div className="border-b border-[#FAF8F5]/20 pb-8">
-              <h3 className="font-['Libre_Baskerville'] text-3xl mb-2">
-                Marcus Chen
-              </h3>
-              <p className="font-['Courier_New'] text-xs uppercase tracking-[0.2em] text-[#FAF8F5]/60">
-                Poetry Editor
+            <div className="hospital-note py-12 px-8 md:px-12">
+              <p 
+                className="font-['Georgia'] text-[24px] text-[#f5f0e8] italic"
+                style={{ lineHeight: '1.8' }}
+              >
+                If this kills me, or if I live to be 90, the when is not my concern anymore. The point is this: I will not leave without finding a way for no more people to die unheard. I will build a world that refuses the gates. A place where voice isn't weighed by credentials, where language belongs to lungs that need it, where no life disappears without its record.
               </p>
             </div>
 
-            <div className="border-b border-[#FAF8F5]/20 pb-8">
-              <h3 className="font-['Libre_Baskerville'] text-3xl mb-2">
-                Alicia Rivera
-              </h3>
-              <p className="font-['Courier_New'] text-xs uppercase tracking-[0.2em] text-[#FAF8F5]/60">
-                Fiction Editor
+            <div className="mt-8">
+              <p className="font-['Cormorant_Garamond'] text-[13px] text-[#8b9dc3]/50 italic text-right">
+                A note found later
               </p>
             </div>
-          </div>
+          </section>
+
+          {/* Spacer before footer */}
+          <div className="h-32"></div>
         </div>
-      </section>
 
-      {/* Contact - Letter-writing feel */}
-      <section className="px-8 md:px-16 py-24 md:py-32 bg-[#F0E8DC]">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="font-['Playfair_Display'] text-5xl md:text-6xl italic font-light text-[#2C1810] mb-12">
-            Write to Us
-          </h2>
-          
-          <form className="space-y-6">
-            <div>
-              <label className="block font-['Libre_Baskerville'] text-sm text-[#2C1810] mb-2">
-                Your Name
-              </label>
-              <input
-                type="text"
-                className="w-full px-4 py-3 bg-white border-2 border-[#E0D8D0] focus:border-[#2C1810] focus:outline-none font-['Libre_Baskerville'] text-base text-[#2C1810] transition-colors"
-                style={{ borderRadius: '2px 8px 2px 8px' }}
-              />
-            </div>
-
-            <div>
-              <label className="block font-['Libre_Baskerville'] text-sm text-[#2C1810] mb-2">
-                Your Email
-              </label>
-              <input
-                type="email"
-                className="w-full px-4 py-3 bg-white border-2 border-[#E0D8D0] focus:border-[#2C1810] focus:outline-none font-['Libre_Baskerville'] text-base text-[#2C1810] transition-colors"
-                style={{ borderRadius: '2px 8px 2px 8px' }}
-              />
-            </div>
-
-            <div>
-              <label className="block font-['Libre_Baskerville'] text-sm text-[#2C1810] mb-2">
-                Your Message
-              </label>
-              <textarea
-                rows={8}
-                className="w-full px-4 py-3 bg-white border-2 border-[#E0D8D0] focus:border-[#2C1810] focus:outline-none font-['Libre_Baskerville'] text-base text-[#2C1810] leading-relaxed resize-none transition-colors"
-                style={{ borderRadius: '2px 8px 2px 8px' }}
-                placeholder="Dear Gallery..."
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="px-8 py-3 bg-[#2C1810] text-[#FAF8F5] hover:bg-[#1A1A1A] transition-all font-['Libre_Baskerville'] text-base"
-              style={{
-                borderRadius: '2px 8px 2px 8px',
-                boxShadow: '4px 4px 0 rgba(44, 24, 16, 0.1)'
-              }}
-            >
-              Send Letter
-            </button>
-          </form>
-        </div>
-      </section>
-
-      <GalleryFooter />
+        <GalleryFooter />
+      </div>
     </div>
   );
 }

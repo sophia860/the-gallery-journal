@@ -57,7 +57,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       } catch (error) {
         console.error('[AuthContext] Fatal error in initAuth:', error);
-        // FIX #2: Don't clear state on error - keep existing state if any
       } finally {
         setLoading(false);
       }
@@ -65,12 +64,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     initAuth();
 
-    // FIX #1, #3, #4: Listen for auth state changes with proper event handling
+    // Listen for auth state changes with proper event handling
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         console.log('[AuthContext] Auth state change:', event, session ? 'session exists' : 'no session');
         
-        // FIX #1: Handle events explicitly - NEVER clear user unless SIGNED_OUT
         switch (event) {
           case 'SIGNED_IN':
             console.log('[AuthContext] User signed in');
@@ -78,7 +76,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               setUser(session.user);
               setAccessToken(session.access_token);
               
-              // FIX #4: Persist session to localStorage as backup
               if (typeof window !== 'undefined') {
                 try {
                   localStorage.setItem('sb-page-gallery-auth', JSON.stringify({
@@ -104,12 +101,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             
           case 'TOKEN_REFRESHED':
             console.log('[AuthContext] Token refreshed');
-            // FIX #1: Always restore session on token refresh
             if (session) {
               setUser(session.user);
               setAccessToken(session.access_token);
               
-              // Update localStorage backup
               if (typeof window !== 'undefined') {
                 try {
                   localStorage.setItem('sb-page-gallery-auth', JSON.stringify({
@@ -127,7 +122,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             
           case 'INITIAL_SESSION':
             console.log('[AuthContext] Initial session loaded');
-            // FIX #1: Always restore session on initial load
             if (session) {
               setUser(session.user);
               setAccessToken(session.access_token);
@@ -139,14 +133,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             console.log('[AuthContext] User data updated');
             if (session) {
               setUser(session.user);
-              // Don't update token on user update
             }
             break;
             
           default:
             console.log('[AuthContext] Unhandled auth event:', event);
-            // FIX #1: For any other event, only update if we have a valid session
-            // NEVER clear user state unless explicitly signed out
             if (session) {
               setUser(session.user);
               setAccessToken(session.access_token);
@@ -156,7 +147,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     );
 
-    // FIX #3: Properly clean up subscription
     return () => {
       console.log('[AuthContext] Cleaning up auth subscription');
       subscription.unsubscribe();
@@ -173,7 +163,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     if (error) {
       console.error('[AuthContext] Sign in error:', error);
-      throw error; // Properly throw the error to the caller
+      throw error;
     }
 
     if (!data.session) {
@@ -201,6 +191,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signUp = async (email: string, password: string, name: string, writerName: string) => {
+    // Step 1: Create the user on the server
     const response = await fetch(
       `https://${projectId}.supabase.co/functions/v1/make-server-07dc516a/auth/signup`,
       {
@@ -214,56 +205,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     );
 
     const data = await response.json();
-
     if (!response.ok) {
       throw new Error(data.error || 'Failed to sign up');
     }
 
     console.log('[AuthContext] User created on server, attempting to sign in...');
-
-    // Try to sign them in
+    
+    // Step 2: Sign them in immediately after account creation
+    // FIX: Always sign in after signup - this establishes the Supabase session
     try {
       await signIn(email, password);
-      console.log('[AuthContext] Sign in after signup successful');
+      console.log('[AuthContext] Sign in after signup successful - session established');
+      
+      // FIX: Verify session is actually established before returning
+      const { data: sessionCheck } = await supabase.auth.getSession();
+      if (!sessionCheck.session) {
+        console.warn('[AuthContext] Session check after signup sign-in found no session, waiting...');
+        // Give Supabase a moment to propagate the session
+        await new Promise(resolve => setTimeout(resolve, 500));
+        const { data: retryCheck } = await supabase.auth.getSession();
+        if (retryCheck.session) {
+          console.log('[AuthContext] Session confirmed after retry');
+          setUser(retryCheck.session.user);
+          setAccessToken(retryCheck.session.access_token);
+        } else {
+          console.error('[AuthContext] Session still not found after retry');
+          throw new Error('Session could not be established after signup. Please try signing in manually.');
+        }
+      } else {
+        console.log('[AuthContext] Session confirmed after signup');
+      }
     } catch (signInError: any) {
       console.error('[AuthContext] Sign in after signup failed:', signInError);
-      console.log('[AuthContext] Trying client-side session creation as fallback...');
-      
-      // If signIn fails, try creating a client-side session with signUp
-      try {
-        const { data: sessionData, error: sessionError } = await supabase.auth.signUp({
-          email,
-          password,
-        });
-        
-        if (sessionError) {
-          console.error('[AuthContext] Client-side signUp fallback failed:', sessionError);
-          // Don't throw - just log and let redirect to login happen
-        } else if (sessionData.session) {
-          console.log('[AuthContext] Client-side session created successfully');
-          setUser(sessionData.user);
-          setAccessToken(sessionData.session.access_token);
-          
-          // Persist session to localStorage
-          if (typeof window !== 'undefined') {
-            try {
-              localStorage.setItem('sb-page-gallery-auth', JSON.stringify({
-                access_token: sessionData.session.access_token,
-                refresh_token: sessionData.session.refresh_token,
-                user: sessionData.user,
-              }));
-              console.log('[AuthContext] Session persisted to localStorage');
-            } catch (e) {
-              console.error('[AuthContext] Failed to persist session:', e);
-            }
-          }
-        } else {
-          console.log('[AuthContext] No session from client-side signUp, user may need to sign in manually');
-        }
-      } catch (fallbackError) {
-        console.error('[AuthContext] Unexpected error in signUp fallback:', fallbackError);
-        // Don't throw - just log and let redirect to login happen
-      }
+      // Re-throw with a helpful message so the UI can handle it
+      throw new Error(
+        signInError.message || 'Account created but auto-login failed. Please sign in manually.'
+      );
     }
   };
 
@@ -303,12 +280,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    // Gracefully return a default context to prevent crashes
-    // This can happen during initial render before AuthProvider mounts
     return {
       user: null,
       accessToken: null,
-      loading: true, // Keep loading true so components wait
+      loading: true,
       supabase,
       signIn: async () => { throw new Error('Auth not initialized'); },
       signUp: async () => { throw new Error('Auth not initialized'); },

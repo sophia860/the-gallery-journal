@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Menu, X, Sprout, Compass, Users, User, LogOut, Settings } from 'lucide-react';
+import { Menu, X, Sprout, Compass, Users, User, LogOut, Settings, Home, Layers, DollarSign, ExternalLink } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 interface GardenNavProps {
@@ -7,21 +7,13 @@ interface GardenNavProps {
 }
 
 export function GardenMainNav({ variant = 'light' }: GardenNavProps) {
+  const { user, signOut } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
-  const { user, signOut } = useAuth();
-
-  // TEMPORARY: Mock user for demo
-  const mockUser = { 
-    id: 'demo-user-123', 
-    email: 'demo@example.com',
-    user_metadata: { display_name: 'Demo Writer' }
-  };
-  const demoUser = user || mockUser;
 
   const isActive = (page: string) => {
     const path = typeof window !== 'undefined' ? window.location.pathname : '';
-    return path.includes(page);
+    return path === page || path.startsWith(page + '/');
   };
 
   const handleSignOut = async () => {
@@ -59,7 +51,7 @@ export function GardenMainNav({ variant = 'light' }: GardenNavProps) {
         <div className="flex items-center gap-10">
           {/* Logo */}
           <a 
-            href="/" 
+            href="/garden/dashboard" 
             className={`${textColor} hover:text-[#8A9A7B] transition-colors duration-300 flex items-center gap-2`}
             style={{ 
               fontSize: '1.4rem', 
@@ -73,12 +65,22 @@ export function GardenMainNav({ variant = 'light' }: GardenNavProps) {
           
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8 font-[family-name:var(--font-ui)] text-sm tracking-wide">
+            {/* Prominent Page Gallery Link */}
             <a 
-              href="/collection-gallery" 
-              className={`${linkColor} ${linkHover} transition-all duration-300 relative group ${isActive('collection') ? activeColor : ''}`}
+              href="/" 
+              className="flex items-center gap-2 px-4 py-2 rounded-lg border-2 transition-all duration-300 relative group"
+              style={{
+                borderColor: isDark ? 'rgba(196, 164, 108, 0.4)' : 'rgba(196, 164, 108, 0.3)',
+                backgroundColor: isDark ? 'rgba(196, 164, 108, 0.1)' : 'rgba(196, 164, 108, 0.05)',
+                color: '#c4a46c',
+                fontSize: '1.05rem',
+                fontWeight: '600',
+                fontFamily: "'Playfair Display', serif",
+                fontStyle: 'italic'
+              }}
             >
-              The Gallery
-              <span className="absolute -bottom-2 left-0 w-0 h-0.5 bg-[#8A9A7B] group-hover:w-full transition-all duration-300"></span>
+              <span style={{ textShadow: '0 0 10px rgba(196, 164, 108, 0.3)' }}>The Page Gallery</span>
+              <ExternalLink className="w-4 h-4" style={{ opacity: 0.7 }} />
             </a>
 
             <a 
@@ -90,7 +92,7 @@ export function GardenMainNav({ variant = 'light' }: GardenNavProps) {
               <span className="absolute -bottom-2 left-0 w-0 h-0.5 bg-[#8A9A7B] group-hover:w-full transition-all duration-300"></span>
             </a>
 
-            {demoUser && (
+            {user && (
               <>
                 <a 
                   href="/my-garden" 
@@ -108,6 +110,24 @@ export function GardenMainNav({ variant = 'light' }: GardenNavProps) {
                   Circles
                   <span className="absolute -bottom-2 left-0 w-0 h-0.5 bg-[#8A9A7B] group-hover:w-full transition-all duration-300"></span>
                 </a>
+
+                <a 
+                  href="/greenhouse" 
+                  className={`${linkColor} ${linkHover} transition-all duration-300 relative group ${isActive('greenhouse') ? activeColor : ''} flex items-center gap-2`}
+                >
+                  <Home className="w-4 h-4" />
+                  Greenhouse
+                  <span className="absolute -bottom-2 left-0 w-0 h-0.5 bg-[#8A9A7B] group-hover:w-full transition-all duration-300"></span>
+                </a>
+
+                <a 
+                  href="/grafts" 
+                  className={`${linkColor} ${linkHover} transition-all duration-300 relative group ${isActive('grafts') ? activeColor : ''} flex items-center gap-2`}
+                >
+                  <Layers className="w-4 h-4" />
+                  Grafts
+                  <span className="absolute -bottom-2 left-0 w-0 h-0.5 bg-[#8A9A7B] group-hover:w-full transition-all duration-300"></span>
+                </a>
               </>
             )}
           </nav>
@@ -115,7 +135,7 @@ export function GardenMainNav({ variant = 'light' }: GardenNavProps) {
 
         {/* Desktop Right Side - Auth UI */}
         <div className="hidden md:flex items-center gap-4">
-          {demoUser ? (
+          {user ? (
             // Logged In - User Dropdown
             <div className="relative">
               <button
@@ -123,10 +143,10 @@ export function GardenMainNav({ variant = 'light' }: GardenNavProps) {
                 className="flex items-center gap-3 px-4 py-2 hover:bg-white/50 rounded-lg transition-colors"
               >
                 <div className="w-8 h-8 bg-[#8A9A7B] rounded-full flex items-center justify-center text-white text-xs font-['Inter'] font-semibold">
-                  {(demoUser.user_metadata?.display_name || demoUser.email || 'U')[0].toUpperCase()}
+                  {(user.user_metadata?.display_name || user.email || 'U')[0].toUpperCase()}
                 </div>
                 <span className={`text-sm font-['Inter'] ${textColor}`}>
-                  {demoUser.user_metadata?.display_name || 'Writer'}
+                  {user.user_metadata?.display_name || 'Writer'}
                 </span>
               </button>
 
@@ -140,11 +160,27 @@ export function GardenMainNav({ variant = 'light' }: GardenNavProps) {
                   <div className="absolute right-0 mt-2 w-56 bg-white border-2 border-[#E0D8D0] rounded-xl shadow-xl z-50">
                     <div className="py-2">
                       <a
+                        href="/"
+                        className="flex items-center gap-3 px-4 py-3 hover:bg-[#F5F0EB] transition-colors font-['Playfair_Display'] italic font-semibold"
+                        style={{ color: '#c4a46c', fontSize: '0.95rem' }}
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        Visit The Page Gallery
+                      </a>
+                      <div className="border-t border-[#E0D8D0] my-2"></div>
+                      <a
                         href="/my-garden"
                         className="flex items-center gap-3 px-4 py-3 hover:bg-[#F5F0EB] transition-colors text-[#2C1810] text-sm font-['Inter']"
                       >
                         <Sprout className="w-4 h-4" />
                         My Garden
+                      </a>
+                      <a
+                        href="/pricing"
+                        className="flex items-center gap-3 px-4 py-3 hover:bg-[#F5F0EB] transition-colors text-[#2C1810] text-sm font-['Inter']"
+                      >
+                        <DollarSign className="w-4 h-4" />
+                        Pricing
                       </a>
                       <a
                         href="/settings"
@@ -203,7 +239,7 @@ export function GardenMainNav({ variant = 'light' }: GardenNavProps) {
         <nav className={`md:hidden absolute top-full left-0 right-0 ${mobileBg} border-b ${borderColor} backdrop-blur-sm`}>
           <div className="px-8 py-6 space-y-4 font-[family-name:var(--font-ui)] text-sm">
             <a 
-              href="/collection-gallery" 
+              href="/" 
               className={`block py-2 ${linkColor} ${linkHover} transition-colors ${isActive('collection') ? activeColor : ''}`}
               onClick={() => setMobileMenuOpen(false)}
             >
@@ -218,7 +254,7 @@ export function GardenMainNav({ variant = 'light' }: GardenNavProps) {
               Explore
             </a>
 
-            {demoUser && (
+            {user && (
               <>
                 <div className="border-t border-[#E0D8D0] pt-4 mt-4">
                   <a 
@@ -235,6 +271,22 @@ export function GardenMainNav({ variant = 'light' }: GardenNavProps) {
                   >
                     <Users className="w-4 h-4" />
                     Circles
+                  </a>
+                  <a 
+                    href="/greenhouse" 
+                    className={`block py-2 ${linkColor} ${linkHover} transition-colors flex items-center gap-2 ${isActive('greenhouse') ? activeColor : ''}`}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Home className="w-4 h-4" />
+                    Greenhouse
+                  </a>
+                  <a 
+                    href="/grafts" 
+                    className={`block py-2 ${linkColor} ${linkHover} transition-colors flex items-center gap-2 ${isActive('grafts') ? activeColor : ''}`}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Layers className="w-4 h-4" />
+                    Grafts
                   </a>
                 </div>
 
@@ -256,7 +308,7 @@ export function GardenMainNav({ variant = 'light' }: GardenNavProps) {
               </>
             )}
 
-            {!demoUser && (
+            {!user && (
               <div className="border-t border-[#E0D8D0] pt-4 mt-4 space-y-3">
                 <a
                   href="/garden/signin"

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { getSupabaseClient } from '/src/utils/supabase/client';
+import { projectId, publicAnonKey } from '/utils/supabase/info';
 
 interface User {
   id: string;
@@ -35,65 +36,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const initAuth = async () => {
       try {
-        // Check for demo mode first
-        const isDemoMode = typeof window !== 'undefined' && localStorage.getItem('demoMode') === 'true';
+        console.log('[AuthContext] Starting auth initialization');
         
-        if (isDemoMode) {
-          const demoRole = localStorage.getItem('demoRole') || 'writer';
-          console.log(`[AuthContext] Demo mode detected, creating demo ${demoRole}`);
-          
-          // Create a demo user with the selected role
-          const demoUser: User = {
-            id: 'demo-user',
-            email: demoRole === 'editor' ? 'editor@page.com' : 'demo@page.com',
-            user_metadata: {
-              name: demoRole === 'editor' ? 'Demo Editor' : 'Demo Writer',
-              role: demoRole,
-              writerName: demoRole === 'editor' ? 'Demo Editor' : 'Demo Writer'
-            }
-          };
-          setUser(demoUser);
-          setAccessToken('demo-token');
+        // Get existing session from Supabase
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('[AuthContext] Error getting session:', error);
+          setUser(null);
           setLoading(false);
           return;
-        }
-
-        // Regular auth flow with error recovery
-        let session = null;
-        
-        try {
-          const { data } = await supabase.auth.getSession();
-          session = data.session;
-        } catch (error) {
-          console.error('[AuthContext] Error getting session from Supabase:', error);
-          
-          // FIX #2 & #6: Try to recover session from localStorage if Supabase call fails
-          if (typeof window !== 'undefined') {
-            const storedAuth = localStorage.getItem('sb-page-gallery-auth');
-            if (storedAuth) {
-              try {
-                const authData = JSON.parse(storedAuth);
-                console.log('[AuthContext] Attempting session recovery from localStorage');
-                
-                // Try to restore the session
-                if (authData.access_token && authData.refresh_token) {
-                  const { data: recoveredSession, error: recoveryError } = await supabase.auth.setSession({
-                    access_token: authData.access_token,
-                    refresh_token: authData.refresh_token,
-                  });
-                  
-                  if (!recoveryError && recoveredSession.session) {
-                    console.log('[AuthContext] Session recovered successfully');
-                    session = recoveredSession.session;
-                  } else {
-                    console.error('[AuthContext] Session recovery failed:', recoveryError);
-                  }
-                }
-              } catch (parseError) {
-                console.error('[AuthContext] Failed to parse stored auth data:', parseError);
-              }
-            }
-          }
         }
         
         if (session) {
@@ -117,13 +69,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         console.log('[AuthContext] Auth state change:', event, session ? 'session exists' : 'no session');
-        
-        // Don't override demo mode
-        const isDemoMode = typeof window !== 'undefined' && localStorage.getItem('demoMode') === 'true';
-        if (isDemoMode) {
-          console.log('[AuthContext] Ignoring auth state change in demo mode');
-          return;
-        }
         
         // FIX #1: Handle events explicitly - NEVER clear user unless SIGNED_OUT
         switch (event) {
@@ -219,30 +164,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signIn = async (email: string, password: string) => {
+    console.log('[AuthContext] Attempting sign in...');
+    
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
     if (error) {
-      throw new Error(error.message);
+      console.error('[AuthContext] Sign in error:', error);
+      throw error; // Properly throw the error to the caller
     }
 
-    if (data.session) {
-      setUser(data.user);
-      setAccessToken(data.session.access_token);
-      
-      // Persist session to localStorage as backup
-      if (typeof window !== 'undefined') {
-        try {
-          localStorage.setItem('sb-page-gallery-auth', JSON.stringify({
-            access_token: data.session.access_token,
-            refresh_token: data.session.refresh_token,
-            user: data.user,
-          }));
-        } catch (e) {
-          console.error('[AuthContext] Failed to backup session on signIn:', e);
-        }
+    if (!data.session) {
+      console.error('[AuthContext] No session returned after sign in');
+      throw new Error('No session returned from sign in');
+    }
+
+    console.log('[AuthContext] Sign in successful');
+    setUser(data.user);
+    setAccessToken(data.session.access_token);
+    
+    // Persist session to localStorage as backup
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('sb-page-gallery-auth', JSON.stringify({
+          access_token: data.session.access_token,
+          refresh_token: data.session.refresh_token,
+          user: data.user,
+        }));
+        console.log('[AuthContext] Session persisted to localStorage');
+      } catch (e) {
+        console.error('[AuthContext] Failed to backup session on signIn:', e);
       }
     }
   };
@@ -266,16 +219,58 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw new Error(data.error || 'Failed to sign up');
     }
 
-    // Now sign them in
-    await signIn(email, password);
+    console.log('[AuthContext] User created on server, attempting to sign in...');
+
+    // Try to sign them in
+    try {
+      await signIn(email, password);
+      console.log('[AuthContext] Sign in after signup successful');
+    } catch (signInError: any) {
+      console.error('[AuthContext] Sign in after signup failed:', signInError);
+      console.log('[AuthContext] Trying client-side session creation as fallback...');
+      
+      // If signIn fails, try creating a client-side session with signUp
+      try {
+        const { data: sessionData, error: sessionError } = await supabase.auth.signUp({
+          email,
+          password,
+        });
+        
+        if (sessionError) {
+          console.error('[AuthContext] Client-side signUp fallback failed:', sessionError);
+          // Don't throw - just log and let redirect to login happen
+        } else if (sessionData.session) {
+          console.log('[AuthContext] Client-side session created successfully');
+          setUser(sessionData.user);
+          setAccessToken(sessionData.session.access_token);
+          
+          // Persist session to localStorage
+          if (typeof window !== 'undefined') {
+            try {
+              localStorage.setItem('sb-page-gallery-auth', JSON.stringify({
+                access_token: sessionData.session.access_token,
+                refresh_token: sessionData.session.refresh_token,
+                user: sessionData.user,
+              }));
+              console.log('[AuthContext] Session persisted to localStorage');
+            } catch (e) {
+              console.error('[AuthContext] Failed to persist session:', e);
+            }
+          }
+        } else {
+          console.log('[AuthContext] No session from client-side signUp, user may need to sign in manually');
+        }
+      } catch (fallbackError) {
+        console.error('[AuthContext] Unexpected error in signUp fallback:', fallbackError);
+        // Don't throw - just log and let redirect to login happen
+      }
+    }
   };
 
   const signOut = async () => {
-    // FIX #7: Clear ALL auth-related localStorage keys
+    // Clear auth-related localStorage keys
     if (typeof window !== 'undefined') {
-      console.log('[AuthContext] Clearing all auth-related storage');
-      localStorage.removeItem('demoMode');
-      localStorage.removeItem('demoRole');
+      console.log('[AuthContext] Clearing auth-related storage');
       localStorage.removeItem('sb-page-gallery-auth');
       
       // Clear any other Supabase storage keys

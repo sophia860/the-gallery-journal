@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import { Users, Plus, ChevronRight, UserPlus, Copy, Check } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { GardenMainNav } from '../components/GardenMainNav';
+import { GardenFooter } from '../components/GardenFooter';
+import { JoinTheGardenGate } from '../components/JoinTheGardenGate';
 import { getUserCircles, createCircle, createInviteLink, joinCircleViaInvite } from '/src/services/gardenCircleService';
 import { Circle, CircleInvite } from '/src/types/garden';
 
 export function CirclesPage() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [circles, setCircles] = useState<Circle[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -20,32 +22,31 @@ export function CirclesPage() {
   const [creating, setCreating] = useState(false);
   const [joining, setJoining] = useState(false);
   const [error, setError] = useState('');
+  
+  // Helper function to format relative time
+  const getRelativeTime = (dateString: string) => {
+    const now = new Date();
+    const date = new Date(dateString);
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+    
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return date.toLocaleDateString();
+  };
 
   useEffect(() => {
     if (user) {
       loadCircles();
-    } else {
-      // Show mock data for demo users too
-      setTimeout(() => {
-        useMockCircles();
-        setLoading(false);
-      }, 100);
     }
   }, [user]);
 
-  // Redirect if not authenticated
-  // TEMPORARY: Commented out for demo
-  // if (!user) {
-  //   window.location.href = '/garden/signin?redirect=/circles';
-  //   return null;
-  // }
-
-  // TEMPORARY: Mock user for demo
-  const mockUser = { id: 'demo-user-123', email: 'demo@example.com' };
-  const demoUser = user || mockUser;
-
   const loadCircles = async () => {
-    if (!demoUser) return;
+    if (!user) return;
 
     try {
       setLoading(true);
@@ -59,7 +60,7 @@ export function CirclesPage() {
       
       // Try to load from database
       try {
-        const data = await getUserCircles(demoUser.id);
+        const data = await getUserCircles(user.id);
         clearTimeout(timeoutId);
         if (data && data.length > 0) {
           setCircles(data);
@@ -83,6 +84,8 @@ export function CirclesPage() {
   };
 
   const useMockCircles = () => {
+    if (!user) return;
+    
     const mockCircles: Circle[] = [
       {
         id: '1',
@@ -93,7 +96,10 @@ export function CirclesPage() {
         created_by: 'user-1',
         created_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
         is_member: true,
-        is_creator: false
+        is_creator: false,
+        last_activity: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+        members_online: 3,
+        posts_this_week: 12
       },
       {
         id: '2',
@@ -104,7 +110,10 @@ export function CirclesPage() {
         created_by: 'user-2',
         created_at: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
         is_member: true,
-        is_creator: false
+        is_creator: false,
+        last_activity: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+        members_online: 1,
+        posts_this_week: 8
       },
       {
         id: '3',
@@ -112,10 +121,13 @@ export function CirclesPage() {
         description: 'Your circle for sharing personal stories and life reflections. We hold each other\'s memories with care.',
         member_count: 15,
         member_limit: 50,
-        created_by: demoUser.id,
+        created_by: user.id,
         created_at: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString(),
         is_member: true,
-        is_creator: true
+        is_creator: true,
+        last_activity: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+        members_online: 5,
+        posts_this_week: 23
       }
     ];
 
@@ -176,6 +188,30 @@ export function CirclesPage() {
       setJoining(false);
     }
   };
+
+  // AUTH GATE: Show join gate if not logged in (after all hooks)
+  if (!authLoading && !user) {
+    return <JoinTheGardenGate />;
+  }
+
+  // Show loading state while checking auth
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-[#0f1729] relative overflow-hidden flex items-center justify-center">
+        <div className="fixed inset-0 pointer-events-none">
+          <div className="stars-layer"></div>
+          <div className="stars-layer-2"></div>
+          <div className="stars-layer-3"></div>
+        </div>
+        <div className="relative z-10 text-center">
+          <Users className="w-12 h-12 text-[#60a5fa] animate-pulse mx-auto mb-4" style={{ filter: 'drop-shadow(0 0 10px rgba(96, 165, 250, 0.5))' }} />
+          <p className="font-['Libre_Baskerville'] text-lg text-[#c8cad8]">
+            Loading...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#0f1729] relative overflow-hidden">
@@ -393,13 +429,42 @@ export function CirclesPage() {
                         <div className="w-12 h-12 bg-gradient-to-br from-[#60a5fa] to-[#3b82f6] rounded-full flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
                           <Users className="w-6 h-6" />
                         </div>
-                        <div>
+                        <div className="flex-1">
                           <h3 className="font-['Cardo'] text-2xl text-white group-hover:text-[#60a5fa] transition-colors" style={{ textShadow: '0 0 15px rgba(96, 165, 250, 0.2)' }}>
                             {circle.name}
                           </h3>
-                          <p className="font-['Inter'] text-sm text-[#8b9dc3]">
-                            {circle.member_count || 0} / {circle.member_limit} members
-                          </p>
+                          <div className="flex items-center gap-3 flex-wrap">
+                            <p className="font-['Inter'] text-sm text-[#8b9dc3]">
+                              {circle.member_count || 0} / {circle.member_limit} members
+                            </p>
+                            {circle.members_online && circle.members_online > 0 && (
+                              <>
+                                <span className="text-[#8b9dc3]">•</span>
+                                <div className="flex items-center gap-1.5">
+                                  <div className="w-2 h-2 bg-[#10b981] rounded-full animate-pulse" style={{ boxShadow: '0 0 8px rgba(16, 185, 129, 0.6)' }}></div>
+                                  <p className="font-['Inter'] text-sm text-[#10b981]">
+                                    {circle.members_online} online
+                                  </p>
+                                </div>
+                              </>
+                            )}
+                            {circle.posts_this_week && circle.posts_this_week > 0 && (
+                              <>
+                                <span className="text-[#8b9dc3]">•</span>
+                                <p className="font-['Inter'] text-sm text-[#60a5fa]">
+                                  {circle.posts_this_week} posts this week
+                                </p>
+                              </>
+                            )}
+                            {circle.last_activity && (
+                              <>
+                                <span className="text-[#8b9dc3]">•</span>
+                                <p className="font-['Inter'] text-sm text-[#8b9dc3]/70">
+                                  Active {getRelativeTime(circle.last_activity)}
+                                </p>
+                              </>
+                            )}
+                          </div>
                         </div>
                       </div>
                       {circle.description && (
@@ -569,6 +634,8 @@ export function CirclesPage() {
           </div>
         </div>
       )}
+
+      <GardenFooter />
     </div>
   );
 }

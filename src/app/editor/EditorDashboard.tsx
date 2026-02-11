@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { CollectionsTab } from './CollectionsTab';
+import { ExitDemoButton } from '../components/ExitDemoButton';
 
 // Editor nav bar component
 function EditorNav({ activeTab, setActiveTab }: { activeTab: string; setActiveTab: (tab: string) => void }) {
@@ -73,6 +75,14 @@ function EditorNav({ activeTab, setActiveTab }: { activeTab: string; setActiveTa
           >
             Picked
           </button>
+          <button
+            onClick={() => setActiveTab('collections')}
+            className={`nav-link font-['Cormorant_Garamond'] text-[13px] uppercase tracking-[0.15em] transition-colors ${
+              activeTab === 'collections' ? 'text-[#c4a46c] active' : 'text-[#c8cad8]/80 hover:text-[#c8cad8]'
+            }`}
+          >
+            Collections
+          </button>
         </div>
       </div>
     </nav>
@@ -113,9 +123,11 @@ export function EditorDashboard() {
   const [isPicking, setIsPicking] = useState(false);
 
   useEffect(() => {
-    // Check if editor is logged in
+    // Check if demo mode is active OR if editor is logged in
+    const demoMode = localStorage.getItem('demoMode');
     const editorLoggedIn = localStorage.getItem('editor_logged_in');
-    if (!editorLoggedIn) {
+    
+    if (!demoMode && !editorLoggedIn) {
       window.location.href = '/editor-login';
       return;
     }
@@ -632,6 +644,11 @@ export function EditorDashboard() {
               )}
             </>
           )}
+
+          {/* Collections Tab */}
+          {activeTab === 'collections' && (
+            <CollectionsTab pickedWritings={pickedWritings} />
+          )}
         </div>
       </div>
 
@@ -739,6 +756,9 @@ export function EditorDashboard() {
           </div>
         </div>
       )}
+
+      {/* Exit Demo Button */}
+      <ExitDemoButton />
     </div>
   );
 }

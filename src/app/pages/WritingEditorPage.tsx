@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Save, Loader2, Sprout, Leaf, Flower2, Eye, Users, Lock, Tag, X } from 'lucide-react';
+import { Save, Loader2, Sprout, Leaf, Flower2, Eye, Users, Lock, Tag, X, Bold, Italic, Quote, Type, Maximize2, Minimize2, Check, Send, Sparkles } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { GardenMainNav } from '../components/GardenMainNav';
+import { JoinTheGardenGate } from '../components/JoinTheGardenGate';
 import { createWriting, updateWriting, getWriting } from '/src/services/gardenWritingService';
 import { Writing } from '/src/types/garden';
 
@@ -10,7 +11,13 @@ interface WritingEditorPageProps {
 }
 
 export function WritingEditorPage({ writingId }: WritingEditorPageProps) {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  
+  // AUTH GATE: Show join gate if not logged in
+  if (!authLoading && !user) {
+    return <JoinTheGardenGate />;
+  }
+
   const [formData, setFormData] = useState({
     title: '',
     content: '',
@@ -24,6 +31,14 @@ export function WritingEditorPage({ writingId }: WritingEditorPageProps) {
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [loading, setLoading] = useState(!!writingId);
   const [autoSaveTimeout, setAutoSaveTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [focusMode, setFocusMode] = useState(false);
+  const [contentTextarea, setContentTextarea] = useState<HTMLTextAreaElement | null>(null);
+  
+  // Submit to Editors state
+  const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [priorityNote, setPriorityNote] = useState('');
+  const [isGreenhouseTier, setIsGreenhouseTier] = useState(false); // TODO: Replace with actual tier check
+  const [showTooltip, setShowTooltip] = useState(false);
 
   // Load existing writing if editing
   useEffect(() => {
@@ -155,12 +170,72 @@ export function WritingEditorPage({ writingId }: WritingEditorPageProps) {
     });
   };
 
-  // Redirect if not authenticated
-  // TEMPORARY: Commented out for demo
-  // if (!user) {
-  //   window.location.href = '/garden/signin?redirect=/garden/write';
-  //   return null;
-  // }
+  // Formatting functions
+  const applyFormat = (prefix: string, suffix: string = prefix) => {
+    if (!contentTextarea) return;
+    
+    const start = contentTextarea.selectionStart;
+    const end = contentTextarea.selectionEnd;
+    const selectedText = formData.content.substring(start, end);
+    const beforeText = formData.content.substring(0, start);
+    const afterText = formData.content.substring(end);
+    
+    if (selectedText) {
+      const newContent = beforeText + prefix + selectedText + suffix + afterText;
+      setFormData({ ...formData, content: newContent });
+      
+      // Restore selection after state update
+      setTimeout(() => {
+        contentTextarea.focus();
+        contentTextarea.setSelectionRange(start + prefix.length, end + prefix.length);
+      }, 0);
+    }
+  };
+
+  const formatBold = () => applyFormat('**', '**');
+  const formatItalic = () => applyFormat('*', '*');
+  const formatHeading = () => {
+    if (!contentTextarea) return;
+    const start = contentTextarea.selectionStart;
+    const beforeText = formData.content.substring(0, start);
+    const lastNewline = beforeText.lastIndexOf('\n');
+    const lineStart = lastNewline === -1 ? 0 : lastNewline + 1;
+    applyFormat('# ', '');
+  };
+  const formatQuote = () => {
+    if (!contentTextarea) return;
+    const start = contentTextarea.selectionStart;
+    const beforeText = formData.content.substring(0, start);
+    const lastNewline = beforeText.lastIndexOf('\n');
+    const lineStart = lastNewline === -1 ? 0 : lastNewline + 1;
+    applyFormat('> ', '');
+  };
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+        e.preventDefault();
+        handleSave();
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key === 'b') {
+        e.preventDefault();
+        formatBold();
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key === 'i') {
+        e.preventDefault();
+        formatItalic();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [formData, contentTextarea]);
+
+  // Calculate stats
+  const wordCount = formData.content.split(/\s+/).filter(Boolean).length;
+  const charCount = formData.content.length;
+  const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 
   if (loading) {
     return (
@@ -347,6 +422,14 @@ export function WritingEditorPage({ writingId }: WritingEditorPageProps) {
               )}
             </div>
             <div className="flex gap-3">
+              <button
+                onClick={() => setFocusMode(true)}
+                className="px-4 py-2 border border-[rgba(139,157,195,0.3)] text-[#8b9dc3] hover:bg-[rgba(96,165,250,0.1)] hover:border-[#60a5fa] hover:text-[#60a5fa] transition-all font-['Inter'] text-sm font-semibold rounded-lg flex items-center gap-2"
+                title="Focus Mode - Distraction-free writing"
+              >
+                <Maximize2 className="w-4 h-4" />
+                Focus Mode
+              </button>
               <a
                 href="/my-garden"
                 className="px-4 py-2 border-2 border-[rgba(139,157,195,0.3)] text-[#c8cad8] hover:bg-[rgba(96,165,250,0.1)] hover:border-[#60a5fa] transition-all font-['Inter'] text-sm font-semibold rounded-lg"
@@ -543,23 +626,126 @@ export function WritingEditorPage({ writingId }: WritingEditorPageProps) {
               className="w-full px-8 py-6 border-b border-[rgba(139,157,195,0.2)] focus:border-[rgba(96,165,250,0.5)] focus:outline-none font-['Cardo'] text-4xl text-white placeholder:text-[#8b9dc3] bg-transparent"
             />
 
+            {/* Formatting Toolbar */}
+            <div className="px-8 py-3 border-b border-[rgba(139,157,195,0.15)] flex items-center gap-2">
+              <button
+                type="button"
+                onClick={formatBold}
+                className="px-3 py-1.5 glass-input hover:bg-[rgba(96,165,250,0.1)] hover:border-[#60a5fa] hover:text-[#60a5fa] text-[#8b9dc3] border border-[rgba(139,157,195,0.2)] rounded font-['Inter'] font-bold text-sm transition-all"
+                title="Bold (Cmd+B)"
+              >
+                <Bold className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={formatItalic}
+                className="px-3 py-1.5 glass-input hover:bg-[rgba(96,165,250,0.1)] hover:border-[#60a5fa] hover:text-[#60a5fa] text-[#8b9dc3] border border-[rgba(139,157,195,0.2)] rounded font-['Inter'] italic text-sm transition-all"
+                title="Italic (Cmd+I)"
+              >
+                <Italic className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={formatHeading}
+                className="px-3 py-1.5 glass-input hover:bg-[rgba(96,165,250,0.1)] hover:border-[#60a5fa] hover:text-[#60a5fa] text-[#8b9dc3] border border-[rgba(139,157,195,0.2)] rounded font-['Inter'] font-bold text-sm transition-all"
+                title="Heading"
+              >
+                <Type className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={formatQuote}
+                className="px-3 py-1.5 glass-input hover:bg-[rgba(96,165,250,0.1)] hover:border-[#60a5fa] hover:text-[#60a5fa] text-[#8b9dc3] border border-[rgba(139,157,195,0.2)] rounded font-['Inter'] text-sm transition-all"
+                title="Quote"
+              >
+                <Quote className="w-4 h-4" />
+              </button>
+            </div>
+
             {/* Content */}
             <textarea
+              ref={setContentTextarea}
               value={formData.content}
               onChange={(e) => setFormData({ ...formData, content: e.target.value })}
               placeholder="Begin writing..."
-              className="w-full min-h-[500px] px-8 py-6 focus:outline-none font-['Libre_Baskerville'] text-lg text-[#e8f0ff] leading-loose resize-none placeholder:text-[#8b9dc3] bg-transparent"
+              style={{ fontSize: '18px', lineHeight: '1.8' }}
+              className="w-full min-h-[500px] px-8 py-6 focus:outline-none font-['Libre_Baskerville'] text-[#e8f0ff] resize-none placeholder:text-[#8b9dc3] bg-transparent"
             />
           </div>
 
-          {/* Word Count */}
-          <div className="mt-4 text-right relative z-10">
+          {/* Stats: Word Count, Character Count, Reading Time */}
+          <div className="mt-4 flex items-center justify-between relative z-10">
             <p className="font-['Inter'] text-sm text-[#8b9dc3]">
-              {formData.content.split(/\s+/).filter(Boolean).length} words
+              {wordCount} words · {charCount} characters · {readingTime} min read
+            </p>
+            <p className="font-['Courier_New'] text-xs text-[#8b9dc3]">
+              Cmd+S to save | Cmd+B bold | Cmd+I italic
             </p>
           </div>
         </div>
       </div>
+
+      {/* Focus Mode Overlay */}
+      {focusMode && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-8" style={{ 
+          background: 'radial-gradient(ellipse at center, rgba(15, 23, 41, 0.95) 0%, rgba(10, 14, 26, 0.98) 100%)',
+          backdropFilter: 'blur(20px)'
+        }}>
+          {/* Subtle vignette effect */}
+          <div className="absolute inset-0 pointer-events-none" style={
+            {
+              background: 'radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.4) 100%)'
+            }
+          }/>
+
+          {/* Minimal starfield in focus mode */}
+          <div className="fixed inset-0 pointer-events-none opacity-30">
+            <div className="stars-layer"></div>
+          </div>
+
+          {/* Exit Focus Button */}
+          <button
+            onClick={() => setFocusMode(false)}
+            className="absolute top-8 right-8 px-4 py-2 glass-card border border-[rgba(139,157,195,0.3)] text-[#c8cad8] hover:bg-[rgba(96,165,250,0.1)] hover:border-[#60a5fa] hover:text-[#60a5fa] transition-all font-['Inter'] text-sm font-semibold rounded-lg flex items-center gap-2 z-10"
+          >
+            <Minimize2 className="w-4 h-4" />
+            Exit Focus
+          </button>
+
+          {/* Autosave indicator */}
+          {saving && (
+            <div className="absolute top-8 left-8 flex items-center gap-2 px-4 py-2 glass-card border border-[rgba(139,157,195,0.3)] rounded-lg z-10">
+              <Check className="w-4 h-4 text-[#10b981]" style={{ animation: 'pulse 2s ease-in-out infinite' }} />
+              <span className="font-['Inter'] text-sm text-[#10b981]">Autosaving...</span>
+            </div>
+          )}
+
+          {/* Focus Mode Editor */}
+          <div className="max-w-4xl w-full relative z-10">
+            <input
+              type="text"
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              placeholder="Title..."
+              className="w-full mb-8 px-0 py-2 bg-transparent border-none focus:outline-none font-['Cardo'] text-5xl text-white placeholder:text-[#8b9dc3] placeholder:opacity-40"
+              style={{ textShadow: '0 0 30px rgba(96, 165, 250, 0.3)' }}
+            />
+            <textarea
+              value={formData.content}
+              onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+              placeholder="Write..."
+              className="w-full min-h-[60vh] px-0 py-0 bg-transparent border-none focus:outline-none font-['Libre_Baskerville'] text-white placeholder:text-[#8b9dc3] placeholder:opacity-40 resize-none"
+              style={{ fontSize: '18px', lineHeight: '1.8' }}
+              autoFocus
+            />
+            <div className="mt-8 text-center">
+              <p className="font-['Inter'] text-sm text-[#8b9dc3] opacity-60">
+                {wordCount} words · {charCount} characters · {readingTime} min read
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

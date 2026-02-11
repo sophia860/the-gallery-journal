@@ -1,8 +1,17 @@
 import { useState } from 'react';
 import { Sprout, Home, Compass, Users, Bookmark, FileText, Settings, Sun, Moon, Monitor, Download, Eye, EyeOff, Lock } from 'lucide-react';
 import { GardenMainNav } from '../components/GardenMainNav';
+import { JoinTheGardenGate } from '../components/JoinTheGardenGate';
+import { useAuth } from '../contexts/AuthContext';
 
 export function SettingsPage() {
+  const { user, loading: authLoading } = useAuth();
+  
+  // AUTH GATE: Show join gate if not logged in
+  if (!authLoading && !user) {
+    return <JoinTheGardenGate />;
+  }
+  
   const [appearance, setAppearance] = useState<'light' | 'dark' | 'system'>('dark');
   const [defaultVisibility, setDefaultVisibility] = useState<'public' | 'private' | 'circle'>('private');
   const [whoCanSeeGarden, setWhoCanSeeGarden] = useState<'everyone' | 'members' | 'tables'>('everyone');

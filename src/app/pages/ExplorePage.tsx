@@ -1,10 +1,16 @@
 import { useState, useEffect } from 'react';
-import { Compass, Flower2, Search, Heart, Sprout, Leaf, Sparkles, MapPin, BookOpen } from 'lucide-react';
+import { Compass, Flower2, Search, Heart, Sprout, Leaf, Sparkles, MapPin, BookOpen, Star } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { GardenMainNav } from '../components/GardenMainNav';
+import { JoinTheGardenGate } from '../components/JoinTheGardenGate';
 import { SectionDivider } from '../components/SectionDivider';
 import { getPublicBlooms, searchWritings, toggleTend } from '/src/services/gardenWritingService';
 import { Writing } from '/src/types/garden';
+
+// Convert display name to URL slug
+function nameToSlug(name: string): string {
+  return name.toLowerCase().replace(/\s+/g, '-');
+}
 
 // Immersive Garden Card - Feels like visiting someone's space
 function GardenCard({ writing, onTend, isDayMode = false }: { writing: Writing; onTend: (id: string) => void; isDayMode?: boolean }) {
@@ -200,7 +206,7 @@ function GardenCard({ writing, onTend, isDayMode = false }: { writing: Writing; 
             </button>
 
             <a
-              href={`/garden/reading/${writing.id}`}
+              href={`/garden/visit/${writing.author_username || nameToSlug(writing.profile?.writer_name || writing.profile?.display_name || 'anonymous')}`}
               className="px-6 py-2.5 transition-all font-['Cardo'] text-lg rounded-lg shadow-md flex items-center gap-2 group/read visit-garden-btn"
               style={{
                 background: 'linear-gradient(135deg, #1a1a5e 0%, #2a2a7e 100%)',
@@ -336,7 +342,7 @@ function GardenCard({ writing, onTend, isDayMode = false }: { writing: Writing; 
           </button>
 
           <a
-            href={`/garden/reading/${writing.id}`}
+            href={`/garden/visit/${writing.author_username || nameToSlug(writing.profile?.writer_name || writing.profile?.display_name || 'anonymous')}`}
             className="px-6 py-2.5 bg-gradient-to-r from-[#60a5fa] via-[#3b82f6] to-[#2563eb] text-white hover:from-[#3b82f6] hover:via-[#2563eb] hover:to-[#1d4ed8] transition-all font-['Cardo'] text-lg rounded-lg shadow-lg flex items-center gap-2 group/read visit-garden-btn"
             style={{ boxShadow: '0 0 25px rgba(96, 165, 250, 0.4)' }}
           >
@@ -358,15 +364,22 @@ function GardenCard({ writing, onTend, isDayMode = false }: { writing: Writing; 
 }
 
 export function ExplorePage() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [writings, setWritings] = useState<Writing[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [searching, setSearching] = useState(false);
 
   useEffect(() => {
-    loadBlooms();
-  }, []);
+    if (user) {
+      loadBlooms();
+    }
+  }, [user]);
+
+  // AUTH GATE: Show join gate if not logged in (after all hooks)
+  if (!authLoading && !user) {
+    return <JoinTheGardenGate />;
+  }
 
   const loadBlooms = async () => {
     try {
@@ -421,7 +434,8 @@ export function ExplorePage() {
         profile: {
           display_name: 'Maya Chen',
           writer_name: 'Maya Chen'
-        }
+        },
+        author_username: 'maya-chen'
       },
       {
         id: '2',
@@ -441,7 +455,8 @@ export function ExplorePage() {
         profile: {
           display_name: 'Jordan Rivers',
           writer_name: 'Jordan Rivers'
-        }
+        },
+        author_username: 'jordan-rivers'
       },
       {
         id: '3',
@@ -461,7 +476,8 @@ export function ExplorePage() {
         profile: {
           display_name: 'River Park',
           writer_name: 'River Park'
-        }
+        },
+        author_username: 'river-park'
       },
       {
         id: '4',
@@ -481,7 +497,8 @@ export function ExplorePage() {
         profile: {
           display_name: 'Alex Santos',
           writer_name: 'Alex Santos'
-        }
+        },
+        author_username: 'alex-santos'
       },
       {
         id: '5',
@@ -501,7 +518,8 @@ export function ExplorePage() {
         profile: {
           display_name: 'Sam Taylor',
           writer_name: 'Sam Taylor'
-        }
+        },
+        author_username: 'sam-taylor'
       },
       {
         id: '6',
@@ -521,7 +539,96 @@ export function ExplorePage() {
         profile: {
           display_name: 'Casey Green',
           writer_name: 'Casey Green'
-        }
+        },
+        author_username: 'casey-green'
+      },
+      {
+        id: '7',
+        user_id: 'editor-1',
+        title: 'The Art of Revision',
+        content: 'Good writing is rewriting. This truth haunts us because it means the first draft is never enough. It means that brilliant flash of inspiration must be tempered with patience, that what felt perfect at 2am often reads differently at noon. Revision is where we learn what we actually meant to say. It is where voice emerges from noise, where structure reveals itself beneath the chaos of initial creation. The best editors know this instinctively: they are not there to fix your work, but to help you see what it could become.',
+        growth_stage: 'bloom',
+        visibility: 'public',
+        work_type: 'essay',
+        word_count: 445,
+        character_count: 2200,
+        tags: ['craft', 'editing', 'writing-advice'],
+        created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+        updated_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+        published_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+        type: 'essay',
+        profile: {
+          display_name: 'Sophia (Editor)',
+          writer_name: 'Sophia'
+        },
+        author_username: 'sophia-editor',
+        is_editor: true
+      },
+      {
+        id: '8',
+        user_id: 'editor-1',
+        title: 'On Reading Like a Writer',
+        content: 'When you read as a writer, everything changes. You notice the rhythm of sentences, the architecture of paragraphs. You see how a writer builds tension or releases it, how they use white space like punctuation, how they choose that word instead of this one. You become aware of craft in a way that makes reading slower, richer, more deliberate. This is not about losing the joy of story—it is about deepening it, about understanding that magic is made, not given.',
+        growth_stage: 'bloom',
+        visibility: 'public',
+        work_type: 'essay',
+        word_count: 380,
+        character_count: 1850,
+        tags: ['craft', 'reading', 'technique'],
+        created_at: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
+        updated_at: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
+        published_at: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
+        type: 'essay',
+        profile: {
+          display_name: 'Sophia (Editor)',
+          writer_name: 'Sophia'
+        },
+        author_username: 'sophia-editor',
+        is_editor: true
+      },
+      {
+        id: '9',
+        user_id: 'editor-2',
+        title: 'Finding Your Voice',
+        content: 'Your voice is not something you find—it is something you uncover. Beneath the imitation, beneath the trying-too-hard, beneath the voice you think you should have, there is the voice you actually have. It emerges through practice, through failure, through writing so much that eventually you stop performing and start speaking. Voice is what remains when you stop trying to sound like someone else. It is the cadence of your thought, the particular way you see the world.',
+        growth_stage: 'bloom',
+        visibility: 'public',
+        work_type: 'essay',
+        word_count: 420,
+        character_count: 2050,
+        tags: ['voice', 'craft', 'authenticity'],
+        created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+        updated_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+        published_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+        type: 'essay',
+        profile: {
+          display_name: 'Giove (Editor)',
+          writer_name: 'Giove'
+        },
+        author_username: 'giove-editor',
+        is_editor: true
+      },
+      {
+        id: '10',
+        user_id: 'editor-2',
+        title: 'The Courage to Begin',
+        content: 'Every writer knows the terror of the blank page. It is not just emptiness—it is potential, which is somehow more frightening. To begin means to commit, to make choices, to move from the realm of infinite possibility into the messy reality of actual words. But here is the secret: beginning badly is still beginning. The first sentence does not have to be perfect. It just has to exist. You can always revise. You cannot revise nothing.',
+        growth_stage: 'bloom',
+        visibility: 'public',
+        work_type: 'essay',
+        word_count: 395,
+        character_count: 1920,
+        tags: ['process', 'courage', 'beginning'],
+        created_at: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
+        updated_at: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
+        published_at: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
+        type: 'essay',
+        profile: {
+          display_name: 'Giove (Editor)',
+          writer_name: 'Giove'
+        },
+        author_username: 'giove-editor',
+        is_editor: true
       }
     ];
 

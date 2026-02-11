@@ -3,7 +3,7 @@ import { Sprout, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 export function NewGardenSignInPage() {
-  const { signIn } = useAuth();
+  const { signIn, supabase } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -25,12 +25,98 @@ export function NewGardenSignInPage() {
     setLoading(true);
 
     try {
+      console.log('[NewGardenSignInPage] Attempting sign in...');
       await signIn(formData.email, formData.password);
-      // Redirect to garden
+      
+      console.log('[NewGardenSignInPage] Sign in successful, checking session...');
+      
+      // Verify session is actually stored before redirecting
+      let attempts = 0;
+      const maxAttempts = 10;
+      
+      while (attempts < maxAttempts) {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session && session.user) {
+          console.log('[NewGardenSignInPage] Session confirmed, redirecting to garden');
+          // Session is confirmed, safe to redirect
+          window.location.href = '/garden';
+          return;
+        }
+        
+        // Wait 100ms before checking again
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
+      }
+      
+      // If we get here, session wasn't confirmed but sign-in succeeded
+      console.warn('[NewGardenSignInPage] Session not confirmed in time, redirecting anyway');
       window.location.href = '/garden';
     } catch (err: any) {
+      console.error('[NewGardenSignInPage] Sign in error:', err);
       setError(err.message || 'Invalid email or password');
-    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setError('');
+    setLoading(true);
+
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin + '/garden',
+        }
+      });
+
+      if (error) {
+        setError(error.message || 'Google sign-in failed');
+        setLoading(false);
+        return;
+      }
+
+      if (!data || !data.url) {
+        setError('Google sign-in is not available yet. Please use email and password to sign in.');
+        setLoading(false);
+        return;
+      }
+
+      window.location.href = data.url;
+    } catch (err: any) {
+      setError(err.message || 'An unexpected error occurred during Google sign-in.');
+      setLoading(false);
+    }
+  };
+
+  const handleGithubSignIn = async () => {
+    setError('');
+    setLoading(true);
+
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'github',
+        options: {
+          redirectTo: window.location.origin + '/garden',
+        }
+      });
+
+      if (error) {
+        setError(error.message || 'GitHub sign-in failed');
+        setLoading(false);
+        return;
+      }
+
+      if (!data || !data.url) {
+        setError('GitHub sign-in is not available yet. Please use email and password to sign in.');
+        setLoading(false);
+        return;
+      }
+
+      window.location.href = data.url;
+    } catch (err: any) {
+      setError(err.message || 'An unexpected error occurred during GitHub sign-in.');
       setLoading(false);
     }
   };
@@ -190,6 +276,7 @@ export function NewGardenSignInPage() {
           <div className="space-y-3">
             <button
               type="button"
+              onClick={handleGoogleSignIn}
               className="w-full px-4 py-3 bg-white border-2 border-[#E5E0DA] hover:border-[#7A9E7E] transition-all font-['Inter'] font-medium text-[#2C2C2C] rounded-lg flex items-center justify-center gap-3"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -202,6 +289,7 @@ export function NewGardenSignInPage() {
             </button>
             <button
               type="button"
+              onClick={handleGithubSignIn}
               className="w-full px-4 py-3 bg-white border-2 border-[#E5E0DA] hover:border-[#7A9E7E] transition-all font-['Inter'] font-medium text-[#2C2C2C] rounded-lg flex items-center justify-center gap-3"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">

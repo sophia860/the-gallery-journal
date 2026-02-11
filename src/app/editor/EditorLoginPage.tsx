@@ -109,6 +109,18 @@ export function EditorLoginPage() {
             </span>
           </button>
 
+          <button
+            type="button"
+            onClick={() => {
+              localStorage.setItem('demoMode', 'true');
+              localStorage.setItem('demoRole', 'editor');
+              window.location.href = '/editor/dashboard';
+            }}
+            className="w-full mt-4 py-3 rounded-lg border border-[rgba(196,164,108,0.3)] hover:border-[rgba(196,164,108,0.6)] hover:bg-[rgba(196,164,108,0.05)] text-[#8b9dc3] hover:text-[#c4a46c] transition-all font-['Inter'] text-sm"
+          >
+            Try Editor Demo
+          </button>
+
           <div className="mt-6 text-center">
             <a
               href="/garden/login"

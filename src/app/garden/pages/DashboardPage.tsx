@@ -1,13 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import { GardenMainNav } from '../../components/GardenMainNav';
 import { NightSkyBackground } from '../../components/NightSkyBackground';
+import { JoinTheGardenGate } from '../../components/JoinTheGardenGate';
 import { WorkTypeBadge } from '../components/WorkTypeBadge';
 import { useAuth } from '../../contexts/AuthContext';
 import { notesService, GardenNote, NoteState, WorkType } from '../utils/notes';
 import { calculateGardenSeason, calculateNoteWarmth, GardenSortOption, sortNotesByGardenLogic } from '../utils/gardenTime';
 
 export function DashboardPage() {
-  const { user, loading, supabase } = useAuth();
+  const { user, loading: authLoading, supabase } = useAuth();
   const [notes, setNotes] = useState<GardenNote[]>([]);
   const [filteredNotes, setFilteredNotes] = useState<GardenNote[]>([]);
   const [stateFilter, setStateFilter] = useState<'all' | NoteState>('all');
@@ -25,13 +26,33 @@ export function DashboardPage() {
     state: n.state,
     tendedBy: n.tendedBy || []
   })));
-
-  // Check auth and redirect if needed
-  useEffect(() => {
-    if (!loading && !user) {
-      window.location.href = '/garden/login';
-    }
-  }, [user, loading]);
+  
+  // LOADING STATE: Show loading while checking auth
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-[#0a0e1a] relative flex items-center justify-center">
+        <NightSkyBackground />
+        <div className="relative z-10 text-center">
+          <div 
+            className="inline-block mb-6"
+            style={{
+              filter: 'drop-shadow(0 0 20px rgba(122, 155, 118, 0.3))'
+            }}
+          >
+            <span className="text-6xl animate-pulse">🌱</span>
+          </div>
+          <p className="font-['Playfair_Display'] italic text-2xl text-white/70">
+            Loading your garden...
+          </p>
+        </div>
+      </div>
+    );
+  }
+  
+  // AUTH GATE: Show join gate if not logged in (after loading check)
+  if (!user) {
+    return <JoinTheGardenGate />;
+  }
 
   // Load user profile and writings from Supabase
   useEffect(() => {
@@ -178,10 +199,6 @@ export function DashboardPage() {
   const stripHtml = (html: string) => {
     return html.replace(/<[^>]*>/g, '').substring(0, 100);
   };
-
-  if (!user) {
-    return null;
-  }
 
   return (
     <div className="min-h-screen bg-[#0a0e1a] relative">

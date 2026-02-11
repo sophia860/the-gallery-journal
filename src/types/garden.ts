@@ -26,11 +26,16 @@ export interface Writing {
   created_at: string;
   updated_at: string;
   published_at?: string;
+  author_username?: string;
+  is_editor?: boolean;
   
   // Populated via joins
   profile?: Profile;
   tend_count?: number;
   has_tended?: boolean;
+  work_type?: string;
+  word_count?: number;
+  character_count?: number;
 }
 
 export interface WritingLink {
@@ -54,6 +59,9 @@ export interface Circle {
   // Populated via joins
   member_count?: number;
   is_member?: boolean;
+  is_creator?: boolean;
+  last_activity?: string;
+  created_by?: string;
 }
 
 export interface CircleMember {

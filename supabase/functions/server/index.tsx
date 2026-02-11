@@ -118,7 +118,7 @@ app.post(
       const sanitizedWriterName = sanitizeString(writerName || name);
       
       // Create auth user with auto-confirm since email server not configured
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+      let { data: authData, error: authError } = await supabase.auth.admin.createUser({
         email: sanitizedEmail,
         password,
         user_metadata: { 
@@ -129,15 +129,70 @@ app.post(
       });
 
       if (authError) {
-        logError('signup:createUser', authError);
-        // Provide user-friendly error messages
+        // Handle potential duplicate email - verify if user actually exists
         if (authError.message.includes('already been registered')) {
-          return errorResponse(c, 'An account with this email already exists. Please sign in instead.', 'DUPLICATE_EMAIL', 409);
+          logInfo('signup:checkingDuplicate', `Verifying if user actually exists: ${sanitizedEmail}`);
+          
+          // Check if user genuinely exists
+          try {
+            const { data: existingUsers, error: listError } = await supabase.auth.admin.listUsers({
+              page: 1,
+              perPage: 1
+            });
+            
+            // Try to find user by email
+            let userExists = false;
+            if (existingUsers && existingUsers.users) {
+              userExists = existingUsers.users.some(u => u.email?.toLowerCase() === sanitizedEmail);
+            }
+            
+            if (userExists) {
+              // User genuinely exists - return duplicate error
+              logInfo('signup:duplicateEmail', `User genuinely exists: ${sanitizedEmail}`);
+              return errorResponse(c, 'An account with this email already exists. Please sign in instead.', 'DUPLICATE_EMAIL', 409);
+            }
+            
+            // User doesn't exist - admin.createUser error was spurious, try signUp as fallback
+            logInfo('signup:fallbackToSignUp', `User doesn't exist, trying signUp fallback: ${sanitizedEmail}`);
+            
+            const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+              email: sanitizedEmail,
+              password,
+              options: {
+                data: {
+                  name: sanitizedName,
+                  role: 'writer',
+                },
+                emailRedirectTo: undefined,
+              }
+            });
+            
+            if (signUpError) {
+              logError('signup:fallbackSignUp', signUpError);
+              return errorResponse(c, 'Failed to create account. Please try again.', 'SIGNUP_ERROR', 400);
+            }
+            
+            if (!signUpData.user) {
+              logError('signup:noUserFromSignUp', 'signUp succeeded but no user returned');
+              return errorResponse(c, 'Failed to create account. Please try again.', 'SIGNUP_ERROR', 400);
+            }
+            
+            // Success with signUp fallback - use this user data
+            authData = signUpData;
+            authError = null;
+            logInfo('signup:fallbackSuccess', `User created via signUp fallback: ${signUpData.user.id}`);
+          } catch (verifyErr) {
+            logError('signup:verificationError', verifyErr);
+            return errorResponse(c, 'Failed to verify account status. Please try again.', 'INTERNAL_ERROR', 500);
+          }
+        } else {
+          // For other auth errors, log as error
+          logError('signup:createUser', authError);
+          return errorResponse(c, authError.message, 'AUTH_ERROR', 400);
         }
-        return errorResponse(c, authError.message, 'AUTH_ERROR', 400);
       }
 
-      if (!authData.user) {
+      if (!authData || !authData.user) {
         return errorResponse(c, 'Failed to create user', 'AUTH_ERROR', 500);
       }
 

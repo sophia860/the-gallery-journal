@@ -29,23 +29,30 @@ export function SignInPage() {
       const { data: { session } } = await supabase.auth.getSession();
       
       if (session?.user) {
-        // Query the profiles table to get user role
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', session.user.id)
-          .single();
+        // Try to query the profiles table to get user role (non-blocking)
+        try {
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', session.user.id)
+            .single();
 
-        if (profileError) {
-          console.error('Error fetching profile:', profileError);
+          if (profileError) {
+            console.log('[SignIn] Profiles table query failed (non-blocking):', profileError.message);
+          }
+
+          // Redirect based on role (if profile exists)
+          if (profile?.role === 'editor' || profile?.role === 'eic' || profile?.role === 'admin') {
+            window.location.href = '/editor-dashboard';
+            return;
+          }
+        } catch (profileErr) {
+          // Profile query failed - non-blocking, just log it
+          console.log('[SignIn] Profile query error (non-blocking):', profileErr);
         }
 
-        // Redirect based on role
-        if (profile?.role === 'editor' || profile?.role === 'eic' || profile?.role === 'admin') {
-          window.location.href = '/editor-dashboard';
-        } else {
-          window.location.href = getRedirectUrl();
-        }
+        // Default redirect for regular users or if profile doesn't exist
+        window.location.href = getRedirectUrl();
       }
     } catch (err: any) {
       setError(err.message || 'Failed to sign in. Please check your credentials.');
@@ -199,18 +206,6 @@ export function SignInPage() {
                   For Editors
                 </span>
               </button>
-              
-              <a
-                href={getRedirectUrl()}
-                onClick={() => {
-                  if (typeof window !== 'undefined') {
-                    localStorage.setItem('demoMode', 'true');
-                  }
-                }}
-                className="mt-4 w-full px-6 py-4 bg-white border-2 border-[#E0D8D0] text-[#717171] hover:border-[#C4918A] hover:text-[#2C2C2C] transition-colors font-['Courier_New'] text-sm flex items-center justify-center gap-2"
-              >
-                Continue as Guest (Demo Mode)
-              </a>
             </div>
 
             <p className="mt-8 text-center font-['Courier_New'] text-sm text-[#717171]">

@@ -1,10 +1,36 @@
 import { useState, useEffect } from 'react';
-import { Sprout, Plus, Leaf, Flower2, Eye, EyeOff, Users, Lock } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
+import { Sprout, Leaf, Flower2, Plus, Calendar, Users, TrendingUp, BookOpen, Eye, Lock, Crown, Zap, Home as HomeIcon } from 'lucide-react';
 import { GardenMainNav } from '../components/GardenMainNav';
-import { getUserWritings } from '/src/services/gardenWritingService';
-import { getGardenStats } from '/src/services/gardenProfileService';
-import { Writing, GardenStats } from '/src/types/garden';
+import { NightSkyBackground } from '../components/NightSkyBackground';
+import { JoinTheGardenGate } from '../components/JoinTheGardenGate';
+import { GardenFooter } from '../components/GardenFooter';
+import { useAuth } from '../contexts/AuthContext';
+
+interface Writing {
+  id: string;
+  user_id: string;
+  title: string;
+  content: string;
+  growth_stage: 'seed' | 'sprout' | 'bloom';
+  visibility: 'private' | 'circles' | 'public' | 'garden';
+  work_type?: string;
+  word_count?: number;
+  character_count?: number;
+  tags?: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+interface GardenStats {
+  total_writings: number;
+  seeds: number;
+  sprouts: number;
+  blooms: number;
+  total_words: number;
+  public_count: number;
+  circles_count: number;
+  private_count: number;
+}
 
 // Plant visual component
 function PlantVisual({ writing }: { writing: Writing }) {
@@ -70,66 +96,35 @@ export function MyGardenPage() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'seed' | 'sprout' | 'bloom'>('all');
   const [selectedWriting, setSelectedWriting] = useState<Writing | null>(null);
-
-  // TEMPORARY: Mock user for demo purposes
-  const mockUser = { id: 'demo-user-123', email: 'demo@example.com' };
-  const demoUser = user || mockUser;
+  const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards');
+  const [sortBy, setSortBy] = useState<'date' | 'type' | 'stage' | 'alphabetical'>('date');
+  const [collectionFilter, setCollectionFilter] = useState<'all' | 'poetry' | 'essays' | 'fiction'>('all');
 
   useEffect(() => {
-    if (demoUser) {
+    if (user) {
       loadGarden();
     }
-  }, [demoUser]);
+  }, [user]);
 
   const loadGarden = async () => {
-    if (!demoUser) return;
+    if (!user) return;
 
-    try {
-      setLoading(true);
-      
-      // Set a 2-second timeout to fall back to mock data
-      const timeoutId = setTimeout(() => {
-        console.log('My Garden loading timeout - falling back to mock data');
-        useMockData();
-        setLoading(false);
-      }, 2000);
-      
-      // Try to load from database
-      try {
-        const [writingsData, statsData] = await Promise.all([
-          getUserWritings(demoUser.id),
-          getGardenStats(demoUser.id)
-        ]);
-        
-        clearTimeout(timeoutId);
-        if (writingsData && writingsData.length > 0) {
-          setWritings(writingsData);
-          setStats(statsData);
-          setLoading(false);
-        } else {
-          // Use mock data if no writings found
-          useMockData();
-          setLoading(false);
-        }
-      } catch (dbError) {
-        clearTimeout(timeoutId);
-        console.log('Database not available, using mock data:', dbError);
-        useMockData();
-        setLoading(false);
-      }
-    } catch (error) {
-      console.error('Error loading garden:', error);
+    // Just use mock data for now
+    setLoading(true);
+    setTimeout(() => {
       useMockData();
       setLoading(false);
-    }
+    }, 500);
   };
 
   const useMockData = () => {
-    // Mock writings for demo
+    if (!user) return;
+    
+    // Mock writings
     const mockWritings: Writing[] = [
       {
         id: '1',
-        user_id: demoUser.id,
+        user_id: user.id,
         title: 'Morning Thoughts',
         content: 'The quiet before dawn holds a special kind of magic...',
         growth_stage: 'bloom',
@@ -143,7 +138,7 @@ export function MyGardenPage() {
       },
       {
         id: '2',
-        user_id: demoUser.id,
+        user_id: user.id,
         title: 'Work in Progress',
         content: 'Still finding the right words for this one. It needs more time to grow...',
         growth_stage: 'sprout',
@@ -157,7 +152,7 @@ export function MyGardenPage() {
       },
       {
         id: '3',
-        user_id: demoUser.id,
+        user_id: user.id,
         title: 'A New Idea',
         content: 'Just planting this seed...',
         growth_stage: 'seed',
@@ -171,7 +166,7 @@ export function MyGardenPage() {
       },
       {
         id: '4',
-        user_id: demoUser.id,
+        user_id: user.id,
         title: 'Sunset Musings',
         content: 'The sky painted in shades of amber and rose, a canvas that changes every evening...',
         growth_stage: 'bloom',
@@ -185,7 +180,7 @@ export function MyGardenPage() {
       },
       {
         id: '5',
-        user_id: demoUser.id,
+        user_id: user.id,
         title: 'Untitled',
         content: 'Some words about...',
         growth_stage: 'seed',
@@ -214,155 +209,74 @@ export function MyGardenPage() {
     setStats(mockStats);
   };
 
-  // TEMPORARY: Commented out auth redirect for demo
-  // if (!authLoading && !user) {
-  //   window.location.href = '/garden/signin?redirect=/my-garden';
-  //   return null;
-  // }
-
   const filteredWritings = filter === 'all' 
     ? writings 
     : writings.filter(w => w.growth_stage === filter);
 
+  // AUTH GATE: Show join gate if not logged in (after all hooks)
+  if (!authLoading && !user) {
+    return <JoinTheGardenGate />;
+  }
+
+  // Show loading state while checking auth
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-[#0f1729] relative overflow-hidden flex items-center justify-center">
+        <NightSkyBackground />
+        <div className="relative z-10 text-center">
+          <Sprout className="w-12 h-12 text-[#60a5fa] animate-pulse mx-auto mb-4" style={{ filter: 'drop-shadow(0 0 10px rgba(96, 165, 250, 0.5))' }} />
+          <p className="font-['Libre_Baskerville'] text-lg text-[#c8cad8]">
+            Loading...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Get subscription tier from localStorage or user metadata
+  const getTier = () => {
+    if (typeof window !== 'undefined') {
+      const storedTier = localStorage.getItem('subscription_tier');
+      if (storedTier) return storedTier;
+    }
+    return user?.user_metadata?.subscription_tier || 'seedling';
+  };
+
+  const tier = getTier();
+
+  const getTierInfo = (tierName: string) => {
+    const tiers: Record<string, any> = {
+      seedling: {
+        name: 'Seedling',
+        color: '#8b9dc3',
+        icon: <Sprout className="w-6 h-6" />,
+        features: ['Basic writing space', 'Share in Garden', 'Join 3 Circles'],
+        canUpgrade: true
+      },
+      gardener: {
+        name: 'Gardener',
+        color: '#10b981',
+        icon: <Leaf className="w-6 h-6" />,
+        features: ['Unlimited Circles', 'Propose Grafts', 'Priority Support', 'Profile customization'],
+        canUpgrade: true
+      },
+      greenhouse: {
+        name: 'Greenhouse',
+        color: '#c4a46c',
+        icon: <Crown className="w-6 h-6" />,
+        features: ['Everything in Gardener', 'Direct editor submissions', 'Featured in Gallery', 'Early access to features'],
+        canUpgrade: false
+      }
+    };
+    return tiers[tierName.toLowerCase()] || tiers.gardener;
+  };
+
+  const tierInfo = getTierInfo(tier);
+
   return (
     <div className="min-h-screen bg-[#0f1729] relative overflow-hidden">
       {/* Animated Starfield Background */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="stars-layer"></div>
-        <div className="stars-layer-2"></div>
-        <div className="stars-layer-3"></div>
-        <div className="stars-layer-glow"></div>
-      </div>
-
-      <style>{`
-        .stars-layer {
-          position: absolute;
-          inset: 0;
-          background-image: 
-            radial-gradient(2px 2px at 10% 10%, white, transparent),
-            radial-gradient(2px 2px at 20% 30%, rgba(255, 255, 255, 0.9), transparent),
-            radial-gradient(1px 1px at 30% 15%, rgba(255, 255, 255, 0.8), transparent),
-            radial-gradient(3px 3px at 40% 40%, rgba(255, 255, 255, 0.95), transparent),
-            radial-gradient(1px 1px at 50% 25%, rgba(255, 255, 255, 0.85), transparent),
-            radial-gradient(2px 2px at 60% 70%, rgba(255, 255, 255, 0.9), transparent),
-            radial-gradient(1px 1px at 70% 50%, rgba(255, 255, 255, 0.8), transparent),
-            radial-gradient(2px 2px at 80% 20%, white, transparent),
-            radial-gradient(1px 1px at 90% 60%, rgba(255, 255, 255, 0.85), transparent),
-            radial-gradient(1px 1px at 15% 60%, rgba(200, 210, 255, 0.9), transparent),
-            radial-gradient(2px 2px at 25% 80%, rgba(255, 255, 255, 0.9), transparent),
-            radial-gradient(1px 1px at 35% 90%, rgba(255, 255, 255, 0.8), transparent),
-            radial-gradient(1px 1px at 45% 5%, rgba(255, 255, 255, 0.85), transparent),
-            radial-gradient(2px 2px at 55% 55%, rgba(255, 255, 255, 0.9), transparent),
-            radial-gradient(1px 1px at 65% 35%, rgba(255, 255, 255, 0.8), transparent),
-            radial-gradient(1px 1px at 75% 75%, rgba(180, 200, 255, 0.9), transparent),
-            radial-gradient(2px 2px at 85% 85%, rgba(255, 255, 255, 0.9), transparent),
-            radial-gradient(1px 1px at 95% 45%, rgba(255, 255, 255, 0.85), transparent),
-            radial-gradient(1px 1px at 5% 95%, rgba(255, 255, 255, 0.8), transparent),
-            radial-gradient(1px 1px at 12% 42%, rgba(255, 255, 255, 0.85), transparent);
-          background-size: 200% 200%;
-          animation: twinkle 4s ease-in-out infinite;
-        }
-        
-        .stars-layer-2 {
-          position: absolute;
-          inset: 0;
-          background-image: 
-            radial-gradient(1px 1px at 8% 20%, rgba(255, 255, 255, 0.9), transparent),
-            radial-gradient(1px 1px at 18% 55%, rgba(255, 255, 255, 0.8), transparent),
-            radial-gradient(2px 2px at 28% 12%, white, transparent),
-            radial-gradient(1px 1px at 38% 68%, rgba(255, 255, 255, 0.85), transparent),
-            radial-gradient(1px 1px at 48% 82%, rgba(255, 255, 255, 0.8), transparent),
-            radial-gradient(1px 1px at 58% 38%, rgba(255, 255, 255, 0.9), transparent),
-            radial-gradient(2px 2px at 68% 8%, rgba(255, 255, 255, 0.95), transparent),
-            radial-gradient(1px 1px at 78% 58%, rgba(255, 255, 255, 0.8), transparent),
-            radial-gradient(1px 1px at 88% 28%, rgba(255, 255, 255, 0.85), transparent),
-            radial-gradient(1px 1px at 98% 78%, rgba(255, 255, 255, 0.8), transparent),
-            radial-gradient(1px 1px at 3% 33%, rgba(200, 210, 255, 0.9), transparent),
-            radial-gradient(1px 1px at 13% 73%, rgba(255, 255, 255, 0.85), transparent),
-            radial-gradient(1px 1px at 23% 48%, rgba(255, 255, 255, 0.8), transparent),
-            radial-gradient(1px 1px at 33% 88%, rgba(255, 255, 255, 0.85), transparent),
-            radial-gradient(2px 2px at 43% 18%, rgba(255, 255, 255, 0.9), transparent),
-            radial-gradient(1px 1px at 53% 63%, rgba(255, 255, 255, 0.8), transparent),
-            radial-gradient(1px 1px at 63% 93%, rgba(180, 200, 255, 0.85), transparent),
-            radial-gradient(1px 1px at 73% 23%, rgba(255, 255, 255, 0.85), transparent),
-            radial-gradient(1px 1px at 83% 53%, rgba(255, 255, 255, 0.8), transparent),
-            radial-gradient(1px 1px at 93% 3%, rgba(255, 255, 255, 0.9), transparent);
-          background-size: 250% 250%;
-          animation: twinkle 6s ease-in-out infinite reverse;
-        }
-
-        .stars-layer-3 {
-          position: absolute;
-          inset: 0;
-          background-image: 
-            radial-gradient(1px 1px at 6% 16%, rgba(255, 255, 255, 0.8), transparent),
-            radial-gradient(1px 1px at 16% 46%, rgba(255, 255, 255, 0.85), transparent),
-            radial-gradient(1px 1px at 26% 76%, rgba(255, 255, 255, 0.8), transparent),
-            radial-gradient(2px 2px at 36% 6%, white, transparent),
-            radial-gradient(1px 1px at 46% 36%, rgba(255, 255, 255, 0.9), transparent),
-            radial-gradient(1px 1px at 56% 66%, rgba(255, 255, 255, 0.8), transparent),
-            radial-gradient(1px 1px at 66% 96%, rgba(255, 255, 255, 0.85), transparent),
-            radial-gradient(1px 1px at 76% 26%, rgba(255, 255, 255, 0.8), transparent),
-            radial-gradient(1px 1px at 86% 56%, rgba(200, 210, 255, 0.9), transparent),
-            radial-gradient(1px 1px at 96% 86%, rgba(255, 255, 255, 0.85), transparent),
-            radial-gradient(1px 1px at 11% 51%, rgba(255, 255, 255, 0.8), transparent),
-            radial-gradient(1px 1px at 21% 21%, rgba(255, 255, 255, 0.85), transparent),
-            radial-gradient(1px 1px at 31% 81%, rgba(255, 255, 255, 0.8), transparent),
-            radial-gradient(1px 1px at 41% 41%, rgba(255, 255, 255, 0.85), transparent),
-            radial-gradient(1px 1px at 51% 11%, rgba(180, 200, 255, 0.9), transparent),
-            radial-gradient(1px 1px at 61% 71%, rgba(255, 255, 255, 0.8), transparent),
-            radial-gradient(1px 1px at 71% 31%, rgba(255, 255, 255, 0.85), transparent),
-            radial-gradient(1px 1px at 81% 91%, rgba(255, 255, 255, 0.8), transparent),
-            radial-gradient(1px 1px at 91% 61%, rgba(255, 255, 255, 0.85), transparent),
-            radial-gradient(1px 1px at 1% 1%, rgba(255, 255, 255, 0.8), transparent);
-          background-size: 300% 300%;
-          animation: twinkle 8s ease-in-out infinite;
-        }
-
-        .stars-layer-glow {
-          position: absolute;
-          inset: 0;
-          background-image: 
-            radial-gradient(3px 3px at 15% 25%, rgba(255, 255, 255, 1), transparent),
-            radial-gradient(4px 4px at 45% 55%, rgba(255, 255, 255, 1), transparent),
-            radial-gradient(3px 3px at 75% 35%, rgba(200, 220, 255, 1), transparent),
-            radial-gradient(4px 4px at 85% 75%, rgba(255, 255, 255, 1), transparent),
-            radial-gradient(3px 3px at 25% 85%, rgba(180, 210, 255, 1), transparent);
-          background-size: 100% 100%;
-          animation: glow 3s ease-in-out infinite;
-          filter: blur(0.5px);
-        }
-        
-        @keyframes twinkle {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.5; }
-        }
-
-        @keyframes glow {
-          0%, 100% { 
-            opacity: 1;
-            filter: blur(0.5px);
-          }
-          50% { 
-            opacity: 0.6;
-            filter: blur(1px);
-          }
-        }
-
-        .glass-card {
-          background: rgba(15, 23, 41, 0.7);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          border: 1px solid rgba(139, 157, 195, 0.2);
-          box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        }
-
-        .glass-card:hover {
-          background: rgba(15, 23, 41, 0.85);
-          border: 1px solid rgba(96, 165, 250, 0.4);
-          box-shadow: 0 8px 32px 0 rgba(96, 165, 250, 0.2);
-        }
-      `}</style>
+      <NightSkyBackground />
 
       <GardenMainNav variant="dark" />
 
@@ -386,6 +300,59 @@ export function MyGardenPage() {
                 <Plus className="w-5 h-5" />
                 New Writing
               </a>
+            </div>
+
+            {/* Subscription Tier Badge */}
+            <div className="glass-card rounded-xl p-6 mb-6" style={{ background: 'rgba(15, 23, 41, 0.7)', border: `1px solid ${tierInfo.color}40` }}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div 
+                    className="w-16 h-16 rounded-full flex items-center justify-center"
+                    style={{ 
+                      background: `${tierInfo.color}20`,
+                      border: `2px solid ${tierInfo.color}`,
+                      boxShadow: `0 0 20px ${tierInfo.color}40`
+                    }}
+                  >
+                    <div style={{ color: tierInfo.color }}>
+                      {tierInfo.icon}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className="font-['Cardo'] text-2xl text-white italic">{tierInfo.name} Member</h3>
+                      <span 
+                        className="px-3 py-1 rounded-full text-xs font-['Inter'] uppercase tracking-wider font-semibold"
+                        style={{ 
+                          background: `${tierInfo.color}20`,
+                          color: tierInfo.color,
+                          border: `1px solid ${tierInfo.color}`
+                        }}
+                      >
+                        Active
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {tierInfo.features.map((feature: string, idx: number) => (
+                        <span key={idx} className="text-sm text-[#c8cad8] font-['Inter'] flex items-center gap-1">
+                          <span className="w-1 h-1 rounded-full bg-[#60a5fa]"></span>
+                          {feature}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                {tierInfo.canUpgrade && (
+                  <a
+                    href="/pricing"
+                    className="px-6 py-3 bg-gradient-to-r from-[#c4a46c] to-[#b8935f] text-white hover:from-[#b8935f] hover:to-[#a68254] transition-all font-['Inter'] text-sm font-semibold rounded-lg shadow-lg flex items-center gap-2"
+                    style={{ boxShadow: '0 0 20px rgba(196, 164, 108, 0.3)' }}
+                  >
+                    <Crown className="w-4 h-4" />
+                    Upgrade
+                  </a>
+                )}
+              </div>
             </div>
 
             {/* Stats */}
@@ -554,6 +521,8 @@ export function MyGardenPage() {
           )}
         </div>
       </div>
+
+      <GardenFooter />
     </div>
   );
 }

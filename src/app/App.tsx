@@ -3,6 +3,7 @@ import { AuthProvider } from './contexts/AuthContext';
 
 // Gallery pages
 import { GalleryLandingPage } from './pages/GalleryLandingPage';
+import { GardenLandingPage } from './pages/GardenLandingPage';
 import { ExhibitsPage } from './pages/ExhibitsPage';
 import { CollectionGalleryPage } from './pages/CollectionGalleryPage';
 
@@ -14,9 +15,15 @@ import { NewGardenSignUpPage } from './pages/NewGardenSignUpPage';
 import { ExplorePage } from './pages/ExplorePage';
 import { CirclesPage } from './pages/CirclesPage';
 import { CircleDetailPage } from './pages/CircleDetailPage';
+import { GreenhousePage } from './pages/GreenhousePage';
+import { GraftsPage } from './pages/GraftsPage';
+import { GraftEditorPage } from './pages/GraftEditorPage';
+import { PricingPage } from './pages/PricingPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { SetupPage } from './pages/SetupPage';
 import { ReadingModePage } from './pages/ReadingModePage';
+import { VisitGardenPage } from './pages/VisitGardenPage';
+import { WriterProfilePage } from './pages/WriterProfilePage';
 
 // Garden pages - Old (keeping for compatibility)
 import { DashboardPage } from './garden/pages/DashboardPage';
@@ -81,11 +88,31 @@ function Router() {
     if (readingMatch) {
       setParams({ writingId: readingMatch[1] });
     }
+    const visitGardenMatch = route.match(/\/garden\/visit\/([^/]+)/);
+    if (visitGardenMatch) {
+      setParams({ username: visitGardenMatch[1] });
+    }
+    const writerMatch = route.match(/\/writer\/([^/]+)/);
+    if (writerMatch) {
+      setParams({ writerUsername: writerMatch[1] });
+    }
+    const graftEditorMatch = route.match(/\/grafts\/edit\/([^/]+)/);
+    if (graftEditorMatch) {
+      setParams({ graftId: graftEditorMatch[1] });
+    }
   }, [route]);
 
   // Gallery routes
   if (route === '/' || route === '') {
     return <GalleryLandingPage />;
+  }
+
+  if (route === '/welcome') {
+    return <GardenLandingPage />;
+  }
+
+  if (route === '/gallery') {
+    return <ExhibitsPage />;
   }
   
   if (route === '/exhibits') {
@@ -125,6 +152,26 @@ function Router() {
     return <CircleDetailPage circleId={params.circleId || ''} />;
   }
 
+  if (route === '/greenhouse') {
+    return <GreenhousePage />;
+  }
+
+  if (route === '/grafts') {
+    return <GraftsPage />;
+  }
+
+  if (route.startsWith('/grafts/edit/')) {
+    return <GraftEditorPage graftId={params.graftId || '1'} />;
+  }
+
+  if (route === '/graft-editor') {
+    return <GraftEditorPage graftId="1" />;
+  }
+
+  if (route === '/pricing') {
+    return <PricingPage />;
+  }
+
   if (route === '/settings') {
     return <SettingsPage />;
   }
@@ -139,6 +186,22 @@ function Router() {
 
   if (route.startsWith('/garden/reading/')) {
     return <ReadingModePage writingId={params.writingId || ''} />;
+  }
+
+  if (route.startsWith('/garden/visit/')) {
+    return <VisitGardenPage username={params.username || ''} />;
+  }
+
+  if (route === '/visit-garden') {
+    return <VisitGardenPage username="maya-chen" />;
+  }
+
+  if (route.startsWith('/writer/')) {
+    return <WriterProfilePage username={params.writerUsername || 'maya-chen'} />;
+  }
+
+  if (route === '/writer-profile') {
+    return <WriterProfilePage username="maya-chen" />;
   }
 
   // OLD Garden routes (keeping for compatibility)

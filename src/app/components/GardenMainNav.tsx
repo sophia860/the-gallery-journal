@@ -95,7 +95,7 @@ export function GardenMainNav({ variant = 'light' }: GardenNavProps) {
             {user && (
               <>
                 <a 
-                  href="/my-garden" 
+                  href="/garden/dashboard" 
                   className={`${linkColor} ${linkHover} transition-all duration-300 relative group ${isActive('my-garden') ? activeColor : ''}`}
                 >
                   My Garden
@@ -169,7 +169,7 @@ export function GardenMainNav({ variant = 'light' }: GardenNavProps) {
                       </a>
                       <div className="border-t border-[#E0D8D0] my-2"></div>
                       <a
-                        href="/my-garden"
+                        href="/garden/dashboard"
                         className="flex items-center gap-3 px-4 py-3 hover:bg-[#F5F0EB] transition-colors text-[#2C1810] text-sm font-['Inter']"
                       >
                         <Sprout className="w-4 h-4" />
@@ -258,7 +258,7 @@ export function GardenMainNav({ variant = 'light' }: GardenNavProps) {
               <>
                 <div className="border-t border-[#E0D8D0] pt-4 mt-4">
                   <a 
-                    href="/my-garden" 
+                    href="/garden/dashboard" 
                     className={`block py-2 ${linkColor} ${linkHover} transition-colors ${isActive('my-garden') ? activeColor : ''}`}
                     onClick={() => setMobileMenuOpen(false)}
                   >

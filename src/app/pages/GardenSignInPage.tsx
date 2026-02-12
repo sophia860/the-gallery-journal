@@ -28,7 +28,7 @@ export function GardenSignInPage() {
       await signIn(formData.email, formData.password);
       
       // Redirect to garden
-      const redirect = new URLSearchParams(window.location.search).get('redirect') || '/my-garden';
+      const redirect = new URLSearchParams(window.location.search).get('redirect') || '/garden/dashboard';
       window.location.href = redirect;
     } catch (err: any) {
       setError(err.message || 'Invalid email or password');

@@ -6620,3 +6620,431 @@ export const storage = {
     }
   }
 };
+
+
+    // --- pages/NewGardenSignInPage.tsx ---
+import { useState } from 'react';
+import { useAuth } from '../../contexts/AuthContext';
+
+export function NewGardenSignInPage() {
+  const { signIn, supabase } = useAuth();
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    rememberMe: false,
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    if (!formData.email || !formData.password) {
+      setError('Please fill in all fields');
+      return;
+    }
+    setLoading(true);
+    try {
+      await signIn(formData.email, formData.password);
+      window.history.pushState({}, '', '/garden/dashboard');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    } catch (err: any) {
+      setError(err.message || 'Invalid email or password');
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: window.location.origin + '/garden/dashboard' }
+      });
+      if (error) { setError(error.message); setLoading(false); return; }
+      if (!data?.url) { setError('Google sign-in not available'); setLoading(false); return; }
+      window.location.href = data.url;
+    } catch (err: any) { setError(err.message); setLoading(false); }
+  };
+
+  const handleGithubSignIn = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'github',
+        options: { redirectTo: window.location.origin + '/garden/dashboard' }
+      });
+      if (error) { setError(error.message); setLoading(false); return; }
+      if (!data?.url) { setError('GitHub sign-in not available'); setLoading(false); return; }
+      window.location.href = data.url;
+    } catch (err: any) { setError(err.message); setLoading(false); }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#FAF8F5] relative">
+      <a href="/" className="fixed top-6 left-6 z-50 flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm border border-[#E5E0DA] rounded-full hover:bg-white transition-colors text-[#2C2C2C] font-['Inter'] text-sm">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        Back to Gallery
+      </a>
+      <div className="flex items-center justify-center min-h-screen px-6 py-12">
+        <div className="w-full max-w-md">
+          <div className="flex items-center justify-center gap-2 mb-8">
+            <span className="text-[#7A9E7E] text-2xl">🌱</span>
+            <a href="/" className="font-['Playfair_Display'] italic text-xl text-[#2C2C2C]">garden</a>
+          </div>
+          <h1 className="font-['Playfair_Display'] italic text-4xl text-center text-[#2C2C2C] mb-2">Welcome back</h1>
+          <p className="font-['Inter'] text-center text-[#9B9B9B] mb-8">Return to your garden</p>
+          <div className="bg-white rounded-2xl border border-[#E5E0DA] p-8 shadow-sm">
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div>
+                <label htmlFor="email" className="block font-['Inter'] text-sm font-medium text-[#2C2C2C] mb-2">Email</label>
+                <input id="email" type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="w-full px-4 py-3 bg-[#FAF8F5] border-2 border-[#E5E0DA] focus:border-[#7A9E7E] focus:outline-none font-['Inter'] text-base text-[#2C2C2C] rounded-lg transition-colors" placeholder="your@email.com" required />
+              </div>
+              <div>
+                <label htmlFor="password" className="block font-['Inter'] text-sm font-medium text-[#2C2C2C] mb-2">Password</label>
+                <div className="relative">
+                  <input id="password" type={showPassword ? 'text' : 'password'} value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} className="w-full px-4 py-3 pr-12 bg-[#FAF8F5] border-2 border-[#E5E0DA] focus:border-[#7A9E7E] focus:outline-none font-['Inter'] text-base text-[#2C2C2C] rounded-lg transition-colors" placeholder="Enter your password" required />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9B9B9B] hover:text-[#2C2C2C] transition-colors">
+                    {showPassword ? <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" strokeLinecap="round" strokeLinejoin="round"/><line x1="1" y1="1" x2="23" y2="23" strokeLinecap="round" strokeLinejoin="round"/></svg> : <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" strokeLinecap="round" strokeLinejoin="round"/><circle cx="12" cy="12" r="3" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                  </button>
+                </div>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" checked={formData.rememberMe} onChange={(e) => setFormData({ ...formData, rememberMe: e.target.checked })} className="w-4 h-4 border-2 border-[#E5E0DA] rounded text-[#7A9E7E]" />
+                  <span className="font-['Inter'] text-[#6B6B6B]">Remember me</span>
+                </label>
+                <a href="/garden/forgot-password" className="font-['Inter'] text-[#7A9E7E] hover:text-[#5C8260] transition-colors">Forgot password?</a>
+              </div>
+              {error && <div className="p-3 bg-red-50 border border-red-200 rounded-lg"><p className="text-sm text-red-600">{error}</p></div>}
+              <button type="submit" disabled={loading} className="w-full py-3.5 bg-[#C4956A] hover:bg-[#B8895E] disabled:opacity-50 text-white font-['Courier_New'] text-sm uppercase tracking-[0.15em] rounded-lg transition-colors cursor-pointer">
+                {loading ? 'Signing in...' : 'Return to your garden'}
+              </button>
+            </form>
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-[#E5E0DA]" /></div>
+              <div className="relative flex justify-center text-sm"><span className="px-4 bg-white font-['Inter'] text-[#9B9B9B] text-xs">or continue with</span></div>
+            </div>
+            <div className="space-y-3">
+              <button type="button" onClick={handleGoogleSignIn} disabled={loading} className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white border-2 border-[#E5E0DA] hover:border-[#7A9E7E] rounded-lg transition-colors disabled:opacity-50 cursor-pointer">
+                <svg width="18" height="18" viewBox="0 0 18 18"><g fill="none"><path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/></g></svg>
+                <span className="font-['Inter'] text-sm text-[#2C2C2C]">Continue with Google</span>
+              </button>
+              <button type="button" onClick={handleGithubSignIn} disabled={loading} className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white border-2 border-[#E5E0DA] hover:border-[#7A9E7E] rounded-lg transition-colors disabled:opacity-50 cursor-pointer">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="#2C2C2C"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                <span className="font-['Inter'] text-sm text-[#2C2C2C]">Continue with GitHub</span>
+              </button>
+            </div>
+          </div>
+          <p className="mt-8 text-center font-['Inter'] text-sm text-[#9B9B9B]">
+            New here?{' '}<a href="/garden/signup" className="text-[#7A9E7E] hover:text-[#5C8260] font-semibold transition-colors">Plant your first seed</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+    // ==================== SIGN UP PAGE ====================
+const SignUpPage = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [displayName, setDisplayName] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { display_name: displayName },
+          emailRedirectTo: window.location.origin + '/garden/dashboard'
+        }
+      });
+      if (error) { setError(error.message); setLoading(false); return; }
+      if (data?.user) {
+        window.location.href = '/garden/verify-email';
+      }
+    } catch (err: any) { setError(err.message); setLoading(false); }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#1C1C1C] flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <h1 className="font-['Fraunces'] text-4xl text-white mb-2">Create Account</h1>
+          <p className="font-['Inter'] text-[#9B9B9B]">Join our community of writers</p>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block font-['Inter'] text-sm text-[#9B9B9B] mb-1">Display Name</label>
+            <input type="text" value={displayName} onChange={(e) => setDisplayName(e.target.value)} className="w-full px-4 py-3 bg-[#2C2C2C] border border-[#3C3C3C] rounded-lg font-['Inter'] text-white focus:outline-none focus:border-[#7A9E7E]" placeholder="Your name" required />
+          </div>
+          <div>
+            <label className="block font-['Inter'] text-sm text-[#9B9B9B] mb-1">Email</label>
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-3 bg-[#2C2C2C] border border-[#3C3C3C] rounded-lg font-['Inter'] text-white focus:outline-none focus:border-[#7A9E7E]" placeholder="you@example.com" required />
+          </div>
+          <div>
+            <label className="block font-['Inter'] text-sm text-[#9B9B9B] mb-1">Password</label>
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full px-4 py-3 bg-[#2C2C2C] border border-[#3C3C3C] rounded-lg font-['Inter'] text-white focus:outline-none focus:border-[#7A9E7E]" placeholder="At least 6 characters" required />
+          </div>
+          <div>
+            <label className="block font-['Inter'] text-sm text-[#9B9B9B] mb-1">Confirm Password</label>
+            <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="w-full px-4 py-3 bg-[#2C2C2C] border border-[#3C3C3C] rounded-lg font-['Inter'] text-white focus:outline-none focus:border-[#7A9E7E]" placeholder="Confirm your password" required />
+          </div>
+          {error && <div className="p-3 bg-red-50 border border-red-200 rounded-lg"><p className="text-sm text-red-600">{error}</p></div>}
+          <button type="submit" disabled={loading} className="w-full py-3.5 bg-[#C4956A] hover:bg-[#B8895E] disabled:opacity-50 rounded-lg font-['Inter'] text-white font-medium">{loading ? 'Creating account...' : 'Create Account'}</button>
+        </form>
+        <p className="mt-6 text-center font-['Inter'] text-sm text-[#9B9B9B]">Already have an account?{' '}<a href="/garden/signin" className="text-[#7A9E7E] hover:text-[#5C8260] font-semibold">Sign in</a></p>
+      </div>
+    </div>
+  );
+}
+
+// ==================== FORGOT PASSWORD PAGE ====================
+const ForgotPasswordPage = () => {
+  const [email, setEmail] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + '/garden/reset-password'
+      });
+      if (error) { setError(error.message); setLoading(false); return; }
+      setSuccess(true);
+    } catch (err: any) { setError(err.message); }
+    setLoading(false);
+  };
+
+  if (success) {
+    return (
+      <div className="min-h-screen bg-[#1C1C1C] flex items-center justify-center p-4">
+        <div className="w-full max-w-md text-center">
+          <div className="w-16 h-16 bg-[#7A9E7E]/20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#7A9E7E" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <h1 className="font-['Fraunces'] text-3xl text-white mb-4">Check your email</h1>
+          <p className="font-['Inter'] text-[#9B9B9B] mb-6">We've sent a password reset link to {email}</p>
+          <a href="/garden/signin" className="inline-block px-6 py-3 bg-[#2C2C2C] hover:bg-[#3C3C3C] rounded-lg font-['Inter'] text-white">Back to Sign In</a>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#1C1C1C] flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <h1 className="font-['Fraunces'] text-4xl text-white mb-2">Reset Password</h1>
+          <p className="font-['Inter'] text-[#9B9B9B]">Enter your email to receive a reset link</p>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block font-['Inter'] text-sm text-[#9B9B9B] mb-1">Email</label>
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-3 bg-[#2C2C2C] border border-[#3C3C3C] rounded-lg font-['Inter'] text-white focus:outline-none focus:border-[#7A9E7E]" placeholder="you@example.com" required />
+          </div>
+          {error && <div className="p-3 bg-red-50 border border-red-200 rounded-lg"><p className="text-sm text-red-600">{error}</p></div>}
+          <button type="submit" disabled={loading} className="w-full py-3.5 bg-[#C4956A] hover:bg-[#B8895E] disabled:opacity-50 rounded-lg font-['Inter'] text-white font-medium">{loading ? 'Sending...' : 'Send Reset Link'}</button>
+        </form>
+        <p className="mt-6 text-center font-['Inter'] text-sm text-[#9B9B9B]"><a href="/garden/signin" className="text-[#7A9E7E] hover:text-[#5C8260] font-semibold">Back to Sign In</a></p>
+      </div>
+    </div>
+  );
+}
+
+// ==================== RESET PASSWORD PAGE ====================
+const ResetPasswordPage = () => {
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.updateUser({ password });
+      if (error) { setError(error.message); setLoading(false); return; }
+      setSuccess(true);
+    } catch (err: any) { setError(err.message); }
+    setLoading(false);
+  };
+
+  if (success) {
+    return (
+      <div className="min-h-screen bg-[#1C1C1C] flex items-center justify-center p-4">
+        <div className="w-full max-w-md text-center">
+          <div className="w-16 h-16 bg-[#7A9E7E]/20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#7A9E7E" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <h1 className="font-['Fraunces'] text-3xl text-white mb-4">Password Updated</h1>
+          <p className="font-['Inter'] text-[#9B9B9B] mb-6">Your password has been successfully reset</p>
+          <a href="/garden/signin" className="inline-block px-6 py-3 bg-[#C4956A] hover:bg-[#B8895E] rounded-lg font-['Inter'] text-white">Sign In</a>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#1C1C1C] flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <h1 className="font-['Fraunces'] text-4xl text-white mb-2">New Password</h1>
+          <p className="font-['Inter'] text-[#9B9B9B]">Enter your new password below</p>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block font-['Inter'] text-sm text-[#9B9B9B] mb-1">New Password</label>
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full px-4 py-3 bg-[#2C2C2C] border border-[#3C3C3C] rounded-lg font-['Inter'] text-white focus:outline-none focus:border-[#7A9E7E]" placeholder="At least 6 characters" required />
+          </div>
+          <div>
+            <label className="block font-['Inter'] text-sm text-[#9B9B9B] mb-1">Confirm New Password</label>
+            <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="w-full px-4 py-3 bg-[#2C2C2C] border border-[#3C3C3C] rounded-lg font-['Inter'] text-white focus:outline-none focus:border-[#7A9E7E]" placeholder="Confirm password" required />
+          </div>
+          {error && <div className="p-3 bg-red-50 border border-red-200 rounded-lg"><p className="text-sm text-red-600">{error}</p></div>}
+          <button type="submit" disabled={loading} className="w-full py-3.5 bg-[#C4956A] hover:bg-[#B8895E] disabled:opacity-50 rounded-lg font-['Inter'] text-white font-medium">{loading ? 'Updating...' : 'Update Password'}</button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// ==================== VERIFY EMAIL PAGE ====================
+const VerifyEmailPage = () => {
+  return (
+    <div className="min-h-screen bg-[#1C1C1C] flex items-center justify-center p-4">
+      <div className="w-full max-w-md text-center">
+        <div className="w-16 h-16 bg-[#7A9E7E]/20 rounded-full flex items-center justify-center mx-auto mb-6">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#7A9E7E" strokeWidth="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
+        </div>
+        <h1 className="font-['Fraunces'] text-3xl text-white mb-4">Check your email</h1>
+        <p className="font-['Inter'] text-[#9B9B9B] mb-6">We've sent you a verification link. Please check your inbox and click the link to verify your email address.</p>
+        <a href="/garden/signin" className="inline-block px-6 py-3 bg-[#2C2C2C] hover:bg-[#3C3C3C] rounded-lg font-['Inter'] text-white">Back to Sign In</a>
+      </div>
+    </div>
+  );
+}
+
+// ==================== DASHBOARD PAGE ====================
+const DashboardPage = () => {
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [posts, setPosts] = useState<any[]>([]);
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        window.location.href = '/garden/signin';
+        return;
+      }
+      setUser(session.user);
+      setLoading(false);
+    };
+    checkUser();
+  }, []);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    window.location.href = '/garden/signin';
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#1C1C1C] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#7A9E7E]"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#1C1C1C]">
+      <nav className="border-b border-[#2C2C2C] px-6 py-4">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
+          <h1 className="font-['Fraunces'] text-2xl text-white">Garden</h1>
+          <div className="flex items-center gap-4">
+            <span className="font-['Inter'] text-sm text-[#9B9B9B]">{user?.email}</span>
+            <button onClick={handleSignOut} className="px-4 py-2 bg-[#2C2C2C] hover:bg-[#3C3C3C] rounded-lg font-['Inter'] text-sm text-white">Sign Out</button>
+          </div>
+        </div>
+      </nav>
+      <main className="max-w-6xl mx-auto p-6">
+        <div className="mb-8">
+          <h2 className="font-['Fraunces'] text-3xl text-white mb-2">Welcome back</h2>
+          <p className="font-['Inter'] text-[#9B9B9B]">Your writing journey continues here</p>
+        </div>
+        <div className="grid gap-6">
+          <div className="bg-[#2C2C2C] rounded-xl p-6 border border-[#3C3C3C]">
+            <h3 className="font-['Fraunces'] text-xl text-white mb-4">Quick Actions</h3>
+            <div className="flex gap-4">
+              <button className="px-4 py-2 bg-[#C4956A] hover:bg-[#B8895E] rounded-lg font-['Inter'] text-white">New Post</button>
+              <button className="px-4 py-2 bg-[#3C3C3C] hover:bg-[#4C4C4C] rounded-lg font-['Inter'] text-white">View Drafts</button>
+            </div>
+          </div>
+          <div className="bg-[#2C2C2C] rounded-xl p-6 border border-[#3C3C3C]">
+            <h3 className="font-['Fraunces'] text-xl text-white mb-4">Recent Posts</h3>
+            {posts.length === 0 ? (
+              <p className="font-['Inter'] text-[#9B9B9B]">No posts yet. Start writing!</p>
+            ) : (
+              <div className="space-y-4">{posts.map((post, i) => (<div key={i} className="p-4 bg-[#1C1C1C] rounded-lg"><h4 className="font-['Inter'] text-white">{post.title}</h4></div>))}</div>
+            )}
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}
+
+// ==================== EXPORTS ====================
+export {
+  // Utilities
+  supabase,
+  LocalStorage,
+  
+  // Authentication Pages
+  SignInPage,
+  SignUpPage,
+  ForgotPasswordPage,
+  ResetPasswordPage,
+  VerifyEmailPage,
+  DashboardPage,
+};

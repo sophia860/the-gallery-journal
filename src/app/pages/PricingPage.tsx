@@ -29,7 +29,7 @@ export function PricingPage() {
     // Show success message
     alert(`Successfully subscribed to ${selectedPlan?.planName}!`);
     // Redirect to dashboard
-    window.location.href = '/my-garden';
+    window.location.href = '/garden/dashboard';
   };
 
   return (

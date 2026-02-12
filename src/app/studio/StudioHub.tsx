@@ -243,7 +243,7 @@ export function StudioHub() {
           
           <div className="grid md:grid-cols-3 gap-6">
             <a
-              href="/studio/my-garden"
+              href="/garden/dashboard"
               className="group p-8 bg-gradient-to-br from-[#8A9A7B]/5 to-white border-2 border-[#8A9A7B] hover:border-[#8A9A7B] hover:shadow-xl rounded-xl transition-all duration-300"
             >
               <Sprout className="w-8 h-8 mb-4 text-[#8A9A7B] group-hover:scale-110 transition-transform" />

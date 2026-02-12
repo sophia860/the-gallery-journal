@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { GardenNav } from '../components/GardenNav';
-import { authService } from '../utils/auth';
+import { useAuth } from '../../contexts/AuthContext';
 import { quietHoursService, QuietHours } from '../utils/quietHours';
 
 export function QuietHoursPage() {
-  const currentUser = authService.getCurrentUser();
+    const { user: currentUser } = useAuth();
   const [settings, setSettings] = useState<QuietHours>(quietHoursService.getQuietHours());
   const [saved, setSaved] = useState(false);
 

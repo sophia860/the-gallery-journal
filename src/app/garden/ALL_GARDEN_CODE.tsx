@@ -615,11 +615,11 @@ export function BookmarksPage() {
 // --- pages/CirclesPage.tsx ---
 import { useState, useEffect } from 'react';
 import { GardenNav } from '../components/GardenNav';
-import { authService } from '../utils/auth';
+import { useAuth } from '../../contexts/AuthContext';
 import { circlesService, Circle } from '../utils/circles';
 
 export function CirclesPage() {
-  const currentUser = authService.getCurrentUser();
+  const { user: currentUser } = useAuth();
   const [circles, setCircles] = useState<Circle[]>([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -1596,11 +1596,11 @@ export function ExplorePage() {
 // --- pages/HarvestPage.tsx ---
 import { useState, useEffect } from 'react';
 import { GardenNav } from '../components/GardenNav';
-import { authService } from '../utils/auth';
+import { useAuth } from '../../contexts/AuthContext';
 import { harvestService, HarvestAnalytics } from '../utils/harvest';
 
 export function HarvestPage() {
-  const currentUser = authService.getCurrentUser();
+  const { user: currentUser } = useAuth();
   const [analytics, setAnalytics] = useState<HarvestAnalytics | null>(null);
 
   useEffect(() => {
@@ -3307,11 +3307,11 @@ export function PromptsPage() {
 // --- pages/QuietHoursPage.tsx ---
 import { useState, useEffect } from 'react';
 import { GardenNav } from '../components/GardenNav';
-import { authService } from '../utils/auth';
+import { useAuth } from '../../contexts/AuthContext';
 import { quietHoursService, QuietHours } from '../utils/quietHours';
 
 export function QuietHoursPage() {
-  const currentUser = authService.getCurrentUser();
+  const { user: currentUser } = useAuth();
   const [settings, setSettings] = useState<QuietHours>(quietHoursService.getQuietHours());
   const [saved, setSaved] = useState(false);
 
@@ -5646,7 +5646,7 @@ export const authService = {
 
   // Update user profile
   updateProfile: (updates: Partial<User>): { success: boolean; user?: User; error?: string } => {
-    const currentUser = authService.getCurrentUser();
+        const currentUser = authService.getCurrentUser();
     if (!currentUser) {
       return { success: false, error: 'Not authenticated' };
     }

@@ -29,9 +29,8 @@ export function NewGardenSignInPage() {
       await signIn(formData.email, formData.password);
       
     console.log('[NewGardenSignInPage] Sign in successful');
-            // Navigate to garden after successful sign in
-      window.history.pushState({}, '', '/garden/dashboard');
-            window.dispatchEvent(new PopStateEvent('popstate'));
+            // Navigate to garden after successful sign in - full reload ensures auth state is ready
+      window.location.href = '/garden/dashboard';
           } catch (err: any) {
       console.error('[NewGardenSignInPage] Sign in error:', err);
       setError(err.message || 'Invalid email or password');

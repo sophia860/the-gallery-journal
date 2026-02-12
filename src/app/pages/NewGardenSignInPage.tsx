@@ -28,33 +28,12 @@ export function NewGardenSignInPage() {
       console.log('[NewGardenSignInPage] Attempting sign in...');
       await signIn(formData.email, formData.password);
       
-      console.log('[NewGardenSignInPage] Sign in successful, checking session...');
-      
-      // Verify session is actually stored before redirecting
-      let attempts = 0;
-      const maxAttempts = 10;
-      
-      while (attempts < maxAttempts) {
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        if (session && session.user) {
-          console.log('[NewGardenSignInPage] Session confirmed, redirecting to garden');
-          // Session is confirmed, use client-side navigation to preserve auth state in memory
-          window.history.pushState({}, '', '/garden');
-          window.dispatchEvent(new PopStateEvent('popstate'));
-          return;
-        }
-        
-        // Wait 100ms before checking again
-        await new Promise(resolve => setTimeout(resolve, 100));
-        attempts++;
-      }
-      
-      // If we get here, session wasn't confirmed but sign-in succeeded
-      console.warn('[NewGardenSignInPage] Session not confirmed in time, redirecting anyway');
-      window.history.pushState({}, '', '/garden');
+    console.log('[NewGardenSignInPage] Sign in successful');
+            // Navigate to garden after successful sign in
+      window.history.pushState({}, '', '/my-garden');
       window.dispatchEvent(new PopStateEvent('popstate'));
-    } catch (err: any) {
+      
+      catch (err: any) {
       console.error('[NewGardenSignInPage] Sign in error:', err);
       setError(err.message || 'Invalid email or password');
       setLoading(false);
@@ -69,7 +48,7 @@ export function NewGardenSignInPage() {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: window.location.origin + '/garden',
+          redirectTo: window.location.origin + '/my-garden',
         }
       });
 
@@ -100,7 +79,7 @@ export function NewGardenSignInPage() {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'github',
         options: {
-          redirectTo: window.location.origin + '/garden',
+          redirectTo: window.location.origin + '/my-garden',
         }
       });
 

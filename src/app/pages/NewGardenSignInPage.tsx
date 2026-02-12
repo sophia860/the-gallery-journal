@@ -30,7 +30,7 @@ export function NewGardenSignInPage() {
       
     console.log('[NewGardenSignInPage] Sign in successful');
             // Navigate to garden after successful sign in
-      window.history.pushState({}, '', '/my-garden');
+      window.history.pushState({}, '', '/garden/dashboard');
             window.dispatchEvent(new PopStateEvent('popstate'));
           } catch (err: any) {
       console.error('[NewGardenSignInPage] Sign in error:', err);
@@ -47,7 +47,7 @@ export function NewGardenSignInPage() {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: window.location.origin + '/my-garden',
+          redirectTo: window.location.origin + '/garden/dashboard',
         }
       });
 
@@ -78,7 +78,7 @@ export function NewGardenSignInPage() {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'github',
         options: {
-          redirectTo: window.location.origin + '/my-garden',
+          redirectTo: window.location.origin + '/garden/dashboard',
         }
       });
 

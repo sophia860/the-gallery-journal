@@ -136,7 +136,7 @@ export function WritingEditorPage({ writingId }: WritingEditorPageProps) {
           user_id: user.id,
         });
         if (newWriting) {
-          window.location.href = `/my-garden`;
+          window.location.href = `/garden/dashboard`;
         }
       }
 
@@ -150,7 +150,7 @@ export function WritingEditorPage({ writingId }: WritingEditorPageProps) {
 
   const handlePlant = async () => {
     await handleSave();
-    window.location.href = '/my-garden';
+    window.location.href = '/garden/dashboard';
   };
 
   const addTag = () => {
@@ -431,7 +431,7 @@ export function WritingEditorPage({ writingId }: WritingEditorPageProps) {
                 Focus Mode
               </button>
               <a
-                href="/my-garden"
+                href="/garden/dashboard"
                 className="px-4 py-2 border-2 border-[rgba(139,157,195,0.3)] text-[#c8cad8] hover:bg-[rgba(96,165,250,0.1)] hover:border-[#60a5fa] transition-all font-['Inter'] text-sm font-semibold rounded-lg"
               >
                 Cancel

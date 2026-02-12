@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { GardenNav } from '../components/GardenNav';
-import { authService } from '../utils/auth';
+import { useAuth } from '../../contexts/AuthContext';
 import { harvestService, HarvestAnalytics } from '../utils/harvest';
 
 export function HarvestPage() {
-  const currentUser = authService.getCurrentUser();
+    const { user: currentUser } = useAuth();
   const [analytics, setAnalytics] = useState<HarvestAnalytics | null>(null);
 
   useEffect(() => {

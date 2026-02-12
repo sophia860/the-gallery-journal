@@ -66,7 +66,7 @@ export function GardenSignUpPage() {
       );
 
       // Redirect to garden
-      window.location.href = '/my-garden';
+      window.location.href = '/garden/dashboard';
     } catch (err: any) {
       setError(err.message || 'Failed to create account');
     } finally {

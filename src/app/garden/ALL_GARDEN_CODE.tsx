@@ -6647,8 +6647,7 @@ export function NewGardenSignInPage() {
     setLoading(true);
     try {
       await signIn(formData.email, formData.password);
-      window.history.pushState({}, '', '/garden/dashboard');
-      window.dispatchEvent(new PopStateEvent('popstate'));
+            window.location.href = '/garden/dashboard';
     } catch (err: any) {
       setError(err.message || 'Invalid email or password');
       setLoading(false);

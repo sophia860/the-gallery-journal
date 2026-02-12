@@ -127,7 +127,7 @@ function Router() {
 
   // NEW Garden routes (Main Navigation)
   if (route === '/my-garden') {
-    return <MyGardenPage />;
+    return <DashboardPage />;
   }
 
   if (route === '/garden/signin') {

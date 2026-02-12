@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { GardenNav } from '../components/GardenNav';
-import { authService } from '../utils/auth';
+import { useAuth } from '../../contexts/AuthContext';
 import { circlesService, Circle } from '../utils/circles';
 
 export function CirclesPage() {
-  const currentUser = authService.getCurrentUser();
+    const { user: currentUser } = useAuth();
   const [circles, setCircles] = useState<Circle[]>([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [formData, setFormData] = useState({
